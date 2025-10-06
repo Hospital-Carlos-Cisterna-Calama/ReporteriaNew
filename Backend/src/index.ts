@@ -1,13 +1,13 @@
 import 'dotenv/config';
 import app from './app';
-import { initDatabaseTrazaFactura } from './config/databaseTrazaFactura';
+import { initDatabase } from './config/databaseEnti';
 
 const PORT = Number(process.env.PORT) || 3002;
 
 (async () => {
   try {
     // Sincronizar base de datos
-    await initDatabaseTrazaFactura('connect'); // Cambia este parámetro según necesites
+    await initDatabase('connect'); // Cambia este parámetro según necesites
 
     app.listen(PORT, () => {
       console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
