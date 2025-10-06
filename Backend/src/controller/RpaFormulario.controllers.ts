@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import createError from 'http-errors';
 import { RpaFormularioService } from '../service/RpaFormulario.service';
 
 const RpaFormulario = new RpaFormularioService();
@@ -7,14 +6,12 @@ const RpaFormulario = new RpaFormularioService();
 export class RpaFormularioController {
   static async findReportUrgencias(req: Request, res: Response, next: NextFunction) {
     try {
-      const fechaInicioStr = req.params.fechaInicio;
-      const fechaTerminoStr = req.params.fechaTermino;
-      const tipoFormulario = req.params.tipoFormulario;
+      const fechaInicio = req.body.fechaInicio;
+      const fechaTermino = req.body.fechaTermino;
+      const box = req.body.box;
+      const tipoFormu = req.body.tipoFormu;
 
-      const fechaInicio = new Date(fechaInicioStr);
-      const fechaTermino = new Date(fechaTerminoStr);
-
-      const results = await RpaFormulario.getInformeUrgencia(fechaInicio, fechaTermino, tipoFormulario, 'M');
+      const results = await RpaFormulario.getInformeUrgencia(fechaInicio, fechaTermino, tipoFormu, box);
       res.json(results);
     } catch (error) {
       next(error);

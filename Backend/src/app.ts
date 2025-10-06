@@ -23,7 +23,9 @@ app.use(express.json());
 app.use(morgan('dev'));
 // ← Descomenta si tus rutas deben ir protegidas
 
-app.use('/api', validateToken, reporteriaRouter);
+//app.use('/api', validateToken, reporteriaRouter); DESCOMENTAR LA RUTA PROTEGIDA
+
+app.use('/api', reporteriaRouter);
 
 /* ─ Ruta raíz ─ */
 app.get('/', (_req, res) => {

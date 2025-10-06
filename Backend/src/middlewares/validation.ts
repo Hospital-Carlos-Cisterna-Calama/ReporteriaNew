@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { ObjectSchema } from 'joi';
-import { ticketSearchSchema } from '../schemas/Tickets/validation-schemas';
 import Joi from 'joi';
 
 export const validateSchema = (schema: ObjectSchema) => {
@@ -29,15 +28,6 @@ export const validateParamSchema = (schema: ObjectSchema) => {
     }
     next();
   };
-};
-
-export const validateSearchQuery = (req: Request, res: Response, next: NextFunction) => {
-  const { error } = ticketSearchSchema.validate(req.query);
-  if (error) {
-    res.status(400).json({ error: error.details[0].message });
-    return;
-  }
-  next();
 };
 
 /* ────────── NUEVO: query-string ────────── */

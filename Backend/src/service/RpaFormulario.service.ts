@@ -1,5 +1,6 @@
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../config/databaseEnti'
+import { sequelize } from '../config/databaseEnti';
+import { log } from 'console';
 
 export interface InformeUrgenciaRow {
   formulario: string;
@@ -30,26 +31,26 @@ export interface InformeUrgenciaRow {
   Destino: string | null;
 }
 
-function atStartOfDay(d: Date) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-
-function atEndOfDay(d: Date) {
-  const x = new Date(d);
-  x.setHours(23, 59, 59, 997);
-  return x;
-}
-
 export class RpaFormularioService {
-  async getInformeUrgencia(fechaInicio: Date,fechaFin: Date,tipoFormu: string,box: 'M' | 'U' | string ): Promise<InformeUrgenciaRow[]> {
+  private toSqlDate121(dateLike: string, endOfDay = false): string {
+    // Espera 'YYYY-MM-DD' o 'YYYY-MM-DD HH:mm:ss[.fff]'
+    // Si viene solo la fecha, agrega hora inicio / fin.
+    const hasTime = /\d{2}:\d{2}/.test(dateLike);
+    if (hasTime) return dateLike.replace('T', ' '); // por si viniera con 'T'
+    // armamos HH:mm:ss.mmm fijos
+    return endOfDay ? `${dateLike} 23:59:59.997` : `${dateLike} 00:00:00.000`;
+  }
 
-    const fIni = atStartOfDay(fechaInicio);
-    const fFin = atEndOfDay(fechaFin);
-    const sql = `EXEC [BD_ENTI_CORPORATIVA].dbo.REPORTERIA_GetInformeUrgencia @FechaInicio= :fechaInicio, @FechaFin= :fechaFin,@tipoFormu= :tipoFormu,@box= :box`;
-    const rows = await sequelize.query<InformeUrgenciaRow>(sql, {type: QueryTypes.SELECT,replacements:{fechaInicio: fIni ,fechaFin: fFin ,tipoFormu , box}});
+  async getInformeUrgencia(fechaInicio: string, fechaFin: string, tipoFormu: String, box: 'M' | 'U' | string): Promise<InformeUrgenciaRow[]> {
+    const fechaInicio121 = this.toSqlDate121(fechaInicio, false);
+    const fechaFin121 = this.toSqlDate121(fechaFin, true);
+
+    log(fechaInicio121, fechaFin121, tipoFormu, box);
+    const sql = `EXEC REPORTERIA_GetInformeUrgencia @FechaInicio= :fechaInicio, @FechaFin= :fechaFin,@tipoFormu= :tipoFormu,@box= :box`;
+    const rows = await sequelize.query<InformeUrgenciaRow>(sql, {
+      type: QueryTypes.SELECT,
+      replacements: { fechaInicio: fechaInicio121, fechaFin: fechaFin121, tipoFormu: tipoFormu, box },
+    });
     return rows;
-
   }
 }
