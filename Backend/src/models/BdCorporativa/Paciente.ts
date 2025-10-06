@@ -11,6 +11,10 @@ export class Paciente extends Model<Paciente> {
   declare PAC_PAC_Numero: number;
 
   @AllowNull(false)
+  @Column(DataType.CHAR(10))
+  declare PAC_PAC_Rut: string;
+
+  @AllowNull(false)
   @Column(DataType.CHAR(20))
   declare PAC_PAC_ApellPater: string;
 
@@ -24,7 +28,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(true)
   @Column(DataType.DATE)
-  declare PAC_PAC_FecNacim: Date;
+  declare PAC_PAC_FechaNacim: Date;
 
   @AllowNull(false)
   @Column(DataType.CHAR(40))
@@ -48,7 +52,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(false)
   @Column(DataType.CHAR(30))
-  declare PAC_PAC_CiudadHabit: string;
+  declare PAC_PAC_CiudaHabit: string;
 
   @AllowNull(false)
   @Column(DataType.CHAR(20))
@@ -76,7 +80,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(false)
   @Column(DataType.CHAR(20))
-  declare PAC_PAC_CiudadTempo: string;
+  declare PAC_PAC_CiudaTempo: string;
 
   @AllowNull(false)
   @Column(DataType.CHAR(20))
@@ -164,7 +168,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(false)
   @Column(DataType.STRING(100))
-  declare PAC_PAC_DireccionGral: string;
+  declare PAC_PAC_DireccionGralHabit: string;
 
   @AllowNull(false)
   @Column(DataType.STRING(20))
@@ -172,7 +176,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(false)
   @Column(DataType.CHAR(8))
-  declare PAC_PAC_CodigIsht: string;
+  declare PAC_PAC_CodigInsti: string;
 
   @AllowNull(false)
   @Column(DataType.STRING(8))
@@ -232,7 +236,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(false)
   @Column(DataType.STRING(25))
-  declare PAC_PAC_CorreoExtens: string;
+  declare PAC_PAC_CorreoExtension: string;
 
   @AllowNull(false)
   @Column(DataType.STRING(1))
@@ -240,7 +244,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(false)
   @Column(DataType.STRING(4))
-  declare PAC_PAC_MotPacSini: string;
+  declare PAC_PAC_MotPacSinRut: string;
 
   @AllowNull(false)
   @Column(DataType.BIGINT)
@@ -248,7 +252,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(false)
   @Column(DataType.STRING(2))
-  declare PAC_PAC_Nivellnstruc: string;
+  declare PAC_PAC_NivelInstruccion: string;
 
   @AllowNull(false)
   @Column(DataType.STRING(2))
@@ -268,7 +272,7 @@ export class Paciente extends Model<Paciente> {
 
   @AllowNull(true)
   @Column(DataType.INTEGER)
-  declare PAC_PAC_IdentidadGener: number;
+  declare PAC_PAC_IdentidadGenero: number;
 
   @AllowNull(false)
   @Column(DataType.STRING(10))
