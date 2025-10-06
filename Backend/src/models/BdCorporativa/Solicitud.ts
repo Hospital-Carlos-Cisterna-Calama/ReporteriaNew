@@ -2,14 +2,15 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
 
 @Table({
   tableName: 'PAB_Solicitud',
+  schema: 'dbo',
   timestamps: false,
 })
 export class Solicitud extends Model<Solicitud> {
-  @PrimaryKey
   @AllowNull(true)
   @Column(DataType.FLOAT)
   declare PAC_PAC_Numero: number;
 
+  @PrimaryKey
   @AllowNull(false)
   @Column(DataType.STRING(10))
   declare PAB_SOL_Numero: string;
@@ -27,24 +28,24 @@ export class Solicitud extends Model<Solicitud> {
   declare SER_OBJ_Codigo: string;
 
   @AllowNull(true)
-  @Column(DataType.DATE())
+  @Column(DataType.DATE)
   declare PAB_SOL_FechaSolicit: Date;
 
   @AllowNull(false)
-  @Column(DataType.CHAR(5))
-  declare PAB_SOL_HoraSolicit: String;
+  @Column(DataType.STRING(5))
+  declare PAB_SOL_HoraSolicit: string;
 
   @AllowNull(true)
-  @Column(DataType.DATE())
+  @Column(DataType.DATE)
   declare PAB_SOL_FechaInterv: Date;
 
   @AllowNull(false)
-  @Column(DataType.CHAR(5))
-  declare PAB_SOL_HoraInterv: String;
+  @Column(DataType.STRING(5))
+  declare PAB_SOL_HoraInterv: string;
 
   @AllowNull(true)
-  @Column(DataType.SMALLINT())
-  declare PAB_SOL_Duracion: string;
+  @Column(DataType.SMALLINT)
+  declare PAB_SOL_Duracion: number;
 
   @AllowNull(false)
   @Column(DataType.CHAR(4))
@@ -68,7 +69,7 @@ export class Solicitud extends Model<Solicitud> {
 
   @AllowNull(false)
   @Column(DataType.CHAR(8))
-  declare PAB_SOL_Hemodev: string;
+  declare PAB_SOL_Hemoderv: string;
 
   @AllowNull(false)
   @Column(DataType.CHAR(4))
@@ -99,7 +100,7 @@ export class Solicitud extends Model<Solicitud> {
   declare ATC_EST_Numero: number;
 
   @AllowNull(false)
-  @Column(DataType.CHAR(4))
+  @Column(DataType.STRING(4))
   declare PAB_SOL_EstPreop: string;
 
   @AllowNull(false)
@@ -131,11 +132,11 @@ export class Solicitud extends Model<Solicitud> {
   declare PAB_SOL_Intervencion: string;
 
   @AllowNull(false)
-  @Column(DataType.STRING(20))
+  @Column(DataType.CHAR(20))
   declare PAB_SOL_CiruVisi: string;
 
   @AllowNull(false)
-  @Column(DataType.CHAR(4))
+  @Column(DataType.STRING(4))
   declare PAB_SOL_Ambito: string;
 
   @AllowNull(false)
@@ -143,11 +144,11 @@ export class Solicitud extends Model<Solicitud> {
   declare PAB_SOL_SerPapa: string;
 
   @AllowNull(false)
-  @Column(DataType.CHAR(4))
+  @Column(DataType.CHAR(1))
   declare PAB_SOL_Compleja: string;
 
   @AllowNull(false)
-  @Column(DataType.CHAR(1))
+  @Column(DataType.CHAR(4))
   declare PAB_SOL_TipoCiru: string;
 
   @AllowNull(false)
@@ -156,11 +157,11 @@ export class Solicitud extends Model<Solicitud> {
 
   @AllowNull(true)
   @Column(DataType.TINYINT)
-  declare PAB_SOL_BiopsiaSINO: number;
+  declare PAB_SOL_BiopsiaSiNo: number;
 
   @AllowNull(false)
   @Column(DataType.CHAR(8))
-  declare PAB_SOL_AutorizHab: string;
+  declare PAB_SOL_AutorizaHora: string;
 
   @AllowNull(false)
   @Column(DataType.STRING(250))
@@ -176,7 +177,7 @@ export class Solicitud extends Model<Solicitud> {
 
   @AllowNull(true)
   @Column(DataType.DATE)
-  declare PAB_SOL_Fechanld: Date;
+  declare PAB_SOL_FechaInd: Date;
 
   @AllowNull(false)
   @Column(DataType.STRING(8))
@@ -214,7 +215,7 @@ export class Solicitud extends Model<Solicitud> {
   @Column(DataType.STRING(1))
   declare PAB_SOL_RegHospi: string;
 
-  @AllowNull(true)
+  @AllowNull(false)
   @Column(DataType.STRING(1))
   declare PAB_SOL_TurnoUrg: string;
 
@@ -260,7 +261,7 @@ export class Solicitud extends Model<Solicitud> {
 
   @AllowNull(true)
   @Column(DataType.BIGINT)
-  declare PAB_ID_ListaEspera: bigint;
+  declare PAB_ID_ListaEspera: number;
 
   @AllowNull(false)
   @Column(DataType.STRING(5))
