@@ -2,7 +2,6 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
 
 @Table({
   tableName: 'PAB_Solicitud',
-  schema: 'dbo',
   timestamps: false,
 })
 export class Solicitud extends Model<Solicitud> {

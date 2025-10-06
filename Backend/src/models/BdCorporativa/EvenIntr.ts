@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
 
 @Table({
   tableName: 'PAB_EvenIntr',
-  schema: 'dbo',
+  timestamps: false,
 })
 export class EventIntr extends Model<EventIntr> {
   @PrimaryKey
