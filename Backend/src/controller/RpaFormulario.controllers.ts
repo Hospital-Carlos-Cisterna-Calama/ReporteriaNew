@@ -2,25 +2,19 @@ import { Request, Response, NextFunction } from 'express';
 import { RpaFormularioService } from '../service/RpaFormulario.service';
 import { InformeUrgenciaRow, UrgenciaDoceHoraFila, UrgenciaHospOrPabFila, UrgenciaIrasFila } from '../interfaces/RpaFormularario.interface';
 import ExcelJS from 'exceljs';
-import { buildSheet, sendWorkbook } from '../utils/excel';
+import { buildSheet, sendOneSheetStream, sendWorkbook } from '../utils/excel';
 const RpaFormulario = new RpaFormularioService();
-
-// Utilidad: detectar si el usuario pidió Excel
-function wantsXlsx(req: Request) {
-  return req.query.xlsx === '1' || req.body?.xlsx === true || req.headers.accept?.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-}
 
 export class RpaFormularioController {
   static async reporteUrgencia(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino, box } = req.body;
+      const { fechaInicio, fechaTermino, box } = req.params;
 
       const results = await RpaFormulario.ObtenerUrgencia(fechaInicio, fechaTermino, box);
-      if (!wantsXlsx(req)) return res.json(results);
 
-      const wb = new ExcelJS.Workbook();
-      await buildSheet<InformeUrgenciaRow>(
-        wb,
+      await sendOneSheetStream<InformeUrgenciaRow>(
+        res,
+        `InformeUrgencia_${fechaInicio}_a_${fechaTermino}.xlsx`,
         'Informe Urgencia',
         [
           { header: 'Formulario', key: 'formulario' },
@@ -53,10 +47,12 @@ export class RpaFormularioController {
         results,
         {
           dateKeys: ['admision', 'FechaCat', 'FechaIngreso', 'FechaEgreso', 'PAC_PAC_FechaNacim'],
+          wrapKeys: ['diag', 'trat', 'Direccion', 'Beneficio', 'Destino', 'MedicoIngreso', 'NomMedico'],
+          // borders: true,  // ⚠️ activa con cautela en datasets enormes
+          // headerColorArgb: 'FF4F46E5',
+          // columnWidths: { diag: 40, trat: 35, Direccion: 30 }, // opcional
         }
       );
-
-      await sendWorkbook(res, wb, `InformeUrgencia_${fechaInicio}_a_${fechaTermino}.xlsx`);
     } catch (error) {
       next(error);
     }
@@ -64,10 +60,9 @@ export class RpaFormularioController {
 
   static async reporteUrgenciaDoceHoras(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino } = req.body;
+      const { fechaInicio, fechaTermino } = req.params;
 
       const results = await RpaFormulario.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
-      if (!wantsXlsx(req)) return res.json(results);
 
       const wb = new ExcelJS.Workbook();
       await buildSheet<UrgenciaDoceHoraFila>(
@@ -103,9 +98,8 @@ export class RpaFormularioController {
 
   static async reporteUrgenciaCategorizaciones(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fecha } = req.body;
+      const { fecha } = req.params;
       const results = await RpaFormulario.ObtenerCategorizadores(fecha);
-      if (!wantsXlsx(req)) return res.json(results);
 
       const wb = new ExcelJS.Workbook();
       // Reutilizo columnas de 12h porque dijiste que devuelve UrgenciaDoceHoraFila
@@ -135,16 +129,13 @@ export class RpaFormularioController {
 
   static async reporteUrgenciaHospitalizado(req: Request, res: Response, next: NextFunction) {
     try {
-      const fechaInicio = req.body.fechaInicio;
-      const fechaTermino = req.body.fechaTermino;
-      const tipo = req.body.box;
+      const { fechaInicio, fechaTermino, box } = req.params;
 
-      const results = await RpaFormulario.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
-      if (!wantsXlsx(req)) return res.json(results);
+      const results = await RpaFormulario.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, box);
 
       const wb = new ExcelJS.Workbook();
 
-      if (tipo === 'H') {
+      if (box === 'H') {
         // UrgenciaHospitalizadoFila
         await buildSheet<UrgenciaHospOrPabFila>(
           wb,
@@ -189,7 +180,7 @@ export class RpaFormularioController {
         );
       }
 
-      await sendWorkbook(res, wb, `Urg_${tipo === 'H' ? 'Hospitalizado' : 'Pabellon'}_${fechaInicio}_a_${fechaTermino}.xlsx`);
+      await sendWorkbook(res, wb, `Urg_${box === 'H' ? 'Hospitalizado' : 'Pabellon'}_${fechaInicio}_a_${fechaTermino}.xlsx`);
     } catch (error) {
       next(error);
     }
@@ -197,12 +188,9 @@ export class RpaFormularioController {
 
   static async reporteIras(req: Request, res: Response, next: NextFunction) {
     try {
-      const fechaInicio = req.body.fechaInicio;
-      const fechaTermino = req.body.fechaTermino;
-      const tipo = req.body.box;
+      const { fechaInicio, fechaTermino, box } = req.params;
 
-      const results = await RpaFormulario.ObtenerInformeIras(fechaInicio, fechaTermino, tipo);
-      if (!wantsXlsx(req)) return res.json(results);
+      const results = await RpaFormulario.ObtenerInformeIras(fechaInicio, fechaTermino, box);
 
       const wb = new ExcelJS.Workbook();
       await buildSheet<UrgenciaIrasFila>(
@@ -220,7 +208,7 @@ export class RpaFormularioController {
         { dateKeys: ['Fecha_Admision'] }
       );
 
-      await sendWorkbook(res, wb, `IRAS_${tipo}_${fechaInicio}_a_${fechaTermino}.xlsx`);
+      await sendWorkbook(res, wb, `IRAS_${box}_${fechaInicio}_a_${fechaTermino}.xlsx`);
     } catch (error) {
       next(error);
     }

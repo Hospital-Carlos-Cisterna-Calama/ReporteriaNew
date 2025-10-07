@@ -6,10 +6,10 @@ import { RpaFormularioController } from '../../controller/RpaFormulario.controll
 
 const reporteriaRouter = Router();
 
-reporteriaRouter.post('/infor', asyncHandler(RpaFormularioController.reporteUrgencia));
-reporteriaRouter.post('/horas', asyncHandler(RpaFormularioController.reporteUrgenciaDoceHoras));
-reporteriaRouter.post('/cat', asyncHandler(RpaFormularioController.reporteUrgenciaCategorizaciones));
-reporteriaRouter.post('/hosp', asyncHandler(RpaFormularioController.reporteUrgenciaHospitalizado));
-reporteriaRouter.post('/iras', asyncHandler(RpaFormularioController.reporteIras));
+reporteriaRouter.get('/infor/:fechaInicio/:fechaTermino/:box', asyncHandler(RpaFormularioController.reporteUrgencia));
+reporteriaRouter.get('/horas/:fechaInicio/:fechaTermino', asyncHandler(RpaFormularioController.reporteUrgenciaDoceHoras));
+reporteriaRouter.get('/cat/:fecha', asyncHandler(RpaFormularioController.reporteUrgenciaCategorizaciones));
+reporteriaRouter.get('/hosp/:fechaInicio/:fechaTermino/:box', asyncHandler(RpaFormularioController.reporteUrgenciaHospitalizado));
+reporteriaRouter.get('/iras/:fechaInicio/:fechaTermino/:box', asyncHandler(RpaFormularioController.reporteIras));
 
 export default reporteriaRouter;
