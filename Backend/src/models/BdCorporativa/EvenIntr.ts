@@ -2,9 +2,9 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
 
 @Table({
   tableName: 'PAB_EvenIntr',
-  schema: 'dbo',
+  timestamps: false,
 })
-export class EventoIntraoperatorio extends Model<EventoIntraoperatorio> {
+export class EventIntr extends Model<EventIntr> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(10))
