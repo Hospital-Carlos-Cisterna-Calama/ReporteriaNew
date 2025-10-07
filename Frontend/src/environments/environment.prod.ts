@@ -1,0 +1,12 @@
+export const environment = {
+  production: true,
+  systemName: 'TURNOS',
+  apiBaseUrl: '/api',
+  loginApiUrl: '/login-api', // Ajusta a la ruta real del servicio de autenticación en producción
+  appVersion: '1.0.0',
+  pacienteSelectionTtlMs: 30 * 60 * 1000,
+  pacienteSelectionStorageKey: 'turnos.paciente.seleccion',
+  catalogoWarmup: true,
+  apiRequestTimeoutMs: 15_000,
+  registrarAccessGraceMs: 5 * 60 * 1000
+};
