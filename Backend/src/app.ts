@@ -25,7 +25,7 @@ app.use(morgan('dev'));
 
 //app.use('/api', validateToken, reporteriaRouter); DESCOMENTAR LA RUTA PROTEGIDA
 
-app.use('/api', reporteriaRouter);
+app.use('/api/reporteria', reporteriaRouter);
 
 /* ─ Ruta raíz ─ */
 app.get('/', (_req, res) => {

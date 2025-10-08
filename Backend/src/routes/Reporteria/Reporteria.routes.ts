@@ -6,10 +6,11 @@ import { RpaFormularioController } from '../../controller/RpaFormulario.controll
 
 const reporteriaRouter = Router();
 
-/* ---------- CRUD ---------- */
-reporteriaRouter.post('/urgencias-infor', validateSchema(ValidarDataUrgenciaSchema), asyncHandler(RpaFormularioController.reporteUrgencia));
-reporteriaRouter.post('/urgencias-horas', validateSchema(ValidarDataUrgenciaSchema), asyncHandler(RpaFormularioController.reporteUrgenciaDoceHoras));
-reporteriaRouter.post('/urgencias-cat', validateSchema(ValidarFechaUrgenciaSchema), asyncHandler(RpaFormularioController.reporteUrgenciaCategorizaciones));
-reporteriaRouter.post('/urgencias-hosp', validateSchema(ValidarDataUrgenciaSchema), asyncHandler(RpaFormularioController.reporteUrgenciaHospitalizado));
-reporteriaRouter.post('/urgencias-iras', validateSchema(ValidarDataUrgenciaSchema), asyncHandler(RpaFormularioController.reporteIras));
+reporteriaRouter.get('/infor/:fechaInicio/:fechaTermino/:tipo', asyncHandler(RpaFormularioController.reporteUrgencia));
+reporteriaRouter.get('/horas/:fechaInicio/:fechaTermino', asyncHandler(RpaFormularioController.reporteUrgenciaDoceHoras));
+reporteriaRouter.get('/cat/:fecha', asyncHandler(RpaFormularioController.reporteUrgenciaCategorizaciones));
+reporteriaRouter.get('/hosp/:fechaInicio/:fechaTermino/:tipo', asyncHandler(RpaFormularioController.reporteUrgenciaHospitalizado));
+reporteriaRouter.get('/iras/:fechaInicio/:fechaTermino/:tipo', asyncHandler(RpaFormularioController.reporteIras));
+
 export default reporteriaRouter;
+1;

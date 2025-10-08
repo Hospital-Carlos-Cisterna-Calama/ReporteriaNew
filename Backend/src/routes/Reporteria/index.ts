@@ -5,6 +5,6 @@ import reporteriaRouter from './Reporteria.routes';
 const router = Router();
 
 // ▸ /api/reporteria/*
-router.use('/reporteria', reporteriaRouter);
+router.use('/urgencia', reporteriaRouter);
 
 export default router;

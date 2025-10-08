@@ -49,7 +49,7 @@ export interface UrgDoceHorasRow {
   rut_profesional: string | null;
 }
 
-export interface ResultadoFila {
+export interface UrgenciaDoceHoraFila {
   Rut: string | null;
   Nombre: string | null;
   Edad: number | null;
@@ -68,7 +68,7 @@ export interface ResultadoFila {
   // fecha_siclople_evolucion?: string | null;
 }
 
-export interface InformeUrgenciaRow {
+export interface InformeUrgenciaFila {
   formulario: string;
   tipo_folio: 'Maternal' | 'Urgencias';
   Sector: string;
@@ -96,5 +96,41 @@ export interface InformeUrgenciaRow {
   Vigente: string;
   Destino: string | null;
 }
+// reporteria.types.ts
+export interface UrgenciaIrasFila {
+  Fecha_Admision: string; // datetime como string (formateo lo haces arriba)
+  Rut_Paciente: string;
+  Nombre_Paciente: string;
+  Sexo: 'M' | 'F' | string;
+  Edad: number;
+  Diagnostico: string | null; // normalizado (sin tilde)
+}
+
+export interface UrgenciaBaseFila {
+  diag: string | null; // STUFF(...), puede venir vacío
+  rut: string; // PAC_PAC_Rut
+  paciente: string; // Nombre + Apellidos
+  PAC_PAC_Sexo: string; // 'M' | 'F' | otros
+  edad: number | null; // CAST(DATEDIFF(...) AS INT)
+  prevision: Prevision; // case F/P/C/else
+  Beneficio: string | null; // PAC_PAC_TipoBenef
+}
+export interface UrgenciaPabellonFila extends UrgenciaBaseFila {
+  Ingreso_Urg: Date | string; // f.RPA_FOR_FechaDigit (datetime)
+  Egreso_Urg: string | null; // d.RPA_FDA_HoraEgreso (suele ser varchar/hora)
+  Ingreso_Pabe: Date | string; // e.ATC_EST_FechaHospi (datetime)
+  destino: 'Pabellon'; // literal del SELECT
+}
+export interface UrgenciaHospitalizadoFila extends UrgenciaBaseFila {
+  PAC_PAC_Numero: number; // clave paciente
+  fecha: Date | string; // f.RPA_FOR_FechaDigit (alias fecha)
+  egreso_Urgencias: string | null; // d.RPA_FDA_HoraEgreso
+  Ingreso_Hospitalizado: Date | string; // e.ATC_EST_FechaHospi
+  TAB_DescripcionPiso: string | null; // u.TAB_DescripcionPiso
+}
+
+export type Prevision = 'Fonasa' | 'Particular' | 'Convenio' | 'No Informado';
+// Unión para el método
+export type UrgenciaHospPabllFila = UrgenciaPabellonRow | UrgenciaHospitalizadoRow;
 
 export type IRpaFormularioCreationAttributes = IRpaFormularioAttributes;
