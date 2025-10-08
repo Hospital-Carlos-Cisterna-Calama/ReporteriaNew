@@ -1,18 +1,30 @@
 import {  Component, HostListener, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, Home, Activity, Pill, FileText, HelpCircle, UserRound, Menu, X, ClipboardList } from 'lucide-angular';
 import { AppIconComponent } from "../ui/app-icon/app-icon.component";
 import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, AppIconComponent,LucideAngularModule],
+  imports: [RouterLink, RouterLinkActive, AppIconComponent, LucideAngularModule],
   templateUrl: './header.component.html',
-
 })
 export class HeaderComponent {
   private readonly authService = inject(AuthService);
+
+  // Iconos de Lucide
+  readonly icons = {
+    Home,
+    Activity,
+    Pill,
+    FileText,
+    HelpCircle,
+    UserRound,
+    Menu,
+    X,
+    ClipboardList
+  };
 
   // #region State
   mobileOpen = false;

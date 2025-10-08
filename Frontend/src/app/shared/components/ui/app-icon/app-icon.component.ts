@@ -2,8 +2,8 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 
 /**
  * AppIconComponent
- * Icono unificado del sistema Turnos Médicos: combina un calendario simplificado
- * con una cruz médica al centro representando la gestión y entrega de turnos.
+ * Icono unificado del sistema de Reportería: combina documentos con gráficos
+ * representando la generación y análisis de reportes hospitalarios.
  */
 @Component({
   selector: 'app-icon',
@@ -18,7 +18,7 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
     >
       <!-- SVG accesible -->
       <svg
-        class="w-[60%] h-[60%]"
+        class="w-[65%] h-[65%]"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -27,17 +27,17 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
         stroke-linejoin="round"
         aria-hidden="true"
       >
-        <!-- Calendario base -->
-        <rect x="3" y="5" width="18" height="16" rx="2" ry="2" class="opacity-90" />
-        <line x1="16" y1="3" x2="16" y2="7" />
-        <line x1="8" y1="3" x2="8" y2="7" />
-        <line x1="3" y1="11" x2="21" y2="11" />
-        <!-- Cruz médica estilizada (entrega / asistencia) -->
-        <path d="M12 14v-2m0 0v-2m0 2h2m-2 0h-2" stroke-width="2.4" />
+        <!-- Documento base -->
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" class="opacity-90" />
+        <polyline points="14 2 14 8 20 8" />
+        <!-- Gráfico de barras/reportes -->
+        <line x1="8" y1="18" x2="8" y2="14" stroke-width="2.2" />
+        <line x1="12" y1="18" x2="12" y2="12" stroke-width="2.2" />
+        <line x1="16" y1="18" x2="16" y2="15" stroke-width="2.2" />
       </svg>
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class AppIconComponent {
   /** Tamaños soportados */
@@ -45,7 +45,7 @@ export class AppIconComponent {
   /** Mostrar sombra externa */
   @Input() shadow = true;
   /** Etiqueta accesible opcional */
-  @Input() ariaLabel = 'Icono Turnos Médicos';
+  @Input() ariaLabel = 'Icono Sistema de Reportería';
 
   get sizeClass(): string {
     switch (this.size) {
