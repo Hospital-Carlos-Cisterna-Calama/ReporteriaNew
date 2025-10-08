@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { LucideAngularModule, FileText, Clock, Building, TrendingUp, LucideIconData } from 'lucide-angular';
 import { SidebarComponent, SidebarItem } from '../../../shared/components/sidebar/sidebar.component';
+import { ModalResultadoComponent, type ConfiguracionModal } from '../../../shared/components/ui';
 import type { ReporteUrgeciaHosQuery, ReporteUrgenciaDoceHorasQuery, ReporteUrgenciaQuery, ReporteUrgIrasQuery, ResporteUrgeciaCatQuery } from '../../interfaces/dto.interface';
 
 import {
@@ -19,7 +20,8 @@ import { UrgenciaService } from '@app/urgencia/services/urgencia.service';
     SidebarComponent,
     LucideAngularModule,
     FiltrosReporteComponent,
-    EstadoVacioComponent
+    EstadoVacioComponent,
+    ModalResultadoComponent
   ],
   templateUrl: './urgencia-page.component.html',
 })
@@ -38,8 +40,14 @@ export class UrgenciaPageComponent {
   // Estado del sidebar
   sidebarAbierto = signal(true);
 
-  // Estado de carga
+  // Estado de carga y modal
   cargandoReporte = signal(false);
+  mostrarModal = signal(false);
+  configuracionModal = signal<ConfiguracionModal>({
+    tipo: 'info',
+    titulo: '',
+    mensaje: ''
+  });
 
   // Opciones de reportes
   readonly reportes = signal<SidebarItem[]>([
@@ -309,15 +317,25 @@ export class UrgenciaPageComponent {
   }
 
   private mostrarExito(mensaje: string) {
-    // TODO: Implementar notificación toast de éxito
-    console.log('✅', mensaje);
-    alert(mensaje);
+    this.configuracionModal.set({
+      tipo: 'exito',
+      titulo: '¡Reporte Generado!',
+      mensaje: mensaje,
+      textoBotonPrincipal: 'Aceptar',
+      autoCerrarMs: 3000
+    });
+    this.mostrarModal.set(true);
   }
 
   private mostrarError(mensaje: string) {
-    // TODO: Implementar notificación toast de error
-    console.error('❌', mensaje);
-    alert(mensaje);
+    this.configuracionModal.set({
+      tipo: 'error',
+      titulo: 'Error al Generar Reporte',
+      mensaje: mensaje,
+      detalles: 'Por favor, verifica los filtros seleccionados e intenta nuevamente.',
+      textoBotonPrincipal: 'Entendido'
+    });
+    this.mostrarModal.set(true);
   }
 
 

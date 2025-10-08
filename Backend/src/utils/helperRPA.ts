@@ -7,8 +7,25 @@ export function fechaStr(d: string | Date | null | undefined): string | null {
 }
 
 export function convertirFecha(dateLike: string, endOfDay = false): string {
-  // Espera 'YYYY-MM-DD' o 'YYYY-MM-DD HH:mm:ss[.fff]'
-  const hasTime = /\d{2}:\d{2}/.test(dateLike);
-  if (hasTime) return dateLike.replace('T', ' ');
-  return endOfDay ? `${dateLike} 23:59:59.997` : `${dateLike} 00:00:00.000`;
+  // Detectar si viene en formato DD/MM/YYYY
+  const formatoDDMMYYYY = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const match = dateLike.match(formatoDDMMYYYY);
+  
+  let fechaISO: string;
+  
+  if (match) {
+    // Convertir DD/MM/YYYY a YYYY-MM-DD
+    const [, dia, mes, anio] = match;
+    fechaISO = `${anio}-${mes}-${dia}`;
+  } else {
+    // Ya viene en formato YYYY-MM-DD o con hora
+    fechaISO = dateLike;
+  }
+  
+  // Si ya tiene hora, solo reemplazar T por espacio
+  const hasTime = /\d{2}:\d{2}/.test(fechaISO);
+  if (hasTime) return fechaISO.replace('T', ' ');
+  
+  // Agregar hora según sea inicio o fin del día
+  return endOfDay ? `${fechaISO} 23:59:59.997` : `${fechaISO} 00:00:00.000`;
 }

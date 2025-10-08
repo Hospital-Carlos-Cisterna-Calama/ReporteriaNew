@@ -20,38 +20,38 @@ export interface FiltrosReporte {
   standalone: true,
   imports: [FormsModule, SelectorRangoFechasComponent, SelectorMesComponent],
   template: `
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-8 backdrop-blur-sm">
+    <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200/50 p-4 sm:p-6 md:p-8 backdrop-blur-sm">
       <!-- Header de la Sección -->
-      <div class="mb-8 pb-6 border-b border-gray-100">
-        <div class="flex items-start justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">
+      <div class="mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-gray-100">
+        <div class="flex flex-col sm:flex-row items-start justify-between gap-4">
+          <div class="flex-1">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               <ng-content select="[titulo]"></ng-content>
             </h2>
-            <p class="text-gray-600 flex items-center gap-2">
-              <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <p class="text-xs sm:text-sm text-gray-600 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              Configura los parámetros para generar tu reporte personalizado
+              <span>Configura los parámetros para generar tu reporte personalizado</span>
             </p>
           </div>
-          <div class="px-4 py-2 bg-teal-50 text-teal-700 rounded-lg text-sm font-semibold border border-teal-200">
+          <div class="px-3 sm:px-4 py-1.5 sm:py-2 bg-teal-50 text-teal-700 rounded-lg text-xs sm:text-sm font-semibold border border-teal-200 flex-shrink-0">
             {{ categoria() }}
           </div>
         </div>
       </div>
 
       <!-- Formulario de Filtros -->
-      <div class="mb-8">
-        <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="mb-6 sm:mb-8">
+        <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
           </svg>
-          Filtros de Búsqueda
+          <span>Filtros de Búsqueda</span>
         </h3>
 
         <!-- Selector de Rango de Fechas con Material -->
-        <div [class.mb-6]="mostrarTipoReporte()">
+        <div [class.mb-4]="mostrarTipoReporte()" [class.sm:mb-6]="mostrarTipoReporte()">
           @if (usarSelectorMes()) {
             <app-selector-mes
               (cambioMes)="alCambiarMes($event)"
@@ -65,16 +65,16 @@ export interface FiltrosReporte {
 
         <!-- Tipo de Reporte (condicional) -->
         @if (mostrarTipoReporte()) {
-          <div class="space-y-3">
-            <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="space-y-2 sm:space-y-3">
+            <label class="text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
-              Tipo de Reporte
+              <span>Tipo de Reporte</span>
             </label>
-            <div class="space-y-3">
+            <div class="space-y-2 sm:space-y-3">
               <!-- Todos -->
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+              <label class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-200
                             hover:border-teal-300 hover:bg-teal-50/50
                             {{ tipoReporteSeleccionado === 'todos' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
                 <input
@@ -82,15 +82,15 @@ export interface FiltrosReporte {
                   name="tipoReporte"
                   value="todos"
                   [(ngModel)]="tipoReporteSeleccionado"
-                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                  class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer flex-shrink-0"
                 >
-                <span class="text-base font-medium {{ tipoReporteSeleccionado === 'todos' ? 'text-teal-700' : 'text-gray-700' }}">
+                <span class="text-sm sm:text-base font-medium {{ tipoReporteSeleccionado === 'todos' ? 'text-teal-700' : 'text-gray-700' }}">
                   Todos
                 </span>
               </label>
 
               <!-- Urgencias -->
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+              <label class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-200
                             hover:border-teal-300 hover:bg-teal-50/50
                             {{ tipoReporteSeleccionado === 'urgencias' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
                 <input
@@ -98,15 +98,15 @@ export interface FiltrosReporte {
                   name="tipoReporte"
                   value="urgencias"
                   [(ngModel)]="tipoReporteSeleccionado"
-                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                  class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer flex-shrink-0"
                 >
-                <span class="text-base font-medium {{ tipoReporteSeleccionado === 'urgencias' ? 'text-teal-700' : 'text-gray-700' }}">
+                <span class="text-sm sm:text-base font-medium {{ tipoReporteSeleccionado === 'urgencias' ? 'text-teal-700' : 'text-gray-700' }}">
                   Urgencias
                 </span>
               </label>
 
               <!-- Maternidad -->
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+              <label class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-200
                             hover:border-teal-300 hover:bg-teal-50/50
                             {{ tipoReporteSeleccionado === 'maternidad' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
                 <input
@@ -114,9 +114,9 @@ export interface FiltrosReporte {
                   name="tipoReporte"
                   value="maternidad"
                   [(ngModel)]="tipoReporteSeleccionado"
-                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                  class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer flex-shrink-0"
                 >
-                <span class="text-base font-medium {{ tipoReporteSeleccionado === 'maternidad' ? 'text-teal-700' : 'text-gray-700' }}">
+                <span class="text-sm sm:text-base font-medium {{ tipoReporteSeleccionado === 'maternidad' ? 'text-teal-700' : 'text-gray-700' }}">
                   Maternidad
                 </span>
               </label>
@@ -126,16 +126,16 @@ export interface FiltrosReporte {
 
         <!-- Selector de Tipo de Hospitalización (condicional) -->
         @if (mostrarSelectorHospitalizacion()) {
-          <div class="space-y-3 mt-6">
-            <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="space-y-2 sm:space-y-3 mt-4 sm:mt-6">
+            <label class="text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
               </svg>
-              Tipo de Hospitalización
+              <span>Tipo de Hospitalización</span>
             </label>
-            <div class="space-y-3">
+            <div class="space-y-2 sm:space-y-3">
               <!-- Hospitalizado -->
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+              <label class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-200
                             hover:border-teal-300 hover:bg-teal-50/50
                             {{ tipoHospitalizacionSeleccionado === 'hospitalizado' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
                 <input
@@ -143,15 +143,15 @@ export interface FiltrosReporte {
                   name="tipoHospitalizacion"
                   value="hospitalizado"
                   [(ngModel)]="tipoHospitalizacionSeleccionado"
-                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                  class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer flex-shrink-0"
                 >
-                <span class="text-base font-medium {{ tipoHospitalizacionSeleccionado === 'hospitalizado' ? 'text-teal-700' : 'text-gray-700' }}">
+                <span class="text-sm sm:text-base font-medium {{ tipoHospitalizacionSeleccionado === 'hospitalizado' ? 'text-teal-700' : 'text-gray-700' }}">
                   Hospitalizado
                 </span>
               </label>
 
               <!-- Pabellón -->
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+              <label class="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-200
                             hover:border-teal-300 hover:bg-teal-50/50
                             {{ tipoHospitalizacionSeleccionado === 'pabellon' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
                 <input
@@ -159,9 +159,9 @@ export interface FiltrosReporte {
                   name="tipoHospitalizacion"
                   value="pabellon"
                   [(ngModel)]="tipoHospitalizacionSeleccionado"
-                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                  class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer flex-shrink-0"
                 >
-                <span class="text-base font-medium {{ tipoHospitalizacionSeleccionado === 'pabellon' ? 'text-teal-700' : 'text-gray-700' }}">
+                <span class="text-sm sm:text-base font-medium {{ tipoHospitalizacionSeleccionado === 'pabellon' ? 'text-teal-700' : 'text-gray-700' }}">
                   Pabellón
                 </span>
               </label>
@@ -171,33 +171,33 @@ export interface FiltrosReporte {
       </div>
 
       <!-- Acciones -->
-      <div class="flex gap-4 pt-6 border-t border-gray-100">
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-100">
         <button
           (click)="alDescargar()"
           [disabled]="cargando()"
-          class="flex-1 sm:flex-none px-8 py-3.5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-xl font-semibold hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          class="flex-1 px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg sm:rounded-xl font-semibold hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
         >
           @if (cargando()) {
-            <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
-            Generando...
+            <span>Generando...</span>
           } @else {
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
-            Descargar Reporte
+            <span>Descargar Reporte</span>
           }
         </button>
         <button
           (click)="alLimpiar()"
           [disabled]="cargando()"
-          class="px-8 py-3.5 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-shrink-0 px-6 sm:px-8 py-3 sm:py-3.5 bg-gray-100 text-gray-700 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
           </svg>
-          Limpiar
+          <span>Limpiar</span>
         </button>
       </div>
     </div>
