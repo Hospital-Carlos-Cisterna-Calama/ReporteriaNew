@@ -1,0 +1,53 @@
+<div class="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <!-- Sidebar -->
+  <app-sidebar
+    [title]="'REPORTES PPV'"
+    [subtitle]="'Programa de Pabellón y Procedimientos'"
+    [items]="reportes()"
+    [icons]="iconos"
+    [selectedItemId]="reporteSeleccionado()"
+    (selectItem)="seleccionarReporte($event)"
+  />
+
+  <!-- Contenido Principal -->
+  <div class="flex-1 overflow-y-auto">
+    <div class="p-4 sm:p-6 md:p-8">
+      <!-- Banner de Instrucciones -->
+      <app-banner-instrucciones
+        [titulo]="'Sistema de Reportería PPV'"
+        [descripcion]="'Selecciona un reporte del menú lateral para generar informes de pabellón, procedimientos y gestión hospitalaria'"
+        [colorGradient]="'teal'"
+      />
+
+      <!-- Área de Reporte -->
+      @if (reporteSeleccionado()) {
+        <div class="animate-fade-in">
+          <!-- Formulario de Filtros -->
+          <app-filtros-reporte
+            [categoria]="'PPV'"
+            [mostrarTipoReporte]="false"
+            [usarSelectorMes]="false"
+            [mostrarSelectorHospitalizacion]="false"
+            [mostrarSelectorEspecialidad]="mostrarSelectorEspecialidad"
+            [especialidades]="especialidades()"
+            [subEspecialidades]="subEspecialidades()"
+            [cargando]="cargandoReporte()"
+            (descargar)="descargarReporte($event)"
+            (limpiar)="limpiarFiltros()"
+          >
+            <span titulo>{{ reporteSeleccionado() }}</span>
+          </app-filtros-reporte>
+        </div>
+      } @else {
+        <!-- Estado Vacío -->
+        <app-estado-vacio
+          [icono]="'📊'"
+          [titulo]="'Bienvenido a Reportes PPV'"
+          [descripcion]="'Selecciona un reporte del menú lateral para comenzar a generar informes de pabellón y procedimientos médicos.'"
+          [estadisticas]="estadisticas()"
+        />
+      }
+    </div>
+  </div>
+</div>
+

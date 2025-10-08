@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { LucideAngularModule, FileText, Clock, Building, TrendingUp, LucideIconData } from 'lucide-angular';
 import { SidebarComponent, SidebarItem } from '../../../shared/components/sidebar/sidebar.component';
-import { ModalResultadoComponent, type ConfiguracionModal } from '../../../shared/components/ui';
+import { ModalResultadoComponent, BannerInstruccionesComponent, type ConfiguracionModal } from '../../../shared/components/ui';
 import type { ReporteUrgeciaHosQuery, ReporteUrgenciaDoceHorasQuery, ReporteUrgenciaQuery, ReporteUrgIrasQuery, ResporteUrgeciaCatQuery } from '../../interfaces/dto.interface';
 
 import {
@@ -21,7 +21,8 @@ import { UrgenciaService } from '@app/urgencia/services/urgencia.service';
     LucideAngularModule,
     FiltrosReporteComponent,
     EstadoVacioComponent,
-    ModalResultadoComponent
+    ModalResultadoComponent,
+    BannerInstruccionesComponent
   ],
   templateUrl: './urgencia-page.component.html',
 })

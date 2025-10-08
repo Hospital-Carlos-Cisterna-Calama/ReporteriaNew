@@ -10,6 +10,8 @@ export interface FiltrosReporte {
   anio?: number;
   tipoReporte?: 'todos' | 'urgencias' | 'maternidad';
   tipoHospitalizacion?: 'hospitalizado' | 'pabellon';
+  especialidadId?: number | null;
+  subEspecialidadId?: number | null;
 }
 
 /**
@@ -51,7 +53,7 @@ export interface FiltrosReporte {
         </h3>
 
         <!-- Selector de Rango de Fechas con Material -->
-        <div [class.mb-4]="mostrarTipoReporte()" [class.sm:mb-6]="mostrarTipoReporte()">
+        <div [class.mb-4]="mostrarTipoReporte() || mostrarSelectorEspecialidad()" [class.sm:mb-6]="mostrarTipoReporte() || mostrarSelectorEspecialidad()">
           @if (usarSelectorMes()) {
             <app-selector-mes
               (cambioMes)="alCambiarMes($event)"
@@ -62,6 +64,68 @@ export interface FiltrosReporte {
             />
           }
         </div>
+
+        <!-- Selector de Especialidad y Sub Especialidad (condicional) -->
+        @if (mostrarSelectorEspecialidad()) {
+          <div class="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
+            <!-- Especialidad -->
+            <div class="space-y-2 sm:space-y-3">
+              <label class="text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span>Especialidad</span>
+              </label>
+              <div class="relative">
+                <select
+                  [value]="especialidadSeleccionada ?? ''"
+                  (change)="alCambiarEspecialidad($event)"
+                  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white hover:border-gray-300 appearance-none cursor-pointer"
+                >
+                  <option value="">Todas las Especialidades</option>
+                  @for (especialidad of especialidades(); track especialidad.id) {
+                    <option [value]="especialidad.id">{{ especialidad.nombre }}</option>
+                  }
+                </select>
+                <svg class="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-teal-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <svg class="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Sub Especialidad -->
+            <div class="space-y-2 sm:space-y-3">
+              <label class="text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                <span>Sub Especialidad</span>
+              </label>
+              <div class="relative">
+                <select
+                  [value]="subEspecialidadSeleccionada ?? ''"
+                  (change)="alCambiarSubEspecialidad($event)"
+                  [disabled]="!especialidadSeleccionada"
+                  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white hover:border-gray-300 appearance-none cursor-pointer disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
+                >
+                  <option value="">Todas las Sub Especialidades</option>
+                  @for (subEspecialidad of subEspecialidadesFiltradas; track subEspecialidad.id) {
+                    <option [value]="subEspecialidad.id">{{ subEspecialidad.nombre }}</option>
+                  }
+                </select>
+                <svg class="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-teal-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                <svg class="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        }
 
         <!-- Tipo de Reporte (condicional) -->
         @if (mostrarTipoReporte()) {
@@ -208,6 +272,9 @@ export class FiltrosReporteComponent {
   readonly mostrarTipoReporte = input<boolean>(true);
   readonly usarSelectorMes = input<boolean>(false);
   readonly mostrarSelectorHospitalizacion = input<boolean>(false);
+  readonly mostrarSelectorEspecialidad = input<boolean>(false);
+  readonly especialidades = input<Array<{id: number, nombre: string}>>([]);
+  readonly subEspecialidades = input<Array<{id: number, nombre: string, especialidadId: number}>>([]);
   readonly cargando = input<boolean>(false);
 
   readonly descargar = output<FiltrosReporte>();
@@ -223,6 +290,8 @@ export class FiltrosReporteComponent {
   anio: number | null = null;
   tipoReporteSeleccionado: 'todos' | 'urgencias' | 'maternidad' = 'todos';
   tipoHospitalizacionSeleccionado: 'hospitalizado' | 'pabellon' = 'hospitalizado';
+  especialidadSeleccionada: number | null = null;
+  subEspecialidadSeleccionada: number | null = null;
 
   alCambiarFecha(rango: RangoFechas) {
     this.fechaInicio = rango.fechaInicio;
@@ -232,6 +301,27 @@ export class FiltrosReporteComponent {
   alCambiarMes(seleccion: SeleccionMes) {
     this.mes = seleccion.mes;
     this.anio = seleccion.anio;
+  }
+
+  alCambiarEspecialidad(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.especialidadSeleccionada = select.value ? Number(select.value) : null;
+    // Limpiar sub especialidad cuando cambia la especialidad
+    this.subEspecialidadSeleccionada = null;
+  }
+
+  alCambiarSubEspecialidad(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.subEspecialidadSeleccionada = select.value ? Number(select.value) : null;
+  }
+
+  get subEspecialidadesFiltradas() {
+    if (!this.especialidadSeleccionada) {
+      return this.subEspecialidades();
+    }
+    return this.subEspecialidades().filter(
+      sub => sub.especialidadId === this.especialidadSeleccionada
+    );
   }
 
   alDescargar() {
@@ -253,6 +343,11 @@ export class FiltrosReporteComponent {
       filtros.tipoHospitalizacion = this.tipoHospitalizacionSeleccionado;
     }
 
+    if (this.mostrarSelectorEspecialidad()) {
+      filtros.especialidadId = this.especialidadSeleccionada;
+      filtros.subEspecialidadId = this.subEspecialidadSeleccionada;
+    }
+
     this.descargar.emit(filtros);
   }
 
@@ -263,6 +358,8 @@ export class FiltrosReporteComponent {
     this.anio = null;
     this.tipoReporteSeleccionado = 'todos';
     this.tipoHospitalizacionSeleccionado = 'hospitalizado';
+    this.especialidadSeleccionada = null;
+    this.subEspecialidadSeleccionada = null;
     this.selectorFechas()?.limpiar();
     this.selectorMes()?.limpiar();
     this.limpiar.emit();
