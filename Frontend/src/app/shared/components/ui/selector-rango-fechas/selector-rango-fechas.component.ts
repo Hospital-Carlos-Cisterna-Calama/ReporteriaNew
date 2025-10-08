@@ -23,76 +23,7 @@ export interface RangoFechas {
     MatNativeDateModule,
     ReactiveFormsModule
   ],
-  template: `
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Fecha Inicio -->
-      <div class="group">
-        <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
-          Fecha Inicio
-        </label>
-        <mat-form-field
-          class="w-full custom-datepicker"
-          appearance="outline"
-          [formGroup]="rangoFechas"
-        >
-          <input
-            matInput
-            [matDatepicker]="pickerInicio"
-            formControlName="fechaInicio"
-            placeholder="Selecciona fecha de inicio"
-            (dateChange)="alCambiarFecha()"
-            class="cursor-pointer"
-            readonly
-          >
-          <mat-datepicker-toggle matIconSuffix [for]="pickerInicio">
-            <mat-icon matDatepickerToggleIcon>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-            </mat-icon>
-          </mat-datepicker-toggle>
-          <mat-datepicker #pickerInicio xPosition="end"></mat-datepicker>
-        </mat-form-field>
-      </div>
-
-      <!-- Fecha Fin -->
-      <div class="group">
-        <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
-          Fecha Fin
-        </label>
-        <mat-form-field
-          class="w-full custom-datepicker"
-          appearance="outline"
-          [formGroup]="rangoFechas"
-        >
-          <input
-            matInput
-            [matDatepicker]="pickerFin"
-            formControlName="fechaFin"
-            placeholder="Selecciona fecha de fin"
-            [min]="rangoFechas.value.fechaInicio"
-            (dateChange)="alCambiarFecha()"
-            class="cursor-pointer"
-            readonly
-          >
-          <mat-datepicker-toggle matIconSuffix [for]="pickerFin">
-            <mat-icon matDatepickerToggleIcon>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-            </mat-icon>
-          </mat-datepicker-toggle>
-          <mat-datepicker #pickerFin xPosition="end"></mat-datepicker>
-        </mat-form-field>
-      </div>
-    </div>
-  `,
+  templateUrl: './selector-rango-fechas.component.html',
   styles: [`
     :host ::ng-deep .custom-datepicker {
       /* Contenedor principal del input */

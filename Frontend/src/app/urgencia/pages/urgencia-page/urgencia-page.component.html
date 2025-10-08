@@ -14,11 +14,6 @@
   <!-- Contenido Principal -->
   <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
     @if (reporteSeleccionado()) {
-      <!-- Header con componente reutilizable -->
-      <app-encabezado-pagina
-        [titulo]="reporteSeleccionado()!"
-        [subtitulo]="'Generación y consulta de ' + reporteSeleccionado()"
-      />
 
       <!-- Área de Contenido -->
       <div class="p-8">

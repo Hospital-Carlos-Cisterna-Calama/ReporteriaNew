@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { LucideAngularModule, FileText, Clock, Building, TrendingUp, LucideIconData } from 'lucide-angular';
 import { SidebarComponent, SidebarItem } from '../../../shared/components/sidebar/sidebar.component';
 import {
-  EncabezadoPaginaComponent,
+
   FiltrosReporteComponent,
   EstadoVacioComponent,
   type FiltrosReporte,
@@ -14,7 +14,6 @@ import {
   imports: [
     SidebarComponent,
     LucideAngularModule,
-    EncabezadoPaginaComponent,
     FiltrosReporteComponent,
     EstadoVacioComponent
   ],
