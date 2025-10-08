@@ -122,10 +122,13 @@ export async function sendWorkbook(res: import('express').Response, wb: ExcelJS.
   await wb.xlsx.write(res);
   res.end();
 }
-
+function sanitizeText(val: any): string {
+  const text = typeof val === 'string' ? val : String(val ?? '');
+  return text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ''); // quita caracteres no válidos
+}
 /* =========================
-   MODO STREAMING (grandes)
-   ========================= */
+  MODO STREAMING (grandes)
+========================= */
 
 /**
  * Envía un XLSX de UNA hoja en streaming (memoria constante).
@@ -197,7 +200,11 @@ export async function sendOneSheetStream<T extends Record<string, any>>(
   for (const r of rows) {
     const clean = nullToEmpty(r);
     for (const k of Object.keys(clean)) {
-      if (dateKeys.has(k)) (clean as any)[k] = fmtDate(clean[k]);
+      if (dateKeys.has(k)) {
+        (clean as Record<string, any>)[k] = fmtDate(clean[k]);
+      } else {
+        (clean as Record<string, any>)[k] = sanitizeText(clean[k]);
+      }
     }
     const row = ws.addRow(clean);
     row.height = 18;

@@ -29,26 +29,6 @@ export interface IRpaFormularioAttributes {
   RPA_FOR_CiruAmbulatoria?: string | null;
 }
 
-export interface UrgDoceHorasRow {
-  RPA_FOR_NumerFormu: string | null;
-  fecha_digitacion_urg: string | null;
-  pacnum: number;
-  PAC_PAC_Rut: string | null;
-  nombre: string | null;
-  sexo: string | null;
-  prevision: string | null;
-  fechnacim: string | null;
-  TAB_DescripcionPiso: string | null;
-  Traslado: string | null;
-  fecha_hospi: string | null;
-  fecha_alta: string | null;
-  Categorizacion: string | null;
-  hora_salida_urg: string | null;
-  fecha_siclope_ingreso: string | null;
-  nombre_profesional: string | null;
-  rut_profesional: string | null;
-}
-
 export interface UrgenciaDoceHoraFila {
   Rut: string | null;
   Nombre: string | null;
@@ -127,6 +107,17 @@ export interface UrgenciaHospitalizadoFila extends UrgenciaBaseFila {
   egreso_Urgencias: string | null; // d.RPA_FDA_HoraEgreso
   Ingreso_Hospitalizado: Date | string; // e.ATC_EST_FechaHospi
   TAB_DescripcionPiso: string | null; // u.TAB_DescripcionPiso
+}
+
+export interface UrgenciaCategorizacion {
+  piso: string; // Descripción del piso (ej: Urgencia Adulto)
+  usuario: string; // Usuario que digitó la categorización
+  cat: string; // Código o letra de categorización (ej: C, B, etc.)
+  nom: string; // Nombre completo del paciente
+  sexo: 'Masculino' | 'Femenino'; // Sexo en formato legible
+  rut: string; // RUT del paciente
+  fecha: string; // Fecha y hora de digitación (ISO string o Date si lo manejas como objeto)
+  numpa: string; // Fecha y hora de digitación (ISO string o Date si lo manejas como objeto)
 }
 
 export type Prevision = 'Fonasa' | 'Particular' | 'Convenio' | 'No Informado';

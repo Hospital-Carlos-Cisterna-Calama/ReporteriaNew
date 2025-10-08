@@ -1,6 +1,12 @@
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '../config/databaseEnti';
-import { UrgenciaDoceHoraFila, InformeUrgenciaFila, UrgenciaIrasFila, UrgenciaHospPabllFila } from '../interfaces/RpaFormularario.interface';
+import {
+  UrgenciaDoceHoraFila,
+  InformeUrgenciaFila,
+  UrgenciaIrasFila,
+  UrgenciaHospPabllFila,
+  UrgenciaCategorizacion,
+} from '../interfaces/RpaFormularario.interface';
 import { convertirFecha } from '../utils/helperRPA';
 
 export class RpaFormularioService {
@@ -27,13 +33,13 @@ export class RpaFormularioService {
     return resultados;
   }
 
-  async ObtenerCategorizadores(fecha: string): Promise<UrgenciaDoceHoraFila[]> {
+  async ObtenerCategorizadores(fecha: string): Promise<UrgenciaCategorizacion[]> {
     const desde = `${fecha}-01 00:00:00.000`;
     const [year, month] = fecha.split('-').map(Number);
     const ultimoDia = new Date(year, month, 0).getDate();
     const hasta = `${fecha}-${String(ultimoDia).padStart(2, '0')} 23:59:59.997`;
     const sql = `EXEC REPORTERIA_URG_GetUrgenciaCategorizaciones @desde=:desde, @hasta=:hasta`;
-    const resultados = await sequelize.query<UrgenciaDoceHoraFila>(sql, {
+    const resultados = await sequelize.query<UrgenciaCategorizacion>(sql, {
       replacements: { desde, hasta },
       type: QueryTypes.SELECT,
     });

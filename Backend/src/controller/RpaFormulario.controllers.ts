@@ -1,6 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { RpaFormularioService } from '../service/RpaFormulario.service';
-import { InformeUrgenciaRow, UrgenciaDoceHoraFila, UrgenciaHospOrPabFila, UrgenciaIrasFila } from '../interfaces/RpaFormularario.interface';
+import {
+  UrgenciaDoceHoraFila,
+  InformeUrgenciaFila,
+  UrgenciaIrasFila,
+  UrgenciaHospPabllFila,
+  UrgenciaCategorizacion,
+} from '../interfaces/RpaFormularario.interface';
 import ExcelJS from 'exceljs';
 import { buildSheet, sendOneSheetStream, sendWorkbook } from '../utils/excel';
 const RpaFormulario = new RpaFormularioService();
@@ -12,7 +18,7 @@ export class RpaFormularioController {
 
       const results = await RpaFormulario.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
 
-      await sendOneSheetStream<InformeUrgenciaRow>(
+      await sendOneSheetStream<InformeUrgenciaFila>(
         res,
         `InformeUrgencia_${fechaInicio}_a_${fechaTermino}.xlsx`,
         'Informe Urgencia',
@@ -48,7 +54,7 @@ export class RpaFormularioController {
         {
           dateKeys: ['admision', 'FechaCat', 'FechaIngreso', 'FechaEgreso', 'PAC_PAC_FechaNacim'],
           wrapKeys: ['diag', 'trat', 'Direccion', 'Beneficio', 'Destino', 'MedicoIngreso', 'NomMedico'],
-          // borders: true,  // ⚠️ activa con cautela en datasets enormes
+          borders: true, // ⚠️ activa con cautela en datasets enormes
           // headerColorArgb: 'FF4F46E5',
           // columnWidths: { diag: 40, trat: 35, Direccion: 30 }, // opcional
         }
@@ -101,27 +107,28 @@ export class RpaFormularioController {
       const { fecha } = req.params;
       const results = await RpaFormulario.ObtenerCategorizadores(fecha);
 
-      const wb = new ExcelJS.Workbook();
-      // Reutilizo columnas de 12h porque dijiste que devuelve UrgenciaDoceHoraFila
-      await buildSheet<UrgenciaDoceHoraFila>(
-        wb,
+      await sendOneSheetStream<UrgenciaCategorizacion>(
+        res,
+        `Categorizaciones_${fecha}.xlsx`,
         'Categorizaciones',
         [
-          { header: 'RUT', key: 'Rut' },
-          { header: 'Nombre', key: 'Nombre' },
-          { header: 'Edad', key: 'Edad' },
-          { header: 'Sexo', key: 'Sexo' },
-          { header: 'Previsión', key: 'Prevision' },
-          { header: 'DAU', key: 'DAU' },
-          { header: 'Ingreso Siclope', key: 'FechaIngresoSiclope' },
-          { header: 'Servicio Ingreso', key: 'ServicioIngreso' },
-          { header: 'Profesional', key: 'Profesional' },
-          { header: 'RUT Profesional', key: 'RutProfesional' },
+          { header: 'Piso', key: 'piso' },
+          { header: 'Usuario', key: 'usuario' },
+          { header: 'Categorizacion', key: 'cat' },
+          { header: 'Nombre', key: 'nom' },
+          { header: 'Sexo', key: 'sexo' },
+          { header: 'Rut', key: 'rut' },
+          { header: 'Fecha', key: 'fecha' },
+          { header: 'Fecha', key: 'numpa' },
         ],
-        results
+        results,
+        {
+          dateKeys: ['Piso', 'Usuario', 'Categorizacion', 'Nombre', 'Sexo', 'Rut', 'Fecha'],
+          borders: true, // ⚠️ activa con cautela en datasets enormes
+          // headerColorArgb: 'FF4F46E5',
+          // columnWidths: { diag: 40, trat: 35, Direccion: 30 }, // opcional
+        }
       );
-
-      await sendWorkbook(res, wb, `Categorizaciones_${fecha}.xlsx`);
     } catch (error) {
       next(error);
     }
@@ -137,7 +144,7 @@ export class RpaFormularioController {
 
       if (tipo === 'H') {
         // UrgenciaHospitalizadoFila
-        await buildSheet<UrgenciaHospOrPabFila>(
+        await buildSheet<UrgenciaHospPabllFila>(
           wb,
           'Hospitalizados',
           [
@@ -159,7 +166,7 @@ export class RpaFormularioController {
         );
       } else {
         // Pabellón
-        await buildSheet<UrgenciaHospOrPabFila>(
+        await buildSheet<UrgenciaHospPabllFila>(
           wb,
           'Pabellón',
           [
