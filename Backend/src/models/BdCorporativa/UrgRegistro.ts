@@ -2,9 +2,9 @@ import { Table, Column, Model, DataType, AllowNull, PrimaryKey } from 'sequelize
 
 @Table({
   tableName: 'URG_Registro',
-  timestamps: false, // La tabla ya trae UpdatedAt propia y no sigue el convenio de Sequelize
+  timestamps: false, 
 })
-export class UrgRegistro extends Model<UrgRegistro> {
+export default class UrgRegistro extends Model<UrgRegistro> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.STRING(10))

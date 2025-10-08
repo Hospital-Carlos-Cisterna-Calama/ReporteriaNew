@@ -1,10 +1,10 @@
-import { Table, Column, Model, DataType, PrimaryKey, AllowNull, AutoIncrement } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AllowNull, AutoIncrement, ForeignKey, BelongsTo } from 'sequelize-typescript';
 
 @Table({
   tableName: 'Camas_Criticas',
   timestamps: false,
 })
-export class CamasCritica extends Model<CamasCritica> {
+export default class CamasCritica extends Model<CamasCritica> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(true)
@@ -54,7 +54,7 @@ export class CamasCritica extends Model<CamasCritica> {
   @AllowNull(true)
   @Column(DataType.STRING(5))
   declare especialidad_medico: string;
-
+  
   @AllowNull(true)
   @Column(DataType.STRING(2))
   declare coronario: string;
@@ -102,4 +102,5 @@ export class CamasCritica extends Model<CamasCritica> {
   @AllowNull(true)
   @Column(DataType.STRING(1))
   declare estado: string;
+
 }

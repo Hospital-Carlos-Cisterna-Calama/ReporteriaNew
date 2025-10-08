@@ -1,10 +1,11 @@
 import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize-typescript';
 
+
 @Table({
   tableName: 'TAB_Ambito',
   timestamps: false,
 })
-export class Ambito extends Model<Ambito> {
+export default class Ambito extends Model<Ambito> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(2))

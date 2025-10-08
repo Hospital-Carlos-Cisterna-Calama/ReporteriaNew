@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'RPA_Formulario',
   timestamps: false,
 })
-export class RpaFormulario extends Model<RpaFormulario> {
+export default  class RpaFormulario extends Model<RpaFormulario> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(4))

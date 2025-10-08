@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'HCE_IngresoCerradaEstablecer',
   timestamps: false,
 })
-export class IngresoCerradaEstablecer extends Model<IngresoCerradaEstablecer> {
+export default class IngresoCerradaEstablecer extends Model<IngresoCerradaEstablecer> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.INTEGER)

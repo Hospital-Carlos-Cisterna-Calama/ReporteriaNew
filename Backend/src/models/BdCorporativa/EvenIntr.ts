@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'PAB_EvenIntr',
   timestamps: false,
 })
-export class EventIntr extends Model<EventIntr> {
+export default class EventIntr extends Model<EventIntr> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(10))
