@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+/* ========================================
+   ANGULAR MATERIAL THEME
+   ======================================== */
+
+/* Importar tema prebuilt de Material (opcional - podemos personalizarlo) */
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+/* ========================================
+   PERSONALIZACION DE MATERIAL DATEPICKER
+   ======================================== */
+
+/* Contenedor principal del calendario */
+.mat-datepicker-content {
+  background-color: white;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  overflow: hidden !important;
+}
+
+.mat-calendar {
+  font-family: inherit;
+}
+
+/* Header del calendario - diseño simple */
+.mat-calendar-header {
+  background-color: white !important;
+  color: #111827 !important;
+  padding: 16px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.mat-calendar-period-button {
+  color: #111827 !important;
+  font-weight: 600 !important;
+  font-size: 0.9375rem !important;
+}
+
+.mat-calendar-arrow {
+  fill: #6b7280 !important;
+}
+
+.mat-calendar-previous-button,
+.mat-calendar-next-button {
+  color: #6b7280 !important;
+}
+
+.mat-calendar-previous-button:hover,
+.mat-calendar-next-button:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* Días de la semana */
+.mat-calendar-table-header {
+  color: #6b7280 !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+}
+
+.mat-calendar-table-header-divider {
+  display: none !important;
+}
+
+/* Celdas del calendario */
+.mat-calendar-body-cell {
+  border-radius: 6px !important;
+}
+
+.mat-calendar-body-cell-content {
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  color: #374151 !important;
+}
+
+/* Día actual */
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border: 1px solid #0d9488 !important;
+  color: #0d9488 !important;
+  font-weight: 600 !important;
+}
+
+/* Día seleccionado */
+.mat-calendar-body-selected {
+  background-color: #0d9488 !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Hover sobre días */
+.mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+  background-color: #f0fdfa !important;
+  color: #0d9488 !important;
+}
+
+/* Días deshabilitados */
+.mat-calendar-body-disabled {
+  opacity: 0.3 !important;
+}
+
+.mat-calendar-body-disabled > .mat-calendar-body-cell-content {
+  cursor: not-allowed !important;
+  color: #9ca3af !important;
+}
+
+/* Cuerpo del calendario */
+.mat-calendar-content {
+  padding: 12px !important;
+}
+
+/* Ocultar el label del mes abreviado (OCT, NOV, etc) */
+.mat-calendar-body-label {
+  display: none !important;
+}
+
+/* Posicionamiento del overlay */
+.cdk-overlay-pane {
+  margin-top: 4px !important;
+}
+
+/* Input del datepicker */
+.mat-mdc-input-element {
+  font-weight: 500;
+}
+
+/* ========================================
+   ESTILOS PARA SELECT
+   ======================================== */
+
+select option {
+  padding: 10px 14px;
+  background-color: white;
+  color: #111827;
+  font-weight: 500;
+}
+
+select option:checked {
+  background-color: #0d9488;
+  color: white;
+  font-weight: 600;
+}

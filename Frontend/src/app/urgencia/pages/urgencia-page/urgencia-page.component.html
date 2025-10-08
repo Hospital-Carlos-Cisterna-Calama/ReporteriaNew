@@ -1,0 +1,83 @@
+﻿<div class="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
+  <!-- Sidebar Component -->
+  <app-sidebar
+    [title]="'REPORTES'"
+    [subtitle]="'Urgencias'"
+    [items]="reportes()"
+    [selectedItemId]="reporteSeleccionado()"
+    [isOpen]="sidebarAbierto()"
+    [icons]="iconos"
+    (toggleSidebar)="alternarSidebar()"
+    (selectItem)="seleccionarReporte($event)"
+  />
+
+  <!-- Contenido Principal -->
+  <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
+    @if (reporteSeleccionado()) {
+
+      <!-- Área de Contenido -->
+      <div class="p-4 sm:p-6 md:p-8">
+        <!-- Filtros con componente reutilizable -->
+        <app-filtros-reporte
+          [categoria]="'Urgencias'"
+          [mostrarTipoReporte]="
+            reporteSeleccionado() !== 'Urgencias (12-Horas)' &&
+            reporteSeleccionado() !== 'Categorizaciones' &&
+            reporteSeleccionado() !== 'Urgencias - Hospitalizado'
+          "
+          [usarSelectorMes]="reporteSeleccionado() === 'Categorizaciones'"
+          [mostrarSelectorHospitalizacion]="reporteSeleccionado() === 'Urgencias - Hospitalizado'"
+          [cargando]="cargandoReporte()"
+          (descargar)="descargarReporte($event)"
+          (limpiar)="limpiarFiltros()"
+        >
+          <span titulo>{{ reporteSeleccionado() }}</span>
+        </app-filtros-reporte>
+      </div>
+    } @else {
+      <!-- Estado vacío con componente reutilizable -->
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <app-estado-vacio
+          [titulo]="'Bienvenido a Reportes de Urgencia'"
+          [descripcion]="'Selecciona un tipo de reporte del menú lateral para comenzar a generar tus informes personalizados'"
+          [estadisticas]="estadisticas()"
+        >
+          <!-- Instrucciones adicionales -->
+          <div class="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-teal-100 mt-6 sm:mt-8 max-w-2xl mx-auto">
+            <div class="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 text-left">
+              <div class="flex-shrink-0 w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-semibold text-gray-900 mb-2 text-sm sm:text-base">¿Cómo empezar?</h3>
+                <ol class="text-xs sm:text-sm text-gray-700 space-y-2">
+                  <li class="flex items-start gap-2">
+                    <span class="flex-shrink-0 w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                    <span>Abre el menú lateral y selecciona el tipo de reporte que necesitas</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="flex-shrink-0 w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                    <span>Configura los filtros de fecha y servicio según tus necesidades</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="flex-shrink-0 w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                    <span>Haz clic en "Descargar Reporte" para obtener el archivo Excel</span>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </app-estado-vacio>
+      </div>
+    }
+  </main>
+</div>
+
+<!-- Modal de Resultado -->
+<app-modal-resultado
+  [visible]="mostrarModal()"
+  [config]="configuracionModal()"
+  (cerrar)="mostrarModal.set(false)"
+/>

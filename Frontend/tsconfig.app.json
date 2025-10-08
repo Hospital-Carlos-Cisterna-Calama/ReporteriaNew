@@ -1,0 +1,32 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": [],
+    "baseUrl": "./",
+    "paths": {
+      // Módulos principales
+      "@app/*": ["src/app/*"],
+      "@environments/*": ["src/environments/*"],
+
+      // Módulo Auth
+      "@auth/*": ["src/app/auth/*"],
+      "@auth/models": ["src/app/auth/models"],
+      "@auth/services": ["src/app/auth/services"],
+      "@auth/guards": ["src/app/auth/guards"],
+      // Módulo Shared
+      "@shared/*": ["src/app/shared/*"],
+      "@shared/interfaces": ["src/app/shared/interfaces"],
+      "@shared/components": ["src/app/shared/components"],
+      "@shared/services": ["src/app/shared/services"],
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
+}
