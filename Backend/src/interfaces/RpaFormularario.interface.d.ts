@@ -68,7 +68,7 @@ export interface UrgenciaDoceHoraFila {
   // fecha_siclople_evolucion?: string | null;
 }
 
-export interface InformeUrgenciaRow {
+export interface InformeUrgenciaFila {
   formulario: string;
   tipo_folio: 'Maternal' | 'Urgencias';
   Sector: string;
@@ -131,6 +131,6 @@ export interface UrgenciaHospitalizadoFila extends UrgenciaBaseFila {
 
 export type Prevision = 'Fonasa' | 'Particular' | 'Convenio' | 'No Informado';
 // Unión para el método
-export type UrgenciaHospOrPabFila = UrgenciaPabellonRow | UrgenciaHospitalizadoRow;
+export type UrgenciaHospPabllFila = UrgenciaPabellonRow | UrgenciaHospitalizadoRow;
 
 export type IRpaFormularioCreationAttributes = IRpaFormularioAttributes;
