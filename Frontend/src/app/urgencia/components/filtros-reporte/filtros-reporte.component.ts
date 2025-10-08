@@ -1,11 +1,15 @@
 import { Component, input, output, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SelectorRangoFechasComponent, type RangoFechas } from '../selector-rango-fechas/selector-rango-fechas.component';
+import { SelectorRangoFechasComponent, type RangoFechas } from '../../../shared/components/ui';
+import { SelectorMesComponent, type SeleccionMes } from '../../../shared/components/ui';
 
 export interface FiltrosReporte {
-  fechaInicio: Date | null;
-  fechaFin: Date | null;
-  servicio: string;
+  fechaInicio?: Date | null;
+  fechaFin?: Date | null;
+  mes?: number;
+  anio?: number;
+  tipoReporte?: 'todos' | 'urgencias' | 'maternidad';
+  tipoHospitalizacion?: 'hospitalizado' | 'pabellon';
 }
 
 /**
@@ -14,7 +18,7 @@ export interface FiltrosReporte {
 @Component({
   selector: 'app-filtros-reporte',
   standalone: true,
-  imports: [FormsModule, SelectorRangoFechasComponent],
+  imports: [FormsModule, SelectorRangoFechasComponent, SelectorMesComponent],
   template: `
     <div class="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-8 backdrop-blur-sm">
       <!-- Header de la Sección -->
@@ -47,51 +51,123 @@ export interface FiltrosReporte {
         </h3>
 
         <!-- Selector de Rango de Fechas con Material -->
-        <div class="mb-6">
-          <app-selector-rango-fechas
-            (cambioFecha)="alCambiarFecha($event)"
-          />
+        <div [class.mb-6]="mostrarTipoReporte()">
+          @if (usarSelectorMes()) {
+            <app-selector-mes
+              (cambioMes)="alCambiarMes($event)"
+            />
+          } @else {
+            <app-selector-rango-fechas
+              (cambioFecha)="alCambiarFecha($event)"
+            />
+          }
         </div>
 
-        <!-- Servicio -->
-        <div class="space-y-2 group">
-          <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-            Servicio
-          </label>
-          <div class="relative">
-            <select
-              [(ngModel)]="servicioSeleccionado"
-              class="w-full pl-12 pr-10 py-3.5 text-base font-medium
-                     border-2 border-gray-300 rounded-xl
-                     bg-white
-                     text-gray-900
-                     focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500
-                     hover:border-teal-400
-                     transition-all duration-200
-                     shadow-sm hover:shadow-lg
-                     cursor-pointer
-                     appearance-none"
-            >
-              <option value="">Todos los servicios</option>
-              <option value="urgencia">Urgencia</option>
-              <option value="upc">UPC</option>
-              <option value="hospitalizacion">Hospitalización</option>
-            </select>
-            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-              <svg class="w-5 h-5 text-teal-600 group-hover:text-teal-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        <!-- Tipo de Reporte (condicional) -->
+        @if (mostrarTipoReporte()) {
+          <div class="space-y-3">
+            <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
-            </div>
-            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
+              Tipo de Reporte
+            </label>
+            <div class="space-y-3">
+              <!-- Todos -->
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                            hover:border-teal-300 hover:bg-teal-50/50
+                            {{ tipoReporteSeleccionado === 'todos' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
+                <input
+                  type="radio"
+                  name="tipoReporte"
+                  value="todos"
+                  [(ngModel)]="tipoReporteSeleccionado"
+                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                >
+                <span class="text-base font-medium {{ tipoReporteSeleccionado === 'todos' ? 'text-teal-700' : 'text-gray-700' }}">
+                  Todos
+                </span>
+              </label>
+
+              <!-- Urgencias -->
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                            hover:border-teal-300 hover:bg-teal-50/50
+                            {{ tipoReporteSeleccionado === 'urgencias' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
+                <input
+                  type="radio"
+                  name="tipoReporte"
+                  value="urgencias"
+                  [(ngModel)]="tipoReporteSeleccionado"
+                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                >
+                <span class="text-base font-medium {{ tipoReporteSeleccionado === 'urgencias' ? 'text-teal-700' : 'text-gray-700' }}">
+                  Urgencias
+                </span>
+              </label>
+
+              <!-- Maternidad -->
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                            hover:border-teal-300 hover:bg-teal-50/50
+                            {{ tipoReporteSeleccionado === 'maternidad' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
+                <input
+                  type="radio"
+                  name="tipoReporte"
+                  value="maternidad"
+                  [(ngModel)]="tipoReporteSeleccionado"
+                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                >
+                <span class="text-base font-medium {{ tipoReporteSeleccionado === 'maternidad' ? 'text-teal-700' : 'text-gray-700' }}">
+                  Maternidad
+                </span>
+              </label>
             </div>
           </div>
-        </div>
+        }
+
+        <!-- Selector de Tipo de Hospitalización (condicional) -->
+        @if (mostrarSelectorHospitalizacion()) {
+          <div class="space-y-3 mt-6">
+            <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              Tipo de Hospitalización
+            </label>
+            <div class="space-y-3">
+              <!-- Hospitalizado -->
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                            hover:border-teal-300 hover:bg-teal-50/50
+                            {{ tipoHospitalizacionSeleccionado === 'hospitalizado' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
+                <input
+                  type="radio"
+                  name="tipoHospitalizacion"
+                  value="hospitalizado"
+                  [(ngModel)]="tipoHospitalizacionSeleccionado"
+                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                >
+                <span class="text-base font-medium {{ tipoHospitalizacionSeleccionado === 'hospitalizado' ? 'text-teal-700' : 'text-gray-700' }}">
+                  Hospitalizado
+                </span>
+              </label>
+
+              <!-- Pabellón -->
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                            hover:border-teal-300 hover:bg-teal-50/50
+                            {{ tipoHospitalizacionSeleccionado === 'pabellon' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white' }}">
+                <input
+                  type="radio"
+                  name="tipoHospitalizacion"
+                  value="pabellon"
+                  [(ngModel)]="tipoHospitalizacionSeleccionado"
+                  class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 cursor-pointer"
+                >
+                <span class="text-base font-medium {{ tipoHospitalizacionSeleccionado === 'pabellon' ? 'text-teal-700' : 'text-gray-700' }}">
+                  Pabellón
+                </span>
+              </label>
+            </div>
+          </div>
+        }
       </div>
 
       <!-- Acciones -->
@@ -120,35 +196,65 @@ export interface FiltrosReporte {
 })
 export class FiltrosReporteComponent {
   readonly categoria = input<string>('Urgencias');
+  readonly mostrarTipoReporte = input<boolean>(true);
+  readonly usarSelectorMes = input<boolean>(false);
+  readonly mostrarSelectorHospitalizacion = input<boolean>(false);
 
   readonly descargar = output<FiltrosReporte>();
   readonly limpiar = output<void>();
 
   readonly selectorFechas = viewChild(SelectorRangoFechasComponent);
+  readonly selectorMes = viewChild(SelectorMesComponent);
 
   // Filtros
   fechaInicio: Date | null = null;
   fechaFin: Date | null = null;
-  servicioSeleccionado = '';
+  mes: number | null = null;
+  anio: number | null = null;
+  tipoReporteSeleccionado: 'todos' | 'urgencias' | 'maternidad' = 'todos';
+  tipoHospitalizacionSeleccionado: 'hospitalizado' | 'pabellon' = 'hospitalizado';
 
   alCambiarFecha(rango: RangoFechas) {
     this.fechaInicio = rango.fechaInicio;
     this.fechaFin = rango.fechaFin;
   }
 
+  alCambiarMes(seleccion: SeleccionMes) {
+    this.mes = seleccion.mes;
+    this.anio = seleccion.anio;
+  }
+
   alDescargar() {
-    this.descargar.emit({
-      fechaInicio: this.fechaInicio,
-      fechaFin: this.fechaFin,
-      servicio: this.servicioSeleccionado
-    });
+    const filtros: FiltrosReporte = {};
+
+    if (this.usarSelectorMes()) {
+      filtros.mes = this.mes ?? undefined;
+      filtros.anio = this.anio ?? undefined;
+    } else {
+      filtros.fechaInicio = this.fechaInicio;
+      filtros.fechaFin = this.fechaFin;
+    }
+
+    if (this.mostrarTipoReporte()) {
+      filtros.tipoReporte = this.tipoReporteSeleccionado;
+    }
+
+    if (this.mostrarSelectorHospitalizacion()) {
+      filtros.tipoHospitalizacion = this.tipoHospitalizacionSeleccionado;
+    }
+
+    this.descargar.emit(filtros);
   }
 
   alLimpiar() {
     this.fechaInicio = null;
     this.fechaFin = null;
-    this.servicioSeleccionado = '';
+    this.mes = null;
+    this.anio = null;
+    this.tipoReporteSeleccionado = 'todos';
+    this.tipoHospitalizacionSeleccionado = 'hospitalizado';
     this.selectorFechas()?.limpiar();
+    this.selectorMes()?.limpiar();
     this.limpiar.emit();
   }
 }

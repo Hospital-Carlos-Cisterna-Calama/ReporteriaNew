@@ -25,6 +25,13 @@
         <!-- Filtros con componente reutilizable -->
         <app-filtros-reporte
           [categoria]="'Urgencias'"
+          [mostrarTipoReporte]="
+            reporteSeleccionado() !== 'Urgencias (12-Horas)' &&
+            reporteSeleccionado() !== 'Categorizaciones' &&
+            reporteSeleccionado() !== 'Urgencias - Hospitalizado'
+          "
+          [usarSelectorMes]="reporteSeleccionado() === 'Categorizaciones'"
+          [mostrarSelectorHospitalizacion]="reporteSeleccionado() === 'Urgencias - Hospitalizado'"
           (descargar)="descargarReporte($event)"
           (limpiar)="limpiarFiltros()"
         >
