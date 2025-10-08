@@ -1,0 +1,176 @@
+<!-- Hero Section -->
+<div class="relative overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+  <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <div class="text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-teal-100 text-teal-700 rounded-full text-sm font-medium mb-6 shadow-sm">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+        </span>
+        Sistema Activo
+      </div>
+
+      <!-- Main Heading -->
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+        Experiencia moderna en
+        <span class="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+          gestión de reportes
+        </span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-10">
+        Accede a tus reportes hospitalarios con información en tiempo real, seguimiento detallado y análisis completo, todo en un solo lugar.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a routerLink="/reportes" class="group px-8 py-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+          Generar Reporte
+          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+        </a>
+        <a routerLink="/ayuda" class="px-8 py-4 bg-white text-gray-700 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 border-2 border-gray-200 hover:border-teal-500">
+          Ver Guía
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Section -->
+<div class="bg-white py-12 border-y border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (stat of stats(); track stat.label) {
+        <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 text-white mb-3">
+            <lucide-icon [img]="icons[stat.icon]" class="w-6 h-6"></lucide-icon>
+          </div>
+          <div class="text-3xl font-bold text-gray-900 mb-1">{{ stat.value }}</div>
+          <div class="text-sm text-gray-600">{{ stat.label }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Main Sections -->
+<div class="bg-gray-50 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        Accede a tus módulos
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Selecciona el módulo que necesitas para generar reportes y consultar información en tiempo real
+      </p>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (section of sections(); track section.title) {
+        <a
+          [routerLink]="section.route"
+          class="group relative bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
+        >
+          <!-- Gradient Background -->
+          <div class="absolute inset-0 bg-gradient-to-br {{ section.color }} opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
+
+          <!-- Icon -->
+          <div class="relative mb-4">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl {{ section.bgColor }} {{ section.textColor }} group-hover:scale-110 transition-transform duration-300">
+              <lucide-icon [img]="icons[section.icon]" class="w-8 h-8"></lucide-icon>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="relative">
+            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:{{ section.textColor }} transition-colors">
+              {{ section.title }}
+            </h3>
+            <p class="text-gray-600 text-sm mb-4">
+              {{ section.description }}
+            </p>
+
+            <!-- Arrow Icon -->
+            <div class="flex items-center {{ section.textColor }} font-semibold text-sm">
+              <span>Acceder</span>
+              <svg class="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<div class="bg-white py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <!-- Image Side -->
+      <div class="relative">
+        <div class="absolute inset-0 bg-gradient-to-br from-teal-200 to-cyan-200 rounded-3xl transform rotate-3"></div>
+        <div class="relative bg-gradient-to-br from-teal-500 to-cyan-600 rounded-3xl p-12 shadow-2xl">
+          <div class="text-white">
+            <lucide-icon [img]="icons['BarChart3']" class="w-32 h-32 mb-6 opacity-90"></lucide-icon>
+            <h3 class="text-2xl font-bold mb-2">¿Por qué elegir nuestro sistema?</h3>
+            <p class="text-teal-50">Diseñado específicamente para las necesidades del Hospital Carlos Cisterna de Calama</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features List -->
+      <div class="space-y-6">
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-1">Datos en Tiempo Real</h4>
+            <p class="text-gray-600">Accede a información actualizada instantáneamente desde cualquier dispositivo</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-1">Seguro y Confiable</h4>
+            <p class="text-gray-600">Protección de datos con los más altos estándares de seguridad hospitalaria</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-1">Rápido y Eficiente</h4>
+            <p class="text-gray-600">Genera reportes complejos en segundos y optimiza tu tiempo de trabajo</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

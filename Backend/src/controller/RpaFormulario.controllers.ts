@@ -14,7 +14,7 @@ const RpaFormulario = new RpaFormularioService();
 export class RpaFormularioController {
   static async reporteUrgencia(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino, tipo } = req.params;
+      const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
       const results = await RpaFormulario.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
 
@@ -66,7 +66,7 @@ export class RpaFormularioController {
 
   static async reporteUrgenciaDoceHoras(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino } = req.params;
+      const { fechaInicio, fechaTermino } = req.query as any;
 
       const results = await RpaFormulario.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
 
@@ -104,7 +104,7 @@ export class RpaFormularioController {
 
   static async reporteUrgenciaCategorizaciones(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fecha } = req.params;
+      const { fecha } = req.query as any;
       const results = await RpaFormulario.ObtenerCategorizadores(fecha);
 
       await sendOneSheetStream<UrgenciaCategorizacion>(
@@ -136,7 +136,7 @@ export class RpaFormularioController {
 
   static async reporteUrgenciaHospitalizado(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino, tipo } = req.params;
+      const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
       const results = await RpaFormulario.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
 
@@ -195,9 +195,9 @@ export class RpaFormularioController {
 
   static async reporteIras(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino, box } = req.params;
+      const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerInformeIras(fechaInicio, fechaTermino, box);
+      const results = await RpaFormulario.ObtenerInformeIras(fechaInicio, fechaTermino, tipo);
 
       const wb = new ExcelJS.Workbook();
       await buildSheet<UrgenciaIrasFila>(
@@ -215,7 +215,7 @@ export class RpaFormularioController {
         { dateKeys: ['Fecha_Admision'] }
       );
 
-      await sendWorkbook(res, wb, `IRAS_${box}_${fechaInicio}_a_${fechaTermino}.xlsx`);
+      await sendWorkbook(res, wb, `IRAS_${tipo}_${fechaInicio}_a_${fechaTermino}.xlsx`);
     } catch (error) {
       next(error);
     }
