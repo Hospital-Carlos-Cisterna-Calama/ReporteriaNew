@@ -27,6 +27,7 @@
           "
           [usarSelectorMes]="reporteSeleccionado() === 'Categorizaciones'"
           [mostrarSelectorHospitalizacion]="reporteSeleccionado() === 'Urgencias - Hospitalizado'"
+          [cargando]="cargandoReporte()"
           (descargar)="descargarReporte($event)"
           (limpiar)="limpiarFiltros()"
         >

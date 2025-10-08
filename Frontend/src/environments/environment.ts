@@ -3,7 +3,7 @@ export const environment = {
   // Nombre del sistema
   systemName: 'TURNOS',
   // Backend local en desarrollo
-  apiBaseUrl: 'http://127.0.0.1:3002/api',
+  apiBaseUrl: 'http://localhost:3002/api',
   // API externa de login / validación de acceso
   loginApiUrl: 'http://127.0.0.1:8000',
   appVersion: 'dev',
@@ -11,6 +11,6 @@ export const environment = {
   pacienteSelectionTtlMs: 30 * 60 * 1000, // 30 min
   pacienteSelectionStorageKey: 'turnos.paciente.seleccion',
   catalogoWarmup: true,
-  apiRequestTimeoutMs: 15_000,
+  apiRequestTimeoutMs: 300_000, // 5 minutos para reportes pesados
   registrarAccessGraceMs: 5 * 60 * 1000,
 };

@@ -7,6 +7,6 @@ export const environment = {
   pacienteSelectionTtlMs: 30 * 60 * 1000,
   pacienteSelectionStorageKey: 'turnos.paciente.seleccion',
   catalogoWarmup: true,
-  apiRequestTimeoutMs: 15_000,
+  apiRequestTimeoutMs: 300_000, // 5 minutos para reportes pesados
   registrarAccessGraceMs: 5 * 60 * 1000
 };

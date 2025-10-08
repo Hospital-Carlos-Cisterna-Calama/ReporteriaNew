@@ -16,7 +16,7 @@ export const sequelize = new Sequelize({
     options: {
       encrypt: false,
       trustServerCertificate: true,
-      requestTimeout: 30000,
+      requestTimeout: 300000, // 5 minutos para reportes pesados
     },
   },
   models: [Ambito, Carpeta],
@@ -34,7 +34,7 @@ export const sequelizePPV = new Sequelize({
     options: {
       encrypt: false,
       trustServerCertificate: true,
-      requestTimeout: 30000,
+      requestTimeout: 300000, // 5 minutos para reportes pesados
     },
   },
   models: [Ambito, Carpeta],
