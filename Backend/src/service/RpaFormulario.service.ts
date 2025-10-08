@@ -1,8 +1,7 @@
-import { QueryTypes, Op, literal, Sequelize } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { sequelize } from '../config/databaseEnti';
 import { UrgenciaDoceHoraFila, InformeUrgenciaRow, UrgenciaIrasFila, UrgenciaHospOrPabFila } from '../interfaces/RpaFormularario.interface';
 import { convertirFecha } from '../utils/helperRPA';
-import { log } from 'console';
 
 export class RpaFormularioService {
   async ObtenerUrgencia(fechaIni: string, fechaTerm: string, box: 'A' | 'U' | 'M' | string): Promise<InformeUrgenciaRow[]> {

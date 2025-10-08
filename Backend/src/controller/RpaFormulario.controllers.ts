@@ -8,9 +8,9 @@ const RpaFormulario = new RpaFormularioService();
 export class RpaFormularioController {
   static async reporteUrgencia(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino, box } = req.params;
+      const { fechaInicio, fechaTermino, tipo } = req.params;
 
-      const results = await RpaFormulario.ObtenerUrgencia(fechaInicio, fechaTermino, box);
+      const results = await RpaFormulario.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
 
       await sendOneSheetStream<InformeUrgenciaRow>(
         res,
@@ -129,13 +129,13 @@ export class RpaFormularioController {
 
   static async reporteUrgenciaHospitalizado(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fechaInicio, fechaTermino, box } = req.params;
+      const { fechaInicio, fechaTermino, tipo } = req.params;
 
-      const results = await RpaFormulario.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, box);
+      const results = await RpaFormulario.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
 
       const wb = new ExcelJS.Workbook();
 
-      if (box === 'H') {
+      if (tipo === 'H') {
         // UrgenciaHospitalizadoFila
         await buildSheet<UrgenciaHospOrPabFila>(
           wb,
@@ -180,7 +180,7 @@ export class RpaFormularioController {
         );
       }
 
-      await sendWorkbook(res, wb, `Urg_${box === 'H' ? 'Hospitalizado' : 'Pabellon'}_${fechaInicio}_a_${fechaTermino}.xlsx`);
+      await sendWorkbook(res, wb, `Urg_${tipo === 'H' ? 'Hospitalizado' : 'Pabellon'}_${fechaInicio}_a_${fechaTermino}.xlsx`);
     } catch (error) {
       next(error);
     }
