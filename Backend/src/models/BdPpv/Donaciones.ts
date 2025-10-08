@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull, AutoIncrement } 
   tableName: 'Donaciones',
   timestamps: false,
 })
-export class Donaciones extends Model<Donaciones> {
+export default class Donaciones extends Model<Donaciones> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(true)

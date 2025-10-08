@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'PAB_Patagreg',
   timestamps: false,
 })
-export class Patagreg extends Model<Patagreg> {
+export default class Patagreg extends Model<Patagreg> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(10))

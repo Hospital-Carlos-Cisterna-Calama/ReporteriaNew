@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, AllowNull } 
   tableName: 'RPH_Especialidad',
   timestamps: false,
 })
-export class RphEspecialidad extends Model<RphEspecialidad> {
+export default class RphEspecialidad extends Model<RphEspecialidad> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(false)

@@ -1,10 +1,16 @@
-import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AllowNull, ForeignKey, BelongsTo, HasOne } from 'sequelize-typescript';
+import Paciente from './Paciente';
+import Especiali from './Especiali';
+import EventIntr from './EvenIntr';
+import Carpeta from './Carpeta';
+import PrePrestacion from './PrePrestacion';
+import Lugar from './Lugar';
 
 @Table({
   tableName: 'PAB_Solicitud',
   timestamps: false,
 })
-export class Solicitud extends Model<Solicitud> {
+export default class Solicitud extends Model<Solicitud> {
   @AllowNull(true)
   @Column(DataType.FLOAT)
   declare PAC_PAC_Numero: number;
@@ -269,4 +275,46 @@ export class Solicitud extends Model<Solicitud> {
   @AllowNull(true)
   @Column(DataType.SMALLINT)
   declare PAB_ONCO: number;
+
+  // ============================================
+  // Relaciones
+  // ============================================
+
+  @ForeignKey(() => Paciente)
+  @Column(DataType.FLOAT)
+  declare PAC_PAC_Numero_FK: number;
+
+  @BelongsTo(() => Paciente)
+  declare Paciente?: Paciente;
+
+  @ForeignKey(() => PrePrestacion)
+  @Column(DataType.CHAR(8))
+  declare INT_INT_Codigo_FK: string;
+
+  @BelongsTo(() => PrePrestacion)
+  declare PrePrestacion?: PrePrestacion;
+
+  @ForeignKey(() => Especiali)
+  @Column(DataType.CHAR(8))
+  declare PAB_SOL_Servicio_FK: string;
+
+  @BelongsTo(() => Especiali)
+  declare Especiali?: Especiali;
+
+  @ForeignKey(() => Lugar)
+  @Column(DataType.CHAR(4))
+  declare SER_REC_Tipo_FK: string;
+
+  @BelongsTo(() => Lugar)
+  declare Lugar?: Lugar;
+
+  @HasOne(() => EventIntr, { sourceKey: 'PAB_SOL_Numero', foreignKey: 'PAB_SOL_Numero' })
+  declare EventIntr?: EventIntr;
+
+  @ForeignKey(() => Carpeta)
+  @Column(DataType.FLOAT)
+  declare PAC_PAC_Numero_Carpeta_FK: number;
+
+  @BelongsTo(() => Carpeta)
+  declare Carpeta?: Carpeta;
 }

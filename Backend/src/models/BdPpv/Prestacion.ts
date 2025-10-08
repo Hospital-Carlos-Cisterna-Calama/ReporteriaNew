@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, AllowNull } 
   tableName: 'Prestacion',
   timestamps: false,
 })
-export class Prestacion extends Model<Prestacion> {
+export default class Prestacion extends Model<Prestacion> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(false)
