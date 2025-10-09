@@ -1,0 +1,58 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-teal-50">
+
+
+  <!-- Contenido Principal -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Guía Rápida -->
+    <div class="mb-12">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">¿Cómo generar un reporte?</h2>
+        <p class="text-gray-600">Sigue estos simples pasos para obtener tus informes</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        @for (paso of pasosGuia; track paso.numero) {
+          <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                {{ paso.numero }}
+              </div>
+              <div class="text-4xl">{{ paso.icono }}</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">{{ paso.titulo }}</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">{{ paso.descripcion }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Módulos Disponibles -->
+    <div class="mb-12">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Módulos del Sistema</h2>
+        <p class="text-gray-600">Explora las diferentes áreas de reportería disponibles</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        @for (modulo of modulos; track modulo.nombre) {
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
+            <div class="h-32 bg-gradient-to-br {{ modulo.color }} flex items-center justify-center">
+              <div class="text-7xl">{{ modulo.icono }}</div>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-2">{{ modulo.nombre }}</h3>
+              <p class="text-gray-600">{{ modulo.descripcion }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+
+
+
+  </div>
+
+</div>
+

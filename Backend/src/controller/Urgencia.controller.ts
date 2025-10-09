@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RpaFormularioService } from '../service/RpaFormulario.service';
+import { UrgenciaService } from '../service/urgencias/Urgencia.service';
 import {
   UrgenciaDoceHoraFila,
   InformeUrgenciaFila,
@@ -9,14 +9,14 @@ import {
 } from '../interfaces/RpaFormularario.interface';
 import ExcelJS from 'exceljs';
 import { buildSheet, sendOneSheetStream, sendWorkbook } from '../utils/excel';
-const RpaFormulario = new RpaFormularioService();
+const UrgenciaServices = new UrgenciaService();
 
-export class RpaFormularioController {
+export class UrgenciaController {
   static async reporteUrgencia(req: Request, res: Response, next: NextFunction) {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
+      const results = await UrgenciaServices.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
 
       await sendOneSheetStream<InformeUrgenciaFila>(
         res,
@@ -68,35 +68,42 @@ export class RpaFormularioController {
     try {
       const { fechaInicio, fechaTermino } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
+      const results = await UrgenciaServices.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
 
-      const wb = new ExcelJS.Workbook();
-      await buildSheet<UrgenciaDoceHoraFila>(
-        wb,
-        'Urgencia 12h',
+      await sendOneSheetStream<UrgenciaDoceHoraFila>(
+        res,
+        `Urgencia-${fechaInicio}_${fechaTermino}.xlsx`,
+        'Urgencia',
         [
-          { header: 'RUT', key: 'Rut' },
-          { header: 'Nombre', key: 'Nombre' },
-          { header: 'Edad', key: 'Edad' },
-          { header: 'Sexo', key: 'Sexo' },
-          { header: 'Previsión', key: 'Prevision' },
-          { header: 'DAU', key: 'DAU' },
-          { header: 'Ingreso Siclope', key: 'FechaIngresoSiclope' },
-          { header: 'Servicio Ingreso', key: 'ServicioIngreso' },
-          { header: 'Ingreso Helios', key: 'FechaIngresoHelios' },
-          { header: 'Servicio Traslado', key: 'ServicioTraslado' },
-          { header: 'Traslado Helios', key: 'FechaTrasladoHelios' },
-          { header: 'Diferencia', key: 'DiferenciaTexto' },
-          { header: 'Profesional', key: 'Profesional' },
-          { header: 'RUT Profesional', key: 'RutProfesional' },
+          { header: 'Rut', key: 'rut' },
+          { header: 'Nombre', key: 'nombre' },
+          { header: 'Edad', key: 'edad' },
+          { header: 'Sexo', key: 'sexo' },
+          { header: 'Previsión', key: 'prevision' },
+          { header: 'DAU', key: 'dau' },
+          { header: 'Fecha Ingreso Siclope', key: 'fecha_ingreso_siclope' },
+          { header: 'Servicio Ingreso', key: 'servicio_ingreso' },
+          { header: 'Fecha Ingreso (Helios)', key: 'fecha_ingreso_helios' },
+          { header: 'Servicio Traslado', key: 'servicio_traslado' },
+          { header: 'Fecha Traslado (Helios)', key: 'fecha_traslado_helios' },
+          { header: 'Diferencia(Ingreso/Indicacion Siclope)', key: 'diferencia_ingreso_indicacion_siclope' },
+          { header: 'Profesional Reg. Siclope', key: 'nombre_profesional' },
+          { header: 'RUT Profesional', key: 'rut_profesional' },
         ],
         results,
         {
-          // estas fechas ya vienen en string "dd/mm/yyyy HH:mm:ss", no forzamos formateo
+          dateKeys: ['fecha_ingreso_siclope', 'fecha_ingreso_helios', 'fecha_traslado_helios'],
+          headerColorArgb: 'FF59ACA5',
+          columnWidths: {
+            fecha_ingreso_siclope: 18,
+            fecha_ingreso_helios: 18,
+            fecha_traslado_helios: 18,
+            servicio_traslado: 40,
+            diferencia_ingreso_indicacion_siclope: 35,
+            servicio_ingreso: 35,
+          },
         }
       );
-
-      await sendWorkbook(res, wb, `Urgencia12h_${fechaInicio}_a_${fechaTermino}.xlsx`);
     } catch (error) {
       next(error);
     }
@@ -105,7 +112,7 @@ export class RpaFormularioController {
   static async reporteUrgenciaCategorizaciones(req: Request, res: Response, next: NextFunction) {
     try {
       const { fecha } = req.query as any;
-      const results = await RpaFormulario.ObtenerCategorizadores(fecha);
+      const results = await UrgenciaServices.ObtenerCategorizadores(fecha);
 
       await sendOneSheetStream<UrgenciaCategorizacion>(
         res,
@@ -124,9 +131,8 @@ export class RpaFormularioController {
         results,
         {
           dateKeys: ['Piso', 'Usuario', 'Categorizacion', 'Nombre', 'Sexo', 'Rut', 'Fecha'],
-          borders: true, // ⚠️ activa con cautela en datasets enormes
-          // headerColorArgb: 'FF4F46E5',
-          // columnWidths: { diag: 40, trat: 35, Direccion: 30 }, // opcional
+          headerColorArgb: 'FF59ACA5',
+          borders: true,
         }
       );
     } catch (error) {
@@ -138,7 +144,7 @@ export class RpaFormularioController {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
+      const results = await UrgenciaServices.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
 
       const wb = new ExcelJS.Workbook();
 
@@ -162,7 +168,7 @@ export class RpaFormularioController {
             { header: 'Diagnóstico', key: 'diag' },
           ],
           results as any,
-          { dateKeys: ['fecha', 'Ingreso_Hospitalizado'] }
+          { dateKeys: ['fecha', 'Ingreso_Hospitalizado'], headerColorArgb: 'FF59ACA5' }
         );
       } else {
         // Pabellón
@@ -183,7 +189,7 @@ export class RpaFormularioController {
             { header: 'Diagnóstico', key: 'diag' },
           ],
           results as any,
-          { dateKeys: ['Ingreso_Urg', 'Ingreso_Pabe'] }
+          { dateKeys: ['Ingreso_Urg', 'Ingreso_Pabe'], headerColorArgb: 'FF59ACA5' }
         );
       }
 
@@ -197,7 +203,7 @@ export class RpaFormularioController {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerInformeIras(fechaInicio, fechaTermino, tipo);
+      const results = await UrgenciaServices.ObtenerInformeIras(fechaInicio, fechaTermino, tipo);
 
       const wb = new ExcelJS.Workbook();
       await buildSheet<UrgenciaIrasFila>(
@@ -212,7 +218,7 @@ export class RpaFormularioController {
           { header: 'Diagnóstico', key: 'Diagnostico' },
         ],
         results,
-        { dateKeys: ['Fecha_Admision'] }
+        { dateKeys: ['Fecha_Admision'], headerColorArgb: 'FF59ACA5' }
       );
 
       await sendWorkbook(res, wb, `IRAS_${tipo}_${fechaInicio}_a_${fechaTermino}.xlsx`);

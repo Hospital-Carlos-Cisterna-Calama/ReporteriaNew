@@ -1,0 +1,54 @@
+<div class="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
+  <!-- Sidebar -->
+  <app-sidebar
+    [title]="'REPORTES'"
+    [subtitle]="'Farmacia'"
+    [items]="reportes()"
+    [selectedItemId]="reporteSeleccionado()"
+    [isOpen]="sidebarAbierto()"
+    [icons]="iconos"
+    (toggleSidebar)="alternarSidebar()"
+    (selectItem)="seleccionarReporte($event)"
+  />
+
+  <!-- Contenido Principal -->
+  <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="p-4 sm:p-6 lg:p-8">
+      <!-- Banner de Instrucciones -->
+      <app-banner-instrucciones
+        [titulo]="'Sistema de Reportería de Farmacia'"
+        [descripcion]="'Selecciona un reporte del menú lateral para generar informes de medicamentos, UNACES y GES'"
+        [colorGradient]="'teal'"
+        [mostrarBotonMenu]="true"
+        [sidebarAbierto]="sidebarAbierto()"
+        (toggleSidebar)="alternarSidebar()"
+      />
+
+      @if (reporteSeleccionado()) {
+        <!-- Área de Contenido -->
+        <div class="animate-fade-in">
+          <!-- Filtros con componente reutilizable -->
+          <app-filtros-farmacia-reporte
+            [categoria]="'Farmacia'"
+            [usarSelectorMes]="false"
+            [cargando]="cargandoReporte()"
+            (descargar)="descargarReporte($event)"
+            (limpiar)="limpiarFiltros()"
+          >
+            <span titulo>{{ reporteSeleccionado() }}</span>
+          </app-filtros-farmacia-reporte>
+        </div>
+      } @else {
+        <!-- Estado vacío con componente reutilizable -->
+        <app-estado-vacio
+          [icono]="'💊'"
+          [titulo]="'Bienvenido a Reportes de Farmacia'"
+          [descripcion]="'Selecciona un tipo de reporte del menú lateral para comenzar a generar tus informes personalizados'"
+          [estadisticas]="estadisticas()"
+        >
+        </app-estado-vacio>
+      }
+    </div>
+  </main>
+</div>
+

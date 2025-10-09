@@ -1,155 +1,182 @@
-import { Component, output, signal } from '@angular/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, output, ElementRef, viewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import flatpickr from 'flatpickr';
+import { Spanish } from 'flatpickr/dist/l10n/es';
+import type { Instance } from 'flatpickr/dist/types/instance';
 
 export interface RangoFechas {
   fechaInicio: Date | null;
   fechaFin: Date | null;
 }
 
-/**
- * Componente de selector de rango de fechas usando Angular Material
- */
 @Component({
   selector: 'app-selector-rango-fechas',
   standalone: true,
-  imports: [
-    MatDatepickerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatNativeDateModule,
-    ReactiveFormsModule
-  ],
+  imports: [],
   templateUrl: './selector-rango-fechas.component.html',
   styles: [`
-    :host ::ng-deep .custom-datepicker {
-      /* Contenedor principal del input */
-      .mdc-text-field {
-        background-color: white !important;
-        border-radius: 12px !important;
-        height: 56px !important;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    @import 'flatpickr/dist/flatpickr.css';
+
+    :host ::ng-deep {
+      .flatpickr-calendar {
+        border-radius: 0.75rem !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        border: 2px solid #14b8a6 !important;
       }
 
-      .mdc-text-field:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-        transform: translateY(-1px);
+      .flatpickr-months {
+        background: linear-gradient(to right, #0d9488, #14b8a6) !important;
+        border-radius: 0.625rem 0.625rem 0 0 !important;
       }
 
-      /* Bordes del outline */
-      .mdc-notched-outline__leading,
-      .mdc-notched-outline__notch,
-      .mdc-notched-outline__trailing {
-        border-color: #d1d5db !important;
-        border-width: 2px !important;
+      .flatpickr-month {
+        color: white !important;
       }
 
-      .mdc-notched-outline__leading {
-        border-radius: 12px 0 0 12px !important;
-        width: 48px !important;
+      .flatpickr-current-month {
+        color: white !important;
       }
 
-      .mdc-notched-outline__trailing {
-        border-radius: 0 12px 12px 0 !important;
+      .flatpickr-current-month input.cur-year {
+        color: white !important;
+        font-weight: 600 !important;
       }
 
-      /* Hover state */
-      .mdc-text-field:hover .mdc-notched-outline__leading,
-      .mdc-text-field:hover .mdc-notched-outline__notch,
-      .mdc-text-field:hover .mdc-notched-outline__trailing {
-        border-color: #2dd4bf !important;
-      }
-
-      /* Focus state */
-      .mdc-text-field--focused .mdc-notched-outline__leading,
-      .mdc-text-field--focused .mdc-notched-outline__notch,
-      .mdc-text-field--focused .mdc-notched-outline__trailing {
-        border-color: #0d9488 !important;
-        border-width: 2px !important;
-      }
-
-      /* Input text */
-      .mat-mdc-input-element {
-        font-weight: 500 !important;
-        color: #111827 !important;
-        font-size: 1rem !important;
-        padding-left: 48px !important;
-        padding-right: 48px !important;
-        cursor: pointer !important;
-        caret-color: transparent !important;
-      }
-
-      /* Placeholder */
-      .mat-mdc-input-element::placeholder {
-        color: #9ca3af !important;
-        opacity: 1 !important;
-      }
-
-      /* Ocultar label flotante */
-      .mdc-floating-label {
-        display: none !important;
-      }
-
-      /* Icono del calendario a la izquierda */
-      .mat-datepicker-toggle {
-        position: absolute !important;
-        left: 8px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        z-index: 2 !important;
-      }
-
-      .mat-datepicker-toggle button {
+      .flatpickr-monthDropdown-months {
+        background: white !important;
         color: #0d9488 !important;
-        width: 32px !important;
-        height: 32px !important;
+        font-weight: 600 !important;
       }
 
-      .mat-datepicker-toggle svg {
-        width: 20px !important;
-        height: 20px !important;
+      .flatpickr-prev-month svg,
+      .flatpickr-next-month svg {
+        fill: white !important;
       }
 
-      /* Ajustar padding del contenedor */
-      .mat-mdc-form-field-infix {
-        padding-top: 16px !important;
-        padding-bottom: 16px !important;
-        min-height: auto !important;
+      .flatpickr-prev-month:hover svg,
+      .flatpickr-next-month:hover svg {
+        fill: #ccfbf1 !important;
       }
 
-      .mat-mdc-text-field-wrapper {
-        padding: 0 !important;
+      .flatpickr-weekdays {
+        background: #f0fdfa !important;
       }
 
-      /* Remover hint wrapper */
-      .mat-mdc-form-field-subscript-wrapper {
-        display: none !important;
+      .flatpickr-weekday {
+        color: #0d9488 !important;
+        font-weight: 600 !important;
+      }
+
+      .flatpickr-day {
+        color: #374151 !important;
+        border-radius: 0.5rem !important;
+        font-weight: 500 !important;
+      }
+
+      .flatpickr-day:hover {
+        background: #ccfbf1 !important;
+        border-color: #14b8a6 !important;
+        color: #0d9488 !important;
+      }
+
+      .flatpickr-day.today {
+        border-color: #14b8a6 !important;
+        color: #0d9488 !important;
+        font-weight: 700 !important;
+      }
+
+      .flatpickr-day.selected,
+      .flatpickr-day.startRange,
+      .flatpickr-day.endRange {
+        background: linear-gradient(to bottom right, #0d9488, #14b8a6) !important;
+        border-color: #0d9488 !important;
+        color: white !important;
+        font-weight: 600 !important;
+      }
+
+      .flatpickr-day.inRange {
+        background: #ccfbf1 !important;
+        border-color: #99f6e4 !important;
+        color: #0d9488 !important;
+        box-shadow: none !important;
+      }
+
+      .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),
+      .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),
+      .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
+        box-shadow: -10px 0 0 #ccfbf1 !important;
       }
     }
   `]
 })
-export class SelectorRangoFechasComponent {
+export class SelectorRangoFechasComponent implements AfterViewInit, OnDestroy {
   readonly cambioFecha = output<RangoFechas>();
 
-  rangoFechas = new FormGroup({
-    fechaInicio: new FormControl<Date | null>(null),
-    fechaFin: new FormControl<Date | null>(null)
-  });
+  readonly inputInicio = viewChild<ElementRef<HTMLInputElement>>('inputInicio');
+  readonly inputFin = viewChild<ElementRef<HTMLInputElement>>('inputFin');
 
-  alCambiarFecha() {
-    const rango = this.rangoFechas.value;
+  private flatpickrInstanceInicio?: Instance;
+  private flatpickrInstanceFin?: Instance;
+
+  fechaInicio: Date | null = null;
+  fechaFin: Date | null = null;
+
+  ngAfterViewInit() {
+    this.inicializarFlatpickr();
+  }
+
+  ngOnDestroy() {
+    this.flatpickrInstanceInicio?.destroy();
+    this.flatpickrInstanceFin?.destroy();
+  }
+
+  private inicializarFlatpickr() {
+    const inputInicioEl = this.inputInicio()?.nativeElement;
+    const inputFinEl = this.inputFin()?.nativeElement;
+
+    if (!inputInicioEl || !inputFinEl) return;
+
+    // Configurar Flatpickr para Fecha Inicio
+    this.flatpickrInstanceInicio = flatpickr(inputInicioEl, {
+      locale: Spanish,
+      dateFormat: 'd/m/Y',
+      allowInput: false,
+      onChange: (selectedDates) => {
+        this.fechaInicio = selectedDates[0] || null;
+
+        // Actualizar el min del input fin
+        if (this.flatpickrInstanceFin && this.fechaInicio) {
+          this.flatpickrInstanceFin.set('minDate', this.fechaInicio);
+        }
+
+        this.emitirCambio();
+      }
+    });
+
+    // Configurar Flatpickr para Fecha Fin
+    this.flatpickrInstanceFin = flatpickr(inputFinEl, {
+      locale: Spanish,
+      dateFormat: 'd/m/Y',
+      allowInput: false,
+      minDate: this.fechaInicio || undefined,
+      onChange: (selectedDates) => {
+        this.fechaFin = selectedDates[0] || null;
+        this.emitirCambio();
+      }
+    });
+  }
+
+  private emitirCambio() {
     this.cambioFecha.emit({
-      fechaInicio: rango.fechaInicio ?? null,
-      fechaFin: rango.fechaFin ?? null
+      fechaInicio: this.fechaInicio,
+      fechaFin: this.fechaFin
     });
   }
 
   limpiar() {
-    this.rangoFechas.reset();
-    this.alCambiarFecha();
+    this.fechaInicio = null;
+    this.fechaFin = null;
+    this.flatpickrInstanceInicio?.clear();
+    this.flatpickrInstanceFin?.clear();
+    this.emitirCambio();
   }
 }
