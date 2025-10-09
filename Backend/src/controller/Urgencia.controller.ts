@@ -94,7 +94,14 @@ export class UrgenciaController {
         {
           dateKeys: ['fecha_ingreso_siclope', 'fecha_ingreso_helios', 'fecha_traslado_helios'],
           headerColorArgb: 'FF59ACA5',
-          columnWidths: { fecha_ingreso_siclope: 18, fecha_ingreso_helios: 18, fecha_traslado_helios: 18, servicio_traslado: 40 },
+          columnWidths: {
+            fecha_ingreso_siclope: 18,
+            fecha_ingreso_helios: 18,
+            fecha_traslado_helios: 18,
+            servicio_traslado: 40,
+            diferencia_ingreso_indicacion_siclope: 35,
+            servicio_ingreso: 35,
+          },
         }
       );
     } catch (error) {
@@ -124,9 +131,8 @@ export class UrgenciaController {
         results,
         {
           dateKeys: ['Piso', 'Usuario', 'Categorizacion', 'Nombre', 'Sexo', 'Rut', 'Fecha'],
-          borders: true, // ⚠️ activa con cautela en datasets enormes
-          // headerColorArgb: 'FF4F46E5',
-          // columnWidths: { diag: 40, trat: 35, Direccion: 30 }, // opcional
+          headerColorArgb: 'FF59ACA5',
+          borders: true,
         }
       );
     } catch (error) {
@@ -162,7 +168,7 @@ export class UrgenciaController {
             { header: 'Diagnóstico', key: 'diag' },
           ],
           results as any,
-          { dateKeys: ['fecha', 'Ingreso_Hospitalizado'] }
+          { dateKeys: ['fecha', 'Ingreso_Hospitalizado'], headerColorArgb: 'FF59ACA5' }
         );
       } else {
         // Pabellón
@@ -183,7 +189,7 @@ export class UrgenciaController {
             { header: 'Diagnóstico', key: 'diag' },
           ],
           results as any,
-          { dateKeys: ['Ingreso_Urg', 'Ingreso_Pabe'] }
+          { dateKeys: ['Ingreso_Urg', 'Ingreso_Pabe'], headerColorArgb: 'FF59ACA5' }
         );
       }
 
@@ -212,7 +218,7 @@ export class UrgenciaController {
           { header: 'Diagnóstico', key: 'Diagnostico' },
         ],
         results,
-        { dateKeys: ['Fecha_Admision'] }
+        { dateKeys: ['Fecha_Admision'], headerColorArgb: 'FF59ACA5' }
       );
 
       await sendWorkbook(res, wb, `IRAS_${tipo}_${fechaInicio}_a_${fechaTermino}.xlsx`);
