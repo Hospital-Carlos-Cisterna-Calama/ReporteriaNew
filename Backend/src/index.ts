@@ -3,7 +3,7 @@ import 'reflect-metadata'; // Necesario para decoradores de sequelize-typescript
 import 'dotenv/config'; // Carga variables del .env ANTES de usar Sequelize o cualquier config
 
 import app from './app';
-import { initDatabase } from './config/initDatabase';
+import { connectDatabase, initDatabase } from './config/initDatabase';
 
 const PORT = Number(process.env.PORT) || 3001;
 

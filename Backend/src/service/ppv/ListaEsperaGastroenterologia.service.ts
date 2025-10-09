@@ -117,14 +117,14 @@ export class ListaEsperaGastroenterologiaService {
       col.width = 18;
     });
 
-//     const nombreArchivo = `Lista_Espera_Gastro_${dayjs().format('YYYYMMDD_HHmm')}.xlsx`;
+    const nombreArchivo = `Lista_Espera_Gastro_${dayjs().format('YYYYMMDD_HHmm')}.xlsx`;
 
-//     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
-//     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
-//     await workbook.xlsx.write(res);
-//     res.end();
-//   }
+    await workbook.xlsx.write(res);
+    res.end();
+  }
 
   async exportarReporte(fechaInicio: Date, fechaFin: Date, tipo: number, res: Response) {
     const lista = await this.obtenerListaEsperaGastroenterologia(fechaInicio, fechaFin, tipo);
