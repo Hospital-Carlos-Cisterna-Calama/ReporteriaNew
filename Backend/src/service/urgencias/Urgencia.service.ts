@@ -9,17 +9,39 @@ import {
 } from '../../interfaces/RpaFormularario.interface';
 import { convertirFecha } from '../../utils/helperRPA';
 
-export class RpaFormularioService {
+export class UrgenciaService {
   async ObtenerUrgencia(fechaIni: string, fechaTerm: string, tipo: 'A' | 'U' | 'M' | string): Promise<InformeUrgenciaFila[]> {
     const tipoFormu = '04';
-    const fechaInicio = convertirFecha(fechaIni, false);
-    const fechaFin = convertirFecha(fechaTerm, true);
-    const sql = `EXEC REPORTERIA_URG_GetUrgenciaInforme @FechaInicio= :fechaInicio, @FechaFin= :fechaFin,@tipoFormu= :tipoFormu,@tipo= :tipo`;
-    const resultados = await sequelize.query<InformeUrgenciaFila>(sql, {
-      type: QueryTypes.SELECT,
-      replacements: { fechaInicio, fechaFin, tipoFormu, tipo },
-    });
-    return resultados;
+
+    const inicio = new Date(convertirFecha(fechaIni, false));
+    const fin = new Date(convertirFecha(fechaTerm, true));
+
+    const intervaloMs = 1000 * 60 * 60 * 24 * 14; // 2 semanas en milisegundos
+
+    let fechaInicioIntervalo = new Date(inicio);
+
+    const resultadosTotales: InformeUrgenciaFila[] = [];
+
+    while (fechaInicioIntervalo <= fin) {
+      const fechaFinIntervalo = new Date(Math.min(fechaInicioIntervalo.getTime() + intervaloMs, fin.getTime()));
+
+      const fechaInicioFmt = convertirFecha(fechaInicioIntervalo.toISOString().slice(0, 10), false);
+      const fechaFinFmt = convertirFecha(fechaFinIntervalo.toISOString().slice(0, 10), true);
+
+      const sql = `EXEC REPORTERIA_URG_GetUrgenciaInforme @FechaInicio= :fechaInicio, @FechaFin= :fechaFin, @tipoFormu= :tipoFormu, @tipo= :tipo`;
+
+      const intervaloResultados = await sequelize.query<InformeUrgenciaFila>(sql, {
+        type: QueryTypes.SELECT,
+        replacements: { fechaInicio: fechaInicioFmt, fechaFin: fechaFinFmt, tipoFormu, tipo },
+      });
+
+      resultadosTotales.push(...intervaloResultados);
+
+      // Avanza 2 semanas
+      fechaInicioIntervalo = new Date(fechaInicioIntervalo.getTime() + intervaloMs);
+    }
+
+    return resultadosTotales;
   }
 
   async ObtenerUrgenciaDoceHoras(fechaInicio: string, fechaTermino: string): Promise<UrgenciaDoceHoraFila[]> {

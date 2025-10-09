@@ -13,7 +13,7 @@ const app = express();
 ────────────────────────────── */
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000','http://127.0.0.1:4300', 'http://ticket.hospitalcalama.cl'],
+    origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     credentials: true,
