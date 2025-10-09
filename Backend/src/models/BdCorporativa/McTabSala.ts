@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, AllowNull } 
   tableName: 'MC_TAB_Salas',
   timestamps: false,
 })
-export class McTabSala extends Model<McTabSala> {
+export default class McTabSala extends Model<McTabSala> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(false)

@@ -1,17 +1,26 @@
-import 'dotenv/config';
-import app from './app';
-import { initDatabase } from './config/databaseEnti';
+// ⚠️ ¡Debe ser la PRIMERA línea!
+import 'dotenv/config'; // Carga variables del .env ANTES de usar Sequelize o cualquier config
 
+import app from './app';
+import { connectDatabase } from './config/initDatabase';
+
+// Puerto por defecto
 const PORT = Number(process.env.PORT) || 3002;
 
+/* ──────────────────────────────
+   🔹 Inicialización principal
+────────────────────────────── */
 (async () => {
   try {
-    // Sincronizar base de datos
-    await initDatabase('connect'); // Cambia este parámetro según necesites
+    console.log('🚀 Iniciando servidor...');
+    console.log('🌐 Intentando conectar a las bases de datos...');
+
+    // ✅ Conecta a todas las bases
+    await connectDatabase();
 
     const server = app.listen(PORT, () => {
-      console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
-      console.log(`⚡ Modo: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`✅ Servidor escuchando en: http://localhost:${PORT}`);
+      console.log(`⚡ Modo: ${process.env.NODE_ENV || 'Desarrollo'}`);
     });
 
     // Aumentar timeout del servidor a 5 minutos para reportes pesados
@@ -21,16 +30,19 @@ const PORT = Number(process.env.PORT) || 3002;
     
     console.log(`⏱️  Timeout del servidor: ${server.timeout}ms (${server.timeout / 1000}s)`);
   } catch (error) {
-    console.error('❌ Error de inicio:', error);
-    process.exit(1);
+    console.error('❌ Error de inicio del servidor o base de datos:');
+    console.error(error);
+    process.exit(1); 
   }
 })();
 
-// Manejo de errores globales
+/* ──────────────────────────────
+   🔹 Errores globales (seguridad extra)
+────────────────────────────── */
 process.on('unhandledRejection', err => {
-  console.error('Unhandled Rejection:', err);
+  console.error('❌ Unhandled Rejection:', err);
 });
 
 process.on('uncaughtException', err => {
-  console.error('Uncaught Exception:', err);
+  console.error('❌ Uncaught Exception:', err);
 });

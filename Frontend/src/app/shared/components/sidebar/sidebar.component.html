@@ -1,73 +1,117 @@
+<!-- Overlay móvil -->
+<div
+  class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-all duration-300"
+  [class.opacity-0]="!isOpen()"
+  [class.pointer-events-none]="!isOpen()"
+  (click)="onToggle()"
+></div>
+
+<!-- Sidebar -->
 <aside
-  [class.w-64]="isOpen()"
-  [class.w-20]="!isOpen()"
-  class="h-full bg-gradient-to-br from-teal-600 via-teal-600 to-teal-700 text-white transition-all duration-300 ease-in-out shadow-2xl relative flex flex-col border-r border-teal-500/30"
+  class="fixed top-0 left-0 z-50 h-screen bg-gradient-to-b from-teal-600 via-teal-700 to-teal-800 text-white shadow-2xl transition-all duration-300 ease-out flex flex-col
+         w-80 max-w-[85vw] lg:relative lg:z-auto lg:shadow-xl"
+  [class.-translate-x-full]="!isOpen()"
+  [class.lg:translate-x-0]="true"
+  [class.lg:w-80]="isOpen()"
+  [class.lg:w-20]="!isOpen()"
 >
-  <!-- Header del Sidebar -->
-  <div class="p-5 border-b border-white/10 backdrop-blur-sm bg-white/5">
-    <div class="flex items-center justify-between">
-      @if (isOpen()) {
-        <div class="flex-1">
-          <h2 class="text-sm font-bold tracking-wider uppercase text-teal-50">{{ title() }}</h2>
-          @if (subtitle()) {
-            <p class="text-xs text-teal-200 mt-0.5 font-medium">{{ subtitle() }}</p>
-          }
+  <!-- Header con degradado -->
+  <div class="relative p-4 lg:p-3 border-b border-white/10 bg-gradient-to-r from-white/5 to-transparent backdrop-blur-sm flex-shrink-0">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+
+    <div class="flex items-center justify-between relative z-10">
+      <div class="flex-1 min-w-0 overflow-hidden transition-all duration-300" [class.lg:opacity-0]="!isOpen()" [class.lg:scale-95]="!isOpen()">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center">
+            <span class="text-lg">📊</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h2 class="text-sm font-bold tracking-wider uppercase text-white truncate">{{ title() }}</h2>
+            @if (subtitle()) {
+              <p class="text-xs text-teal-100 mt-0.5 truncate">{{ subtitle() }}</p>
+            }
+          </div>
         </div>
-      }
+      </div>
+
       <button
         (click)="onToggle()"
-        class="p-2 hover:bg-white/10 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-        [class.ml-auto]="isOpen()"
-        [attr.aria-label]="isOpen() ? 'Cerrar sidebar' : 'Abrir sidebar'"
+        class="hidden lg:flex items-center justify-center p-2 hover:bg-white/15 active:bg-white/20 rounded-lg transition-all duration-200 flex-shrink-0 group"
+        [class.lg:ml-3]="isOpen()"
+        [class.lg:mx-auto]="!isOpen()"
+        [attr.aria-label]="isOpen() ? 'Comprimir menú' : 'Expandir menú'"
       >
         <lucide-icon
-          [img]="isOpen() ? chevronIcons.ChevronLeft : chevronIcons.ChevronRight"
-          class="w-5 h-5 text-teal-50"
+          [img]="chevronIcons.ChevronLeft"
+          class="w-5 h-5 text-white transition-transform duration-300 group-hover:scale-110"
+          [class.rotate-180]="!isOpen()"
         ></lucide-icon>
       </button>
     </div>
   </div>
 
-  <!-- Lista de Items -->
-  <nav class="flex-1 overflow-y-auto py-3 scrollbar-thin scrollbar-thumb-teal-500 scrollbar-track-transparent">
-    <ul class="space-y-0.5 px-3">
+  <!-- Lista de reportes con scroll suave -->
+  <nav class="flex-1 overflow-y-auto py-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
+    <ul class="space-y-1 px-2">
       @for (item of items(); track item.title) {
-        <li>
+        <li class="relative">
           <button
             (click)="onSelectItem(item.title)"
-            [class]="selectedItemId() === item.title
-              ? 'bg-white/20 shadow-lg shadow-teal-900/20 border-l-4 border-white'
-              : 'bg-transparent hover:bg-white/10 border-l-4 border-transparent'"
-            class="w-full text-left px-3 py-3.5 rounded-r-lg transition-all duration-200 group relative overflow-hidden"
+            class="w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden"
+            [class.bg-white/25]="selectedItemId() === item.title"
+            [class.shadow-lg]="selectedItemId() === item.title"
+            [class.shadow-black/10]="selectedItemId() === item.title"
+            [class.hover:bg-white/15]="selectedItemId() !== item.title"
+            [attr.title]="!isOpen() ? item.title : null"
           >
-            <!-- Efecto hover -->
-            <div class="absolute inset-0 bg-gradient-to-r from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            <!-- Borde lateral animado -->
+            <div
+              class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full transition-all duration-300"
+              [class.bg-white]="selectedItemId() === item.title"
+              [class.scale-100]="selectedItemId() === item.title"
+              [class.scale-0]="selectedItemId() !== item.title"
+            ></div>
 
-            <div class="flex items-center gap-3 relative z-10">
-              <div class="flex-shrink-0">
-                <div [class]="selectedItemId() === item.title
-                  ? 'bg-white/30 text-white'
-                  : 'bg-teal-500/30 text-teal-100 group-hover:bg-white/20 group-hover:text-white'"
-                  class="p-2 rounded-lg transition-all duration-200"
-                >
-                  <lucide-icon
-                    [img]="icons()[item.icon]"
-                    class="w-4 h-4"
-                  ></lucide-icon>
-                </div>
+            <!-- Brillo hover -->
+            <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-full group-hover:translate-x-full" style="transition: transform 0.6s ease-out, opacity 0.3s;"></div>
+
+            <div class="flex items-center gap-3 relative z-10 transition-all duration-300" [class.lg:justify-center]="!isOpen()" [class.lg:gap-0]="!isOpen()">
+              <!-- Icono con animación -->
+              <div
+                class="flex-shrink-0 p-2 rounded-lg transition-all duration-300 transform group-hover:scale-110"
+                [class.bg-white/30]="selectedItemId() === item.title"
+                [class.shadow-md]="selectedItemId() === item.title"
+                [class.bg-white/10]="selectedItemId() !== item.title"
+              >
+                <lucide-icon
+                  [img]="icons()[item.icon]"
+                  class="w-4 h-4 transition-transform duration-300 group-hover:rotate-3"
+                  [class.text-white]="selectedItemId() === item.title"
+                  [class.text-teal-100]="selectedItemId() !== item.title"
+                ></lucide-icon>
               </div>
-              @if (isOpen()) {
-                <div class="flex-1 min-w-0">
-                  <div [class]="selectedItemId() === item.title ? 'text-white font-semibold' : 'text-teal-50 font-medium'"
-                    class="text-sm leading-tight">
-                    {{ item.title }}
-                  </div>
-                  @if (item.description) {
-                    <div class="text-xs text-teal-100/80 mt-0.5 truncate leading-tight">
-                      {{ item.description }}
-                    </div>
-                  }
+
+              <!-- Texto con fade -->
+              <div class="flex-1 min-w-0 transition-all duration-300" [class.lg:hidden]="!isOpen()" [class.lg:opacity-0]="!isOpen()">
+                <div
+                  class="text-sm leading-tight truncate transition-all duration-200"
+                  [class.font-bold]="selectedItemId() === item.title"
+                  [class.text-white]="selectedItemId() === item.title"
+                  [class.font-medium]="selectedItemId() !== item.title"
+                  [class.text-teal-50]="selectedItemId() !== item.title"
+                >
+                  {{ item.title }}
                 </div>
+                @if (item.description && isOpen()) {
+                  <div class="text-xs text-teal-100/80 mt-0.5 truncate transition-all duration-200">
+                    {{ item.description }}
+                  </div>
+                }
+              </div>
+
+              <!-- Badge de selección -->
+              @if (selectedItemId() === item.title && isOpen()) {
+                <div class="flex-shrink-0 w-2 h-2 rounded-full bg-white animate-pulse"></div>
               }
             </div>
           </button>
@@ -76,21 +120,17 @@
     </ul>
   </nav>
 
-  <!-- Footer del Sidebar -->
-  @if (isOpen()) {
-    <div class="p-4 border-t border-white/10 backdrop-blur-sm bg-white/5">
-      <div class="bg-teal-700/50 rounded-lg p-3 border border-white/10">
-        <div class="flex items-center gap-2 mb-2">
-          <div class="relative">
-            <div class="w-2 h-2 bg-emerald-400 rounded-full"></div>
-            <div class="w-2 h-2 bg-emerald-400 rounded-full absolute inset-0 animate-ping"></div>
-          </div>
-          <span class="text-xs font-semibold text-teal-50">Sistema Activo</span>
-        </div>
-        <div class="text-xs text-teal-100 font-medium">
-          <span class="text-white font-bold">{{ itemCount() }}</span> reportes disponibles
-        </div>
+  <!-- Footer con estadísticas (opcional) -->
+  <div class="border-t border-white/10 p-3 bg-gradient-to-r from-white/5 to-transparent transition-all duration-300" [class.lg:p-2]="!isOpen()">
+    <div class="flex items-center justify-center gap-2" [class.lg:flex-col]="!isOpen()">
+      <div class="text-xs text-teal-100/80 transition-all duration-300" [class.lg:hidden]="!isOpen()">
+        {{ itemCount() }} reportes disponibles
       </div>
+      @if (!isOpen()) {
+        <div class="hidden lg:flex w-8 h-8 rounded-full bg-white/20 items-center justify-center">
+          <span class="text-xs font-bold text-white">{{ itemCount() }}</span>
+        </div>
+      }
     </div>
-  }
+  </div>
 </aside>

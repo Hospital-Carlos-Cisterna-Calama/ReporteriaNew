@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RpaFormularioService } from '../service/RpaFormulario.service';
+import { RpaFormularioService } from '../service/urgencias/RpaFormulario.service';
 import {
   UrgenciaDoceHoraFila,
   InformeUrgenciaFila,

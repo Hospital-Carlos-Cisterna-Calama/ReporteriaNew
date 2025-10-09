@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, AllowNull, PrimaryKey } from 'sequelize
   tableName: 'SER_Profesiona',
   timestamps: false,
 })
-export class SerProfesiona extends Model<SerProfesiona> {
+export default class SerProfesiona extends Model<SerProfesiona> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.STRING(10))

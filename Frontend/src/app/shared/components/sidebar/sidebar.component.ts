@@ -1,5 +1,6 @@
 import { Component, input, output, computed } from '@angular/core';
-import { LucideAngularModule, ChevronLeft, ChevronRight, LucideIconData } from 'lucide-angular';
+import { LucideAngularModule, ChevronLeft, ChevronRight } from 'lucide-angular';
+import type { LucideIconData } from 'lucide-angular';
 
 export interface SidebarItem {
   title: string;
@@ -10,37 +11,28 @@ export interface SidebarItem {
 
 @Component({
   selector: 'app-sidebar',
-  standalone: true,
   imports: [LucideAngularModule],
   templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {
-  // Inputs
-  readonly title = input<string>('REPORTES');
-  readonly subtitle = input<string>('');
+  readonly title = input('REPORTES');
+  readonly subtitle = input('');
   readonly items = input<SidebarItem[]>([]);
   readonly selectedItemId = input<string | null>(null);
-  readonly isOpen = input<boolean>(true);
+  readonly isOpen = input(true);
   readonly icons = input<Record<string, LucideIconData>>({});
 
-  // Outputs
   readonly toggleSidebar = output<void>();
   readonly selectItem = output<string>();
 
-  // Iconos internos
-  readonly chevronIcons = {
-    ChevronLeft,
-    ChevronRight
-  };
-
-  // Computed
+  readonly chevronIcons = { ChevronLeft, ChevronRight };
   readonly itemCount = computed(() => this.items().length);
 
-  onToggle() {
+  onToggle(): void {
     this.toggleSidebar.emit();
   }
 
-  onSelectItem(itemTitle: string) {
+  onSelectItem(itemTitle: string): void {
     this.selectItem.emit(itemTitle);
   }
 }

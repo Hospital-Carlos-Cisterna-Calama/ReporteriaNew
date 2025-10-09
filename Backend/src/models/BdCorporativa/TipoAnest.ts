@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'TAB_TipoAnest',
   timestamps: false,
 })
-export class TipoAnest extends Model<TipoAnest> {
+export default class TipoAnest extends Model<TipoAnest> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(4))

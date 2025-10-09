@@ -99,3 +99,91 @@ export const reporteUrgIrasSchema = Joi.object({
       'any.required': 'El tipo de reporte IRA es requerido'
     })
 });
+
+// PPV Reportes
+
+export const hospitalizacionesPorServicioSchema = Joi.object({
+  fechaInicio: Joi.string().isoDate().required().messages({
+    'string.empty': 'Debe indicar la fecha de inicio',
+    'any.required': 'La fecha de inicio es obligatoria',
+  }),
+  fechaFin: Joi.string().isoDate().required().messages({
+    'string.empty': 'Debe indicar la fecha de término',
+    'any.required': 'La fecha de término es obligatoria',
+  }),
+  especialidad: Joi.string().optional().allow(null, '').messages({
+    'string.base': 'La especialidad debe ser un texto válido',
+  }),
+});
+
+export const ingresosEgresosSchema = Joi.object({
+  fechaInicio: Joi.string().isoDate().required(),
+  fechaFin: Joi.string().isoDate().required(),
+  unidad: Joi.string().required().messages({ 'any.required': 'Debe indicar la unidad' }),
+  filtro: Joi.string().valid('ingreso', 'egreso', 'todos').default('todos').messages({
+    'any.only': 'El filtro debe ser "ingreso", "egreso" o "todos"',
+  }),
+});
+
+export const intervencionPabellonSchema = Joi.object({
+  fechaInicio: Joi.string().isoDate().required(),
+  fechaFin: Joi.string().isoDate().required(),
+  pabellonId: Joi.string().optional().allow(null, ''),
+});
+
+export const irGrdSchema = Joi.object({
+  fechaInicio: Joi.string().isoDate().required(),
+  fechaFin: Joi.string().isoDate().required(),
+});
+
+export const listaEsperaSchema = Joi.object({
+  fechaInicio: Joi.string().isoDate().required(),
+  fechaFin: Joi.string().isoDate().required(),
+  tipo: Joi.number().valid(1, 2).required().messages({
+    'any.only': 'El tipo debe ser 1 (Solicitud) o 2 (Realización)',
+  }),
+});
+
+export const pacientesHospitalizadosSchema = Joi.object({
+  fechaInicio: Joi.string().isoDate().required(),
+  fechaFin: Joi.string().isoDate().required(),
+  servicioId: Joi.string().optional().allow(null, ''),
+});
+
+export const procedimientosSchema = Joi.object({
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaTermino: fechaSchema.label('Fecha de término'),
+  especialidadId: Joi.string()
+    .optional()
+    .allow(null, '')
+    .messages({
+      'string.base': 'El ID de especialidad debe ser un texto válido'
+    })
+    .label('ID de Especialidad'),
+  subEspecialidadId: Joi.number()
+    .integer()
+    .optional()
+    .allow(null)
+    .messages({
+      'number.base': 'El ID de sub especialidad debe ser un número',
+      'number.integer': 'El ID de sub especialidad debe ser un número entero'
+    })
+    .label('ID de Sub Especialidad')
+});
+
+// ============================================================================
+// SCHEMAS DE VALIDACIÓN PARA ESPECIALIDADES
+// ============================================================================
+
+/**
+ * Schema de validación para obtener sub especialidades por especialidad
+ */
+export const subEspecialidadesSchema = Joi.object({
+  especialidadId: Joi.string()
+    .required()
+    .messages({
+      'string.empty': 'El ID de especialidad es requerido',
+      'any.required': 'El ID de especialidad es requerido'
+    })
+    .label('ID de Especialidad')
+});

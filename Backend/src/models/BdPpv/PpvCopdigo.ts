@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, AllowNull } 
   tableName: 'PPV_Codigo',
   timestamps: false,
 })
-export class PpvCodigo extends Model<PpvCodigo> {
+export default class PpvCodigo extends Model<PpvCodigo> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(true)

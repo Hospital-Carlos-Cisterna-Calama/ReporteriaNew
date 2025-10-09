@@ -5,7 +5,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'PAC_Carpeta',
   timestamps: false,
 })
-export class Carpeta extends Model<Carpeta> {
+export default class Carpeta extends Model<Carpeta> {
   @PrimaryKey
   @AllowNull(true)
   @Column(DataType.FLOAT)

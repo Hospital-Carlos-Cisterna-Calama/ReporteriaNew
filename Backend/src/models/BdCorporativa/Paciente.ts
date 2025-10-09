@@ -1,10 +1,10 @@
-import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AllowNull, HasMany } from 'sequelize-typescript';
 
 @Table({
   tableName: 'PAC_Paciente',
   timestamps: false,
 })
-export class Paciente extends Model<Paciente> {
+export default class Paciente extends Model<Paciente> {
   @PrimaryKey
   @AllowNull(true)
   @Column(DataType.FLOAT)

@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'SER_Objetos',
   timestamps: false,
 })
-export class SerObjeto extends Model<SerObjeto> {
+export default class SerObjeto extends Model<SerObjeto> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(8))

@@ -1,17 +1,11 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal, HostListener } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { LucideAngularModule, FileText, Clock, Building, TrendingUp, LucideIconData } from 'lucide-angular';
-import { SidebarComponent, SidebarItem } from '../../../shared/components/sidebar/sidebar.component';
-import { ModalResultadoComponent, type ConfiguracionModal } from '../../../shared/components/ui';
+import { SidebarComponent, SidebarItem } from '@shared/components/sidebar/sidebar.component';
+import { ModalResultadoComponent, BannerInstruccionesComponent, type ConfiguracionModal, EstadoVacioComponent, type EstadisticaReporte} from '@shared/components/ui';
 import type { ReporteUrgeciaHosQuery, ReporteUrgenciaDoceHorasQuery, ReporteUrgenciaQuery, ReporteUrgIrasQuery, ResporteUrgeciaCatQuery } from '../../interfaces/dto.interface';
-
-import {
-  FiltrosReporteComponent,
-  EstadoVacioComponent,
-  type FiltrosReporte,
-  type EstadisticaReporte
-} from '../../components';
+import { FiltrosReporteComponent, type FiltrosReporte } from '../../components';
 import { UrgenciaService } from '@app/urgencia/services/urgencia.service';
 
 @Component({
@@ -21,67 +15,37 @@ import { UrgenciaService } from '@app/urgencia/services/urgencia.service';
     LucideAngularModule,
     FiltrosReporteComponent,
     EstadoVacioComponent,
-    ModalResultadoComponent
+    ModalResultadoComponent,
+    BannerInstruccionesComponent
   ],
   templateUrl: './urgencia-page.component.html',
 })
 export class UrgenciaPageComponent {
   private readonly urgenciaService = inject(UrgenciaService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly BREAKPOINT_MOBILE = 768;
 
-  // Iconos
-  readonly iconos: Record<string, LucideIconData> = {
-    FileText,
-    Clock,
-    Building,
-    TrendingUp
-  };
+  readonly iconos: Record<string, LucideIconData> = { FileText, Clock, Building, TrendingUp };
 
-  // Estado del sidebar
-  sidebarAbierto = signal(true);
+  readonly sidebarAbierto = signal(this.obtenerEstadoInicialSidebar());
+  readonly cargandoReporte = signal(false);
+  readonly mostrarModal = signal(false);
+  readonly reporteSeleccionado = signal<string | null>(null);
 
-  // Estado de carga y modal
-  cargandoReporte = signal(false);
-  mostrarModal = signal(false);
-  configuracionModal = signal<ConfiguracionModal>({
+  readonly configuracionModal = signal<ConfiguracionModal>({
     tipo: 'info',
     titulo: '',
     mensaje: ''
   });
 
-  // Opciones de reportes
   readonly reportes = signal<SidebarItem[]>([
-    {
-      title: 'Urgencias',
-      icon: 'FileText',
-      description: 'Reporte general de atenciones de urgencia'
-    },
-    {
-      title: 'Urgencias (12-Horas)',
-      icon: 'Clock',
-      description: 'Reporte de urgencias de las últimas 12 horas'
-    },
-    {
-      title: 'Categorizaciones',
-      icon: 'TrendingUp',
-      description: 'Reporte de categorización de pacientes'
-    },
-    {
-      title: 'Urgencias - Hospitalizado',
-      icon: 'Building',
-      description: 'Pacientes de urgencia hospitalizados'
-    },
-    {
-      title: 'I.R.A.S',
-      icon: 'FileText',
-      description: 'Infecciones Respiratorias Agudas'
-    }
+    { title: 'Urgencias', icon: 'FileText', description: 'Reporte general de atenciones de urgencia' },
+    { title: 'Urgencias (12-Horas)', icon: 'Clock', description: 'Reporte de urgencias de las últimas 12 horas' },
+    { title: 'Categorizaciones', icon: 'TrendingUp', description: 'Reporte de categorización de pacientes' },
+    { title: 'Urgencias - Hospitalizado', icon: 'Building', description: 'Pacientes de urgencia hospitalizados' },
+    { title: 'I.R.A.S', icon: 'FileText', description: 'Infecciones Respiratorias Agudas' }
   ]);
 
-  // Reporte seleccionado
-  reporteSeleccionado = signal<string | null>(null);
-
-  // Estadísticas del sistema
   readonly estadisticas = signal<EstadisticaReporte[]>([
     { etiqueta: 'Reportes Disponibles', valor: '5', icono: '📊' },
     { etiqueta: 'Última Actualización', valor: 'Hoy', icono: '🕐' },
@@ -89,80 +53,70 @@ export class UrgenciaPageComponent {
     { etiqueta: 'Estado', valor: 'Activo', icono: '✅' }
   ]);
 
-  alternarSidebar() {
+  private obtenerEstadoInicialSidebar(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth >= this.BREAKPOINT_MOBILE;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    const ancho = (event.target as Window).innerWidth;
+    this.sidebarAbierto.set(ancho >= this.BREAKPOINT_MOBILE);
+  }
+
+  alternarSidebar(): void {
     this.sidebarAbierto.set(!this.sidebarAbierto());
   }
 
-  seleccionarReporte(titulo: string) {
+  seleccionarReporte(titulo: string): void {
     this.reporteSeleccionado.set(titulo);
-  }
 
-  descargarReporte(filtros: FiltrosReporte) {
-    const reporte = this.reporteSeleccionado();
-    if (!reporte) return;
-
-    switch (reporte) {
-      case 'Urgencias':
-        this.generarReporteUrgencias(filtros);
-        break;
-      case 'Urgencias (12-Horas)':
-        this.generarReporteUrgencias12Horas(filtros);
-        break;
-      case 'Categorizaciones':
-        this.generarReporteCategorizaciones(filtros);
-        break;
-      case 'Urgencias - Hospitalizado':
-        this.generarReporteUrgenciasHospitalizados(filtros);
-        break;
-      case 'I.R.A.S':
-        this.generarReporteIras(filtros);
-        break;
-      default:
-        console.warn('Reporte no implementado:', reporte);
+    if (typeof window !== 'undefined' && window.innerWidth < this.BREAKPOINT_MOBILE) {
+      this.sidebarAbierto.set(false);
     }
   }
 
-  limpiarFiltros() {
+  descargarReporte(filtros: FiltrosReporte): void {
+    const reporte = this.reporteSeleccionado();
+    if (!reporte) return;
+
+    const generadores: Record<string, () => void> = {
+      'Urgencias': () => this.generarReporteUrgencias(filtros),
+      'Urgencias (12-Horas)': () => this.generarReporteUrgencias12Horas(filtros),
+      'Categorizaciones': () => this.generarReporteCategorizaciones(filtros),
+      'Urgencias - Hospitalizado': () => this.generarReporteUrgenciasHospitalizados(filtros),
+      'I.R.A.S': () => this.generarReporteIras(filtros)
+    };
+
+    const generador = generadores[reporte];
+    if (generador) {
+      generador();
+    } else {
+      console.warn('Reporte no implementado:', reporte);
+    }
+  }
+
+  limpiarFiltros(): void {
     console.log('Limpiando filtros');
   }
 
-  // ============================================================================
-  // GENERADORES DE REPORTES
-  // ============================================================================
-
-  private generarReporteUrgencias(filtros: FiltrosReporte) {
+  private generarReporteUrgencias(filtros: FiltrosReporte): void {
     if (!this.validarFechas(filtros)) return;
 
-    // Mapear 'todos' | 'urgencias' | 'maternidad' a 'A' | 'U' | 'M'
-    const tipoMap: { [key: string]: 'A' | 'U' | 'M' } = {
-      'todos': 'A',
-      'urgencias': 'U',
-      'maternidad': 'M'
-    };
-
+    const tipoMap: Record<string, 'A' | 'U' | 'M'> = { todos: 'A', urgencias: 'U', maternidad: 'M' };
     const query: ReporteUrgenciaQuery = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaTermino: this.formatearFecha(filtros.fechaFin!),
       tipo: tipoMap[filtros.tipoReporte || 'todos'] || 'A'
     };
 
-    this.cargandoReporte.set(true);
-    this.urgenciaService.generarReporteUrgencias(query)
-      .pipe(
-        finalize(() => this.cargandoReporte.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (blob) => {
-          const nombre = `reporte-urgencias-${filtros.tipoReporte}-${query.fechaInicio}-${query.fechaTermino}.xlsx`;
-          this.descargarBlob(blob, nombre);
-          this.mostrarExito('Reporte de Urgencias generado correctamente');
-        },
-        error: (err) => this.mostrarError(err.message)
-      });
+    this.ejecutarDescarga(
+      this.urgenciaService.generarReporteUrgencias(query),
+      `reporte-urgencias-${filtros.tipoReporte}-${query.fechaInicio}-${query.fechaTermino}.xlsx`,
+      'Reporte de Urgencias generado correctamente'
+    );
   }
 
-  private generarReporteUrgencias12Horas(filtros: FiltrosReporte) {
+  private generarReporteUrgencias12Horas(filtros: FiltrosReporte): void {
     if (!this.validarFechas(filtros)) return;
 
     const query: ReporteUrgenciaDoceHorasQuery = {
@@ -170,119 +124,78 @@ export class UrgenciaPageComponent {
       fechaTermino: this.formatearFecha(filtros.fechaFin!)
     };
 
-    this.cargandoReporte.set(true);
-    this.urgenciaService.generarReporteUrgencias12Horas(query)
-      .pipe(
-        finalize(() => this.cargandoReporte.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (blob) => {
-          const nombre = `reporte-urgencias-12horas-${query.fechaInicio}-${query.fechaTermino}.xlsx`;
-          this.descargarBlob(blob, nombre);
-          this.mostrarExito('Reporte de Urgencias (12 Horas) generado correctamente');
-        },
-        error: (err) => this.mostrarError(err.message)
-      });
+    this.ejecutarDescarga(
+      this.urgenciaService.generarReporteUrgencias12Horas(query),
+      `reporte-urgencias-12horas-${query.fechaInicio}-${query.fechaTermino}.xlsx`,
+      'Reporte de Urgencias (12 Horas) generado correctamente'
+    );
   }
 
-  private generarReporteCategorizaciones(filtros: FiltrosReporte) {
+  private generarReporteCategorizaciones(filtros: FiltrosReporte): void {
     if (!filtros.mes || !filtros.anio) {
       this.mostrarError('Debe seleccionar un mes y año');
       return;
     }
 
-    // ResporteUrgeciaCatQuery espera formato YYYY-MM
     const mes = String(filtros.mes).padStart(2, '0');
-    const anio = String(filtros.anio);
-    const fechaFormateada = `${anio}-${mes}`;
+    const query: ResporteUrgeciaCatQuery = { fecha: `${filtros.anio}-${mes}` };
 
-    const query: ResporteUrgeciaCatQuery = {
-      fecha: fechaFormateada
-    };
-
-    this.cargandoReporte.set(true);
-    this.urgenciaService.generarReporteUrgenciaCetegorizaciones(query)
-      .pipe(
-        finalize(() => this.cargandoReporte.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (blob) => {
-          const nombreMes = this.obtenerNombreMes(filtros.mes!);
-          const nombre = `reporte-categorizaciones-${nombreMes}-${filtros.anio}.xlsx`;
-          this.descargarBlob(blob, nombre);
-          this.mostrarExito('Reporte de Categorizaciones generado correctamente');
-        },
-        error: (err) => this.mostrarError(err.message)
-      });
+    this.ejecutarDescarga(
+      this.urgenciaService.generarReporteUrgenciaCetegorizaciones(query),
+      `reporte-categorizaciones-${this.obtenerNombreMes(filtros.mes)}-${filtros.anio}.xlsx`,
+      'Reporte de Categorizaciones generado correctamente'
+    );
   }
 
-  private generarReporteUrgenciasHospitalizados(filtros: FiltrosReporte) {
+  private generarReporteUrgenciasHospitalizados(filtros: FiltrosReporte): void {
     if (!this.validarFechas(filtros)) return;
 
-    // Mapear 'hospitalizado' | 'pabellon' a 'H' | 'P'
-    const tipoMap: { [key: string]: 'H' | 'P' } = {
-      'hospitalizado': 'H',
-      'pabellon': 'P'
-    };
-
+    const tipoMap: Record<string, 'H' | 'P'> = { hospitalizado: 'H', pabellon: 'P' };
     const query: ReporteUrgeciaHosQuery = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaTermino: this.formatearFecha(filtros.fechaFin!),
       tipo: tipoMap[filtros.tipoHospitalizacion || 'hospitalizado'] || 'H'
     };
 
-    this.cargandoReporte.set(true);
-    this.urgenciaService.generarReporteUrgenciasHospitalizados(query)
-      .pipe(
-        finalize(() => this.cargandoReporte.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (blob) => {
-          const nombre = `reporte-urgencias-${filtros.tipoHospitalizacion}-${query.fechaInicio}-${query.fechaTermino}.xlsx`;
-          this.descargarBlob(blob, nombre);
-          this.mostrarExito(`Reporte de Urgencias - ${filtros.tipoHospitalizacion} generado correctamente`);
-        },
-        error: (err) => this.mostrarError(err.message)
-      });
+    this.ejecutarDescarga(
+      this.urgenciaService.generarReporteUrgenciasHospitalizados(query),
+      `reporte-urgencias-${filtros.tipoHospitalizacion}-${query.fechaInicio}-${query.fechaTermino}.xlsx`,
+      `Reporte de Urgencias - ${filtros.tipoHospitalizacion} generado correctamente`
+    );
   }
 
-  private generarReporteIras(filtros: FiltrosReporte) {
+  private generarReporteIras(filtros: FiltrosReporte): void {
     if (!this.validarFechas(filtros)) return;
 
-    // Mapear 'urgencias' | 'maternidad' a 'U' | 'M' (solo estos 2 tipos para IRAs)
-    const tipoMap: { [key: string]: 'U' | 'M' } = {
-      'urgencias': 'U',
-      'maternidad': 'M'
-    };
-
+    const tipoMap: Record<string, 'U' | 'M'> = { urgencias: 'U', maternidad: 'M' };
     const query: ReporteUrgIrasQuery = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaTermino: this.formatearFecha(filtros.fechaFin!),
       tipo: tipoMap[filtros.tipoReporte || 'urgencias'] || 'U'
     };
 
+    this.ejecutarDescarga(
+      this.urgenciaService.generarResporteIras(query),
+      `reporte-iras-${filtros.tipoReporte}-${query.fechaInicio}-${query.fechaTermino}.xlsx`,
+      'Reporte de I.R.A.S generado correctamente'
+    );
+  }
+
+  private ejecutarDescarga(observable: any, nombreArchivo: string, mensajeExito: string): void {
     this.cargandoReporte.set(true);
-    this.urgenciaService.generarResporteIras(query)
+    observable
       .pipe(
         finalize(() => this.cargandoReporte.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
-        next: (blob) => {
-          const nombre = `reporte-iras-${filtros.tipoReporte}-${query.fechaInicio}-${query.fechaTermino}.xlsx`;
-          this.descargarBlob(blob, nombre);
-          this.mostrarExito('Reporte de I.R.A.S generado correctamente');
+        next: (blob: Blob) => {
+          this.descargarBlob(blob, nombreArchivo);
+          this.mostrarExito(mensajeExito);
         },
-        error: (err) => this.mostrarError(err.message)
+        error: (err: any) => this.mostrarError(err.message)
       });
   }
-
-  // ============================================================================
-  // MÉTODOS AUXILIARES
-  // ============================================================================
 
   private validarFechas(filtros: FiltrosReporte): boolean {
     if (!filtros.fechaInicio || !filtros.fechaFin) {
@@ -300,14 +213,11 @@ export class UrgenciaPageComponent {
   }
 
   private obtenerNombreMes(mes: number): string {
-    const meses = [
-      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-    ];
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     return meses[mes - 1] || 'mes';
   }
 
-  private descargarBlob(blob: Blob, nombreArchivo: string) {
+  private descargarBlob(blob: Blob, nombreArchivo: string): void {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -316,27 +226,25 @@ export class UrgenciaPageComponent {
     window.URL.revokeObjectURL(url);
   }
 
-  private mostrarExito(mensaje: string) {
+  private mostrarExito(mensaje: string): void {
     this.configuracionModal.set({
       tipo: 'exito',
       titulo: '¡Reporte Generado!',
-      mensaje: mensaje,
+      mensaje,
       textoBotonPrincipal: 'Aceptar',
       autoCerrarMs: 3000
     });
     this.mostrarModal.set(true);
   }
 
-  private mostrarError(mensaje: string) {
+  private mostrarError(mensaje: string): void {
     this.configuracionModal.set({
       tipo: 'error',
       titulo: 'Error al Generar Reporte',
-      mensaje: mensaje,
+      mensaje,
       detalles: 'Por favor, verifica los filtros seleccionados e intenta nuevamente.',
       textoBotonPrincipal: 'Entendido'
     });
     this.mostrarModal.set(true);
   }
-
-
 }

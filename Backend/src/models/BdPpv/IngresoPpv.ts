@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, AllowNull } 
   tableName: 'IngresoPpv',
   timestamps: false,
 })
-export class IngresoPpv extends Model<IngresoPpv> {
+export default class IngresoPpv extends Model<IngresoPpv> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(false)

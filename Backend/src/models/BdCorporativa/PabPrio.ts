@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'TAB_PabPrio',
   timestamps: false,
 })
-export class Pabprio extends Model<Pabprio> {
+export default class Pabprio extends Model<Pabprio> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.CHAR(4))

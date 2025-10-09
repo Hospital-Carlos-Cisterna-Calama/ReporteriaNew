@@ -1,10 +1,10 @@
 import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'PPB_Servicios',
+  tableName: 'PPV_Servicios',
   timestamps: false,
 })
-export class PpvServicios extends Model<PpvServicios> {
+export default class PpvServicios extends Model<PpvServicios> {
   @PrimaryKey
   @AllowNull(true)
   @Column(DataType.INTEGER())

@@ -1,0 +1,1 @@
+export { CatalogoService } from './Catalogo.service';

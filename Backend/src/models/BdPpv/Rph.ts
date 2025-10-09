@@ -1,10 +1,11 @@
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, AllowNull, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import PpvServicios from './PpvServicios';
 
 @Table({
   tableName: 'RPH',
   timestamps: false,
 })
-export class Rph extends Model<Rph> {
+export default class Rph extends Model<Rph> {
   @PrimaryKey
   @AutoIncrement
   @AllowNull(false)
@@ -83,15 +84,18 @@ export class Rph extends Model<Rph> {
   @Column(DataType.DATE)
   declare RPH_fecha_reg: Date;
 
-  @AllowNull(false)
+  @ForeignKey(() => PpvServicios)
+  @AllowNull(true)
   @Column(DataType.STRING(50))
   declare RPH_servicio: string;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataType.STRING(50))
-  declare RPH_usuario_reg: string;
+  declare RPH_PAC_Numero_FK: string;
 
-  @AllowNull(false)
-  @Column(DataType.STRING(50))
-  declare RPH_usuario_upd: string;
+  // ==========================
+  // RELACIONES
+  // ==========================
+  @BelongsTo(() => PpvServicios, { foreignKey: 'RPH_servicio', targetKey: 'ID', as: 'Servicio' })
+  declare Servicio?: PpvServicios;
 }

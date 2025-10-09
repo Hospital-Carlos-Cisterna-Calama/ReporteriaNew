@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AllowNull } from 'sequelize
   tableName: 'RPA_ForDau',
   timestamps: false,
 })
-export class RpaForDau extends Model<RpaForDau> {
+export default class RpaForDau extends Model<RpaForDau> {
   @PrimaryKey
   @AllowNull(false)
   @Column(DataType.STRING(10))
