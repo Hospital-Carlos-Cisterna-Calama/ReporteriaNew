@@ -3,14 +3,20 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { environment } from '@environments/environment';
 import { LoggerService } from '@shared/services/logger.service';
 import { catchError, Observable, tap, throwError } from 'rxjs';
-import { ReporteUrgeciaHosQuery, ReporteUrgenciaDoceHorasQuery, ReporteUrgenciaQuery, ReporteUrgIrasQuery, ResporteUrgeciaCatQuery } from '../interfaces/dto.interface';
+import {
+  ReporteUrgeciaHosQuery,
+  ReporteUrgenciaDoceHorasQuery,
+  ReporteUrgenciaQuery,
+  ReporteUrgIrasQuery,
+  ResporteUrgeciaCatQuery,
+} from '../interfaces/dto.interface';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class UrgenciaService {
   private readonly http = inject(HttpClient);
   private readonly logger = inject(LoggerService);
 
-   private readonly API_REPORTES = `${environment.apiBaseUrl}/reporteria/urgencia`;
+  private readonly API_REPORTES = `${environment.apiBaseUrl}/urgencia`;
 
   /* ───────────────────────────
    * Helpers internos
@@ -37,55 +43,53 @@ export class UrgenciaService {
     return params;
   }
 
-
   generarReporteUrgencias(query: ReporteUrgenciaQuery): Observable<Blob> {
     const params = this.construirHttpParams(query);
-    return this.http.get(`${this.API_REPORTES}/infor`, { params, responseType: 'blob' })
-    .pipe(
+    return this.http.get(`${this.API_REPORTES}/infor`, { params, responseType: 'blob' }).pipe(
       tap(() => this.log('Reporte MQ (archivo) generado', query, '📄')),
-      catchError(err => this.handleError(err, 'No se pudo generar el reporte de urgencias'))
-    )
+      catchError((err) => this.handleError(err, 'No se pudo generar el reporte de urgencias'))
+    );
   }
 
   generarReporteUrgencias12Horas(query: ReporteUrgenciaDoceHorasQuery): Observable<Blob> {
     const params = this.construirHttpParams(query);
-    return this.http.get(`${this.API_REPORTES}/horas`, { params, responseType: 'blob' })
-    .pipe(
+    return this.http.get(`${this.API_REPORTES}/horas`, { params, responseType: 'blob' }).pipe(
       tap(() => this.log('Reporte 12 horas (archivo) generado', query, '📄')),
-      catchError(err => this.handleError(err, 'No se pudo generar el reporte de urgencias últimas 12 horas'))
-    )
+      catchError((err) =>
+        this.handleError(err, 'No se pudo generar el reporte de urgencias últimas 12 horas')
+      )
+    );
   }
 
   generarReporteUrgenciaCetegorizaciones(query: ResporteUrgeciaCatQuery): Observable<Blob> {
     const params = this.construirHttpParams(query);
-    return this.http.get(`${this.API_REPORTES}/cat`, { params, responseType: 'blob' })
-    .pipe(
+    return this.http.get(`${this.API_REPORTES}/cat`, { params, responseType: 'blob' }).pipe(
       tap(() => this.log('Reporte categorizaciones (archivo) generado', query, '📄')),
-      catchError(err => this.handleError(err, 'No se pudo generar el reporte de categorizaciones'))
-    )
+      catchError((err) =>
+        this.handleError(err, 'No se pudo generar el reporte de categorizaciones')
+      )
+    );
   }
 
   generarReporteUrgenciasHospitalizados(query: ReporteUrgeciaHosQuery): Observable<Blob> {
     const params = this.construirHttpParams(query);
-    return this.http.get(`${this.API_REPORTES}/hosp`, { params, responseType: 'blob' })
-    .pipe(
+    return this.http.get(`${this.API_REPORTES}/hosp`, { params, responseType: 'blob' }).pipe(
       tap(() => this.log('Reporte urgencias hospitalizados (archivo) generado', query, '📄')),
-      catchError(err => this.handleError(err, 'No se pudo generar el reporte de urgencias hospitalizados'))
-    )
+      catchError((err) =>
+        this.handleError(err, 'No se pudo generar el reporte de urgencias hospitalizados')
+      )
+    );
   }
 
   generarResporteIras(query: ReporteUrgIrasQuery): Observable<Blob> {
     const params = this.construirHttpParams(query);
-    return this.http.get(`${this.API_REPORTES}/iras`, { params, responseType: 'blob' })
-    .pipe(
+    return this.http.get(`${this.API_REPORTES}/iras`, { params, responseType: 'blob' }).pipe(
       tap(() => this.log('Reporte IRAS (archivo) generado', query, '📄')),
-      catchError(err => this.handleError(err, 'No se pudo generar el reporte de IRAS'))
-    )
+      catchError((err) => this.handleError(err, 'No se pudo generar el reporte de IRAS'))
+    );
   }
 
-
-
-   // ============================================================================
+  // ============================================================================
   // MÉTODOS PRIVADOS PARA LOGGING Y MANEJO DE ERRORES
   // ============================================================================
 
@@ -107,7 +111,7 @@ export class UrgenciaService {
 
       this.logger.error(`Error HTTP (${error.status}): ${errorMessage}`, {
         url: error.url,
-        detalles: error.error
+        detalles: error.error,
       });
     } else {
       this.logger.error('Error inesperado', error);
@@ -115,5 +119,4 @@ export class UrgenciaService {
 
     return throwError(() => new Error(errorMessage));
   }
-
 }
