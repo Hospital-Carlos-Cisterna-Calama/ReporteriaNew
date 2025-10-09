@@ -70,33 +70,32 @@ export class RpaFormularioController {
 
       const results = await RpaFormulario.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
 
-      const wb = new ExcelJS.Workbook();
-      await buildSheet<UrgenciaDoceHoraFila>(
-        wb,
-        'Urgencia 12h',
+      await sendOneSheetStream<UrgenciaDoceHoraFila>(
+        res,
+        `Urgencia-${fechaInicio}_${fechaTermino}.xlsx`,
+        'Urgencia',
         [
-          { header: 'RUT', key: 'Rut' },
-          { header: 'Nombre', key: 'Nombre' },
-          { header: 'Edad', key: 'Edad' },
-          { header: 'Sexo', key: 'Sexo' },
-          { header: 'Previsión', key: 'Prevision' },
-          { header: 'DAU', key: 'DAU' },
-          { header: 'Ingreso Siclope', key: 'FechaIngresoSiclope' },
-          { header: 'Servicio Ingreso', key: 'ServicioIngreso' },
-          { header: 'Ingreso Helios', key: 'FechaIngresoHelios' },
-          { header: 'Servicio Traslado', key: 'ServicioTraslado' },
-          { header: 'Traslado Helios', key: 'FechaTrasladoHelios' },
-          { header: 'Diferencia', key: 'DiferenciaTexto' },
-          { header: 'Profesional', key: 'Profesional' },
-          { header: 'RUT Profesional', key: 'RutProfesional' },
+          { header: 'Rut', key: 'rut' },
+          { header: 'Nombre', key: 'nombre' },
+          { header: 'Edad', key: 'edad' },
+          { header: 'Sexo', key: 'sexo' },
+          { header: 'Previsión', key: 'prevision' },
+          { header: 'DAU', key: 'dau' },
+          { header: 'Fecha Ingreso Siclope', key: 'fecha_ingreso_siclope' },
+          { header: 'Servicio Ingreso', key: 'servicio_ingreso' },
+          { header: 'Fecha Ingreso (Helios)', key: 'fecha_ingreso_helios' },
+          { header: 'Servicio Traslado', key: 'servicio_traslado' },
+          { header: 'Fecha Traslado (Helios)', key: 'fecha_traslado_helios' },
+          { header: 'Diferencia(Ingreso/Indicacion Siclope)', key: 'diferencia_ingreso_indicacion_siclope' },
+          { header: 'Profesional Reg. Siclope', key: 'nombre_profesional' },
+          { header: 'RUT Profesional', key: 'rut_profesional' },
         ],
         results,
         {
-          // estas fechas ya vienen en string "dd/mm/yyyy HH:mm:ss", no forzamos formateo
+          dateKeys: ['fecha_ingreso_siclope', 'fecha_ingreso_helios', 'fecha_traslado_helios'],
+          headerColorArgb: 'FF59ACA5',
         }
       );
-
-      await sendWorkbook(res, wb, `Urgencia12h_${fechaInicio}_a_${fechaTermino}.xlsx`);
     } catch (error) {
       next(error);
     }
