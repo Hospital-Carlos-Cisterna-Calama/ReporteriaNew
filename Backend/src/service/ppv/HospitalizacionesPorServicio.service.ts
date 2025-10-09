@@ -4,7 +4,7 @@ import { HospitalizacionesPorServicio } from '../../sql/PpvConsulta';
 
 export class HospitalizacionesPorServicioService {
   async obtenerHospitalizacionesPorServicios(servicios: number[], fechaInicio: string, fechaFin: string) {
-    return await HospitalizacionesPorServicio(servicios, fechaInicio, fechaFin);
+    return HospitalizacionesPorServicio(servicios, fechaInicio, fechaFin);
   }
 
   async procesarHospitalizaciones(registros: any[]) {
@@ -55,23 +55,33 @@ export class HospitalizacionesPorServicioService {
       'Servicio',
     ];
 
-    hoja.addRow(encabezados);
-
-    const headerRow = hoja.getRow(1);
-    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    headerRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FF808080' },
-    };
-    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-
-    datos.forEach(fila => {
-      hoja.addRow(Object.values(fila));
+    hoja.addTable({
+      name: 'HospitalizacionesTable',
+      ref: 'A1',
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: undefined, 
+        showRowStripes: false, 
+      },
+      columns: encabezados.map(h => ({ name: h, filterButton: true })),
+      rows: datos.map(fila => Object.values(fila)),
     });
 
+    const headerRow = hoja.getRow(1);
+    headerRow.eachCell(cell => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF0D9488' }, 
+      };
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; 
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    });
+    headerRow.height = 20;
+
     hoja.columns.forEach(col => {
-      col.width = 20;
+      col.width = Math.max(15, col.header ? col.header.toString().length + 5 : 15);
     });
 
     return workbook;
@@ -81,7 +91,7 @@ export class HospitalizacionesPorServicioService {
     const registros = await this.obtenerHospitalizacionesPorServicios(servicios, fechaInicio, fechaFin);
     const datos = await this.procesarHospitalizaciones(registros);
     const workbook = await this.generarArchivoExcel(datos);
-    const nombreArchivo = `Hospitalizaciones_${fechaInicio}_a_${fechaFin}.xlsx`;
+    const nombreArchivo = `InformeRPHs.xlsx`;
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     await workbook.xlsx.write(res);

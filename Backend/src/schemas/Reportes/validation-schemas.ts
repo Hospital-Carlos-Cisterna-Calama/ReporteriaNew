@@ -13,14 +13,11 @@ const FECHA_REGEX = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
 /**
  * Schema base para validación de fechas en formato DD/MM/YYYY
  */
-const fechaSchema = Joi.string()
-  .pattern(FECHA_REGEX)
-  .required()
-  .messages({
-    'string.empty': 'La fecha es requerida',
-    'string.pattern.base': 'La fecha debe estar en formato DD/MM/YYYY',
-    'any.required': 'La fecha es requerida'
-  });
+const fechaSchema = Joi.string().pattern(FECHA_REGEX).required().messages({
+  'string.empty': 'La fecha es requerida',
+  'string.pattern.base': 'La fecha debe estar en formato DD/MM/YYYY',
+  'any.required': 'La fecha es requerida',
+});
 
 // ============================================================================
 // SCHEMAS DE VALIDACIÓN PARA REPORTES DE URGENCIA
@@ -33,13 +30,10 @@ const fechaSchema = Joi.string()
 export const reporteUrgenciaSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
   fechaTermino: fechaSchema.label('Fecha de término'),
-  tipo: Joi.string()
-    .valid('A', 'U', 'M')
-    .required()
-    .messages({
-      'any.only': 'El tipo debe ser "A" (Todos), "U" (Urgencias) o "M" (Maternidad)',
-      'any.required': 'El tipo de reporte es requerido'
-    })
+  tipo: Joi.string().valid('A', 'U', 'M').required().messages({
+    'any.only': 'El tipo debe ser "A" (Todos), "U" (Urgencias) o "M" (Maternidad)',
+    'any.required': 'El tipo de reporte es requerido',
+  }),
 });
 
 /**
@@ -48,7 +42,7 @@ export const reporteUrgenciaSchema = Joi.object({
  */
 export const reporteUrgenciaDoceHorasSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
-  fechaTermino: fechaSchema.label('Fecha de término')
+  fechaTermino: fechaSchema.label('Fecha de término'),
 });
 
 /**
@@ -63,9 +57,9 @@ export const reporteUrgeciaCatSchema = Joi.object({
     .messages({
       'string.empty': 'La fecha es requerida',
       'string.pattern.base': 'La fecha debe estar en formato YYYY-MM (ejemplo: 2025-08)',
-      'any.required': 'La fecha es requerida'
+      'any.required': 'La fecha es requerida',
     })
-    .label('Fecha')
+    .label('Fecha'),
 });
 
 /**
@@ -75,13 +69,10 @@ export const reporteUrgeciaCatSchema = Joi.object({
 export const reporteUrgeciaHosSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
   fechaTermino: fechaSchema.label('Fecha de término'),
-  tipo: Joi.string()
-    .valid('H', 'P')
-    .required()
-    .messages({
-      'any.only': 'El tipo debe ser "H" (Hospitalizado) o "P" (Pabellón)',
-      'any.required': 'El tipo de hospitalización es requerido'
-    })
+  tipo: Joi.string().valid('H', 'P').required().messages({
+    'any.only': 'El tipo debe ser "H" (Hospitalizado) o "P" (Pabellón)',
+    'any.required': 'El tipo de hospitalización es requerido',
+  }),
 });
 
 /**
@@ -91,16 +82,11 @@ export const reporteUrgeciaHosSchema = Joi.object({
 export const reporteUrgIrasSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
   fechaTermino: fechaSchema.label('Fecha de término'),
-  tipo: Joi.string()
-    .valid('M', 'U')
-    .required()
-    .messages({
-      'any.only': 'El tipo debe ser "M" (Maternidad) o "U" (Urgencias)',
-      'any.required': 'El tipo de reporte IRA es requerido'
-    })
+  tipo: Joi.string().valid('M', 'U').required().messages({
+    'any.only': 'El tipo debe ser "M" (Maternidad) o "U" (Urgencias)',
+    'any.required': 'El tipo de reporte IRA es requerido',
+  }),
 });
-
-// PPV Reportes
 
 export const hospitalizacionesPorServicioSchema = Joi.object({
   fechaInicio: Joi.string().isoDate().required().messages({
@@ -111,8 +97,10 @@ export const hospitalizacionesPorServicioSchema = Joi.object({
     'string.empty': 'Debe indicar la fecha de término',
     'any.required': 'La fecha de término es obligatoria',
   }),
-  especialidad: Joi.string().optional().allow(null, '').messages({
-    'string.base': 'La especialidad debe ser un texto válido',
+  servicios: Joi.array().items(Joi.number().integer()).min(1).required().messages({
+    'array.base': 'El campo servicios debe ser un arreglo de números',
+    'array.min': 'Debe seleccionar al menos un servicio',
+    'any.required': 'Debe indicar los servicios a consultar',
   }),
 });
 
@@ -128,7 +116,6 @@ export const ingresosEgresosSchema = Joi.object({
 export const intervencionPabellonSchema = Joi.object({
   fechaInicio: Joi.string().isoDate().required(),
   fechaFin: Joi.string().isoDate().required(),
-  pabellonId: Joi.string().optional().allow(null, ''),
 });
 
 export const irGrdSchema = Joi.object({
@@ -144,16 +131,21 @@ export const listaEsperaSchema = Joi.object({
   }),
 });
 
-export const pacientesHospitalizadosSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required(),
-  fechaFin: Joi.string().isoDate().required(),
-  servicioId: Joi.string().optional().allow(null, ''),
-});
-
 export const procedimientosSchema = Joi.object({
   fechaInicio: Joi.string().isoDate().required(),
   fechaFin: Joi.string().isoDate().required(),
   especialidad: Joi.string().required().messages({
     'any.required': 'Debe indicar la especialidad',
+  }),
+});
+
+export const pacientesHospitalizadosSchema = Joi.object({
+  fechaInicio: Joi.string().isoDate().required().messages({
+    'string.empty': 'Debe indicar la fecha de inicio',
+    'any.required': 'La fecha de inicio es obligatoria',
+  }),
+  fechaFin: Joi.string().isoDate().required().messages({
+    'string.empty': 'Debe indicar la fecha de término',
+    'any.required': 'La fecha de término es obligatoria',
   }),
 });

@@ -1,5 +1,5 @@
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../config/databaseEnti';
+import { sequelize } from '../config/initDatabase';
 import {
   UrgenciaDoceHoraFila,
   InformeUrgenciaFila,

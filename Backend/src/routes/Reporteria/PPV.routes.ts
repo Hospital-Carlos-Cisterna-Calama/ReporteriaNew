@@ -9,24 +9,25 @@ import {
   intervencionPabellonSchema,
   irGrdSchema,
   listaEsperaSchema,
-  pacientesHospitalizadosSchema,
   procedimientosSchema,
+  pacientesHospitalizadosSchema,
 } from '../../schemas/Reportes/validation-schemas';
 
 const ppvRouter = Router();
 
-ppvRouter.post('/hospitalizaciones',validateSchema(hospitalizacionesPorServicioSchema),asyncHandler(PpvReportesController.exportarHospitalizacionesPorServicios));
+ppvRouter.get('/hospitalizaciones', asyncHandler(PpvReportesController.exportarHospitalizacionesPorServicios));
 
-ppvRouter.post('/ingresosEgresos', validateSchema(ingresosEgresosSchema), asyncHandler(PpvReportesController.exportarIngresosEgresos));
+ppvRouter.get('/ingresosEgresos', validateSchema(ingresosEgresosSchema), asyncHandler(PpvReportesController.exportarIngresosEgresos));
 
-ppvRouter.post('/pabellon', validateSchema(intervencionPabellonSchema), asyncHandler(PpvReportesController.exportarIntervencionPabellon));
+ppvRouter.get('/pabellon', validateSchema(intervencionPabellonSchema), asyncHandler(PpvReportesController.exportarIntervencionPabellon));
 
-ppvRouter.post('/irGrd', validateSchema(irGrdSchema), asyncHandler(PpvReportesController.exportarIrGrd));
+ppvRouter.get('/irGrd', asyncHandler(PpvReportesController.exportarIrGrd));
 
-ppvRouter.post('/listaEspera', validateSchema(listaEsperaSchema), asyncHandler(PpvReportesController.exportarListaEspera));
+ppvRouter.get('/listaEspera', validateSchema(listaEsperaSchema), asyncHandler(PpvReportesController.exportarListaEspera));
 
-ppvRouter.post('/pacientesHospitalizados', validateSchema(pacientesHospitalizadosSchema), asyncHandler(PpvReportesController.exportarPacientesHospitalizados));
+ ppvRouter.get('/pacientesHospitalizados', validateSchema(pacientesHospitalizadosSchema), asyncHandler(PpvReportesController.exportarPacientesHospitalizados));
 
-ppvRouter.post('/procedimientos', validateSchema(procedimientosSchema), asyncHandler(PpvReportesController.exportarProcedimientos));
+ppvRouter.get('/procedimientos', asyncHandler(PpvReportesController.exportarProcedimientos));
 
 export default ppvRouter;
+  
