@@ -9,7 +9,7 @@ import {
 } from '../../interfaces/RpaFormularario.interface';
 import { convertirFecha } from '../../utils/helperRPA';
 
-export class RpaFormularioService {
+export class UrgenciaService {
   async ObtenerUrgencia(fechaIni: string, fechaTerm: string, tipo: 'A' | 'U' | 'M' | string): Promise<InformeUrgenciaFila[]> {
     const tipoFormu = '04';
 

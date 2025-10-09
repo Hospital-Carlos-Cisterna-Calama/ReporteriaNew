@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RpaFormularioService } from '../service/urgencias/RpaFormulario.service';
+import { UrgenciaService } from '../service/urgencias/Urgencia.service';
 import {
   UrgenciaDoceHoraFila,
   InformeUrgenciaFila,
@@ -9,14 +9,14 @@ import {
 } from '../interfaces/RpaFormularario.interface';
 import ExcelJS from 'exceljs';
 import { buildSheet, sendOneSheetStream, sendWorkbook } from '../utils/excel';
-const RpaFormulario = new RpaFormularioService();
+const UrgenciaServices = new UrgenciaService();
 
-export class RpaFormularioController {
+export class UrgenciaController {
   static async reporteUrgencia(req: Request, res: Response, next: NextFunction) {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
+      const results = await UrgenciaServices.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
 
       await sendOneSheetStream<InformeUrgenciaFila>(
         res,
@@ -68,7 +68,7 @@ export class RpaFormularioController {
     try {
       const { fechaInicio, fechaTermino } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
+      const results = await UrgenciaServices.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
 
       await sendOneSheetStream<UrgenciaDoceHoraFila>(
         res,
@@ -104,7 +104,7 @@ export class RpaFormularioController {
   static async reporteUrgenciaCategorizaciones(req: Request, res: Response, next: NextFunction) {
     try {
       const { fecha } = req.query as any;
-      const results = await RpaFormulario.ObtenerCategorizadores(fecha);
+      const results = await UrgenciaServices.ObtenerCategorizadores(fecha);
 
       await sendOneSheetStream<UrgenciaCategorizacion>(
         res,
@@ -137,7 +137,7 @@ export class RpaFormularioController {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
+      const results = await UrgenciaServices.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
 
       const wb = new ExcelJS.Workbook();
 
@@ -196,7 +196,7 @@ export class RpaFormularioController {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await RpaFormulario.ObtenerInformeIras(fechaInicio, fechaTermino, tipo);
+      const results = await UrgenciaServices.ObtenerInformeIras(fechaInicio, fechaTermino, tipo);
 
       const wb = new ExcelJS.Workbook();
       await buildSheet<UrgenciaIrasFila>(
