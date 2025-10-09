@@ -1,1 +1,1 @@
-export { EspecialidadService } from './especialidad.service';
+export { CatalogoService } from './Catalogo.service';

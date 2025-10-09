@@ -13,12 +13,15 @@
 
   <!-- Contenido Principal -->
   <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
-    <div class="p-4 sm:p-6 md:p-8">
+    <div class="p-4 sm:p-6 lg:p-8">
       <!-- Banner de Instrucciones -->
       <app-banner-instrucciones
         [titulo]="'Sistema de Reportería de Urgencias'"
         [descripcion]="'Selecciona un reporte del menú lateral para generar informes de atenciones de urgencia, categorizaciones y gestión hospitalaria'"
         [colorGradient]="'teal'"
+        [mostrarBotonMenu]="true"
+        [sidebarAbierto]="sidebarAbierto()"
+        (toggleSidebar)="alternarSidebar()"
       />
 
       @if (reporteSeleccionado()) {

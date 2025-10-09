@@ -2,3 +2,7 @@ export { SelectorRangoFechasComponent, type RangoFechas } from './selector-rango
 export { SelectorMesComponent, type SeleccionMes } from './selector-mes/selector-mes.component';
 export { ModalResultadoComponent, type ConfiguracionModal, type TipoMensaje } from './modal-resultado/modal-resultado.component';
 export { BannerInstruccionesComponent } from './banner-instrucciones/banner-instrucciones.component';
+
+
+
+export { EstadoVacioComponent, type EstadisticaReporte } from './estado-vacio/estado-vacio.component';

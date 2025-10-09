@@ -1,14 +1,15 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
-import { EspecialidadService } from '../service/ppv/especialidad.service';
+import { CatalogoService  } from '../service/ppv/Catalogo.service';
 import type { 
   EspecialidadResponse, 
+  PpvServicioResponse, 
   SubEspecialidadResponse
-} from '../interfaces/Especialidad.interface';
+} from '../interfaces/Catalogos.interface';
 
 // Instancia del servicio
-const especialidadService = new EspecialidadService();
+const catalogoService = new CatalogoService();
 
 /**
  * Obtener todas las especialidades activas
@@ -21,7 +22,7 @@ export const obtenerEspecialidades = asyncHandler(async (req: Request, res: Resp
   const busqueda = typeof q === 'string' ? q : undefined;
   
   try {
-    const especialidades = await especialidadService.obtenerEspecialidades(busqueda);
+    const especialidades = await catalogoService.obtenerEspecialidades(busqueda);
 
     const response: EspecialidadResponse = {
       success: true,
@@ -54,12 +55,12 @@ export const obtenerSubEspecialidades = asyncHandler(async (req: Request, res: R
 
   try {
     // Validar que la especialidad existe
-    const especialidadExiste = await especialidadService.validarEspecialidad(especialidadId);
+    const especialidadExiste = await catalogoService.validarEspecialidad(especialidadId);
     if (!especialidadExiste) {
       throw new AppError(`Especialidad con ID ${especialidadId} no encontrada`, 404);
     }
 
-    const subEspecialidades = await especialidadService.obtenerSubEspecialidadesPorEspecialidad(
+    const subEspecialidades = await catalogoService.obtenerSubEspecialidadesPorEspecialidad(
       especialidadId, 
       busqueda
     );
@@ -79,3 +80,22 @@ export const obtenerSubEspecialidades = asyncHandler(async (req: Request, res: R
   }
 });
 
+
+export const obtenerPpvServicios = asyncHandler(async (req: Request, res: Response) => {
+
+  try {
+    const servicios = await catalogoService.obtenerServicios();
+
+    const response: PpvServicioResponse = {
+      success: true,
+      message: 'Servicios obtenidos exitosamente',
+      count: servicios.length,
+      data: servicios,
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error al obtener servicios:', error);
+    throw new AppError('Error interno del servidor al obtener servicios', 500);
+  }
+});

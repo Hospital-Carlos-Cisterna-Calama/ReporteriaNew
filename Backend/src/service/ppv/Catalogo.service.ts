@@ -3,14 +3,15 @@ import { sequelize } from '../../config/initDatabase';
 import type { 
   Especialidad, 
   SubEspecialidad, 
-  EstadisticasEspecialidades 
-} from '../../interfaces/Especialidad.interface';
+  EstadisticasEspecialidades, 
+  PpvServicio
+} from '../../interfaces/Catalogos.interface';
 
 /**
  * Servicio para el manejo de especialidades y sub-especialidades
  * Basado en las queries del sistema legacy
  */
-export class EspecialidadService {
+export class CatalogoService {
   
   /**
    * Obtener todas las especialidades activas
@@ -73,6 +74,18 @@ export class EspecialidadService {
       type: QueryTypes.SELECT,
     });
   }
+
+  async obtenerServicios(): Promise<PpvServicio[]>{
+    let whereClause = "WHERE vigente = 'V' AND cod_rel_servicio IS NOT NULL";
+    const query = `SELECT servicio.ID as id, 
+        servicio.servicio as serv
+        FROM BD_PPV.dbo.PPV_Servicios AS servicio
+        ${whereClause}`
+    return await sequelize.query(query, {
+          type: QueryTypes.SELECT,
+      });
+  }
+
 
 
 

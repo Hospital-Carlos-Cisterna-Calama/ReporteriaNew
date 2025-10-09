@@ -9,17 +9,19 @@ import {
   EspecialidadesResponse,
   SubEspecialidadesResponse
 } from '../interfaces';
-import { EspecialidadesMapper } from '../mappers';
+import { EspecialidadesMapper, ServiciosMapper } from '../mappers';
+import { PpvServicio, PpvServicioResponse } from '../interfaces/servicio.interface';
 
 @Injectable({ providedIn: 'root' })
-export class EspecialidadService {
+export class CatalogosService {
   private readonly http = inject(HttpClient);
   private readonly logger = inject(LoggerService);
 
-  private readonly API_ESPECIALIDAD = `${environment.apiBaseUrl}/especialidades`;
+  private readonly API_CATALOGOS = `${environment.apiBaseUrl}/catalogos`;
 
-  // Cache para especialidades
+  // Cache para especialidades y servicios
   private especialidadesCache$?: Observable<Especialidad[]>;
+  private serviciosCache$?: Observable<PpvServicio[]>;
 
   // ============================================================================
   // MÉTODOS PÚBLICOS DEL SERVICIO
@@ -28,7 +30,7 @@ export class EspecialidadService {
   /** Lista todas las especialidades disponibles (con caché) */
   listarEspecialidades(): Observable<Especialidad[]> {
     if (!this.especialidadesCache$) {
-      this.especialidadesCache$ = this.http.get<EspecialidadesResponse>(`${this.API_ESPECIALIDAD}`).pipe(
+      this.especialidadesCache$ = this.http.get<EspecialidadesResponse>(`${this.API_CATALOGOS}/especialidades`).pipe(
         map(resp => EspecialidadesMapper.mapRestEspecialidadesToEspecialidades(resp)),
         tap(especialidades => this.log('Especialidades recibidas:', especialidades)),
         shareReplay(1),
@@ -40,17 +42,32 @@ export class EspecialidadService {
 
   /** Obtiene sub especialidades por especialidad */
   obtenerSubEspecialidades(especialidadId: string): Observable<SubEspecialidad[]> {
-    return this.http.get<SubEspecialidadesResponse>(`${this.API_ESPECIALIDAD}/${especialidadId}/sub-especialidades`).pipe(
+    return this.http.get<SubEspecialidadesResponse>(`${this.API_CATALOGOS}/especialidades/${especialidadId}/sub-especialidades`).pipe(
       map(resp => EspecialidadesMapper.mapRestSubEspecialidadesToSubEspecialidades(resp)),
       tap(subEspecialidades => this.log(`Sub especialidades recibidas para ${especialidadId}:`, subEspecialidades)),
       catchError(err => this.handleError(err, 'No se encontraron sub especialidades'))
     );
   }
 
-  /** Limpia el caché de especialidades */
+  /** Lista todos los servicios disponibles (con caché) */
+  obtenerServicios(): Observable<PpvServicio[]> {
+    if (!this.serviciosCache$) {
+      this.serviciosCache$ = this.http.get<PpvServicioResponse>(`${this.API_CATALOGOS}/servicios`).pipe(
+        map(resp => ServiciosMapper.mapRestServiciosToServicios(resp)),
+        map(servicios => ServiciosMapper.ordenarServiciosPorNombre(servicios)),
+        tap(servicios => this.log('Servicios recibidos:', servicios)),
+        shareReplay(1),
+        catchError(err => this.handleError(err, 'No se encontraron servicios'))
+      );
+    }
+    return this.serviciosCache$;
+  }
+
+  /** Limpia el caché de especialidades y servicios */
   limpiarCache(): void {
     this.especialidadesCache$ = undefined;
-    this.log('Caché de especialidades limpiado', undefined, '🧹');
+    this.serviciosCache$ = undefined;
+    this.log('Caché de especialidades y servicios limpiado', undefined, '🧹');
   }
 
   // ============================================================================
