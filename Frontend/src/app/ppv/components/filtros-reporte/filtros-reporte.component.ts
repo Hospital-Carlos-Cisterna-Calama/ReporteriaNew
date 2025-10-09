@@ -1,12 +1,12 @@
 import { Component, input, output, viewChild, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SelectorRangoFechasComponent, SelectorMesComponent } from '@shared/components/ui';
-import type { RangoFechas, SeleccionMes } from '@shared/components/ui';
+import { SelectorRangoFechasComponent, SelectorMesComponent, SelectorBuscadorComponent } from '@shared/components/ui';
+import type { RangoFechas, SeleccionMes, OpcionSelector } from '@shared/components/ui';
 import type { ItemCatalogo, SubEspecialidadItem, ItemServicio, FiltrosPpvReporte, TipoFecha } from '../../interfaces/filtro.interface';
 
 @Component({
   selector: 'app-filtros-ppv-reporte',
-  imports: [FormsModule, SelectorRangoFechasComponent, SelectorMesComponent],
+  imports: [FormsModule, SelectorRangoFechasComponent, SelectorMesComponent, SelectorBuscadorComponent],
   templateUrl: './filtros-reporte.component.html'
 })
 export class FiltrosPpvReporteComponent {
@@ -43,6 +43,16 @@ export class FiltrosPpvReporteComponent {
     this.especialidadSeleccionada() ? this.subEspecialidades() : []
   );
 
+  // Convertir especialidades a OpcionSelector
+  readonly especialidadesOpciones = computed<OpcionSelector[]>(() =>
+    this.especialidades().map(esp => ({ id: esp.id, nombre: esp.nombre }))
+  );
+
+  // Convertir sub especialidades a OpcionSelector
+  readonly subEspecialidadesOpciones = computed<OpcionSelector[]>(() =>
+    this.subEspecialidadesFiltradas().map(subEsp => ({ id: subEsp.id, nombre: subEsp.nombre }))
+  );
+
   alCambiarFecha(rango: RangoFechas): void {
     this.fechaInicio = rango.fechaInicio;
     this.fechaFin = rango.fechaFin;
@@ -53,18 +63,15 @@ export class FiltrosPpvReporteComponent {
     this.anio = seleccion.anio;
   }
 
-  alCambiarEspecialidad(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const nuevaEspecialidad = select.value ? Number(select.value) : null;
-
+  alCambiarEspecialidad(valor: string | number | null): void {
+    const nuevaEspecialidad = valor ? Number(valor) : null;
     this.especialidadSeleccionada.set(nuevaEspecialidad);
     this.subEspecialidadSeleccionada = null;
     this.especialidadChange.emit(nuevaEspecialidad ?? 0);
   }
 
-  alCambiarSubEspecialidad(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.subEspecialidadSeleccionada = select.value ? Number(select.value) : null;
+  alCambiarSubEspecialidad(valor: string | number | null): void {
+    this.subEspecialidadSeleccionada = valor ? Number(valor) : null;
   }
 
   alCambiarServicio(servicioId: string, seleccionado: boolean): void {

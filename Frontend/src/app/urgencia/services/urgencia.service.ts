@@ -10,7 +10,7 @@ export class UrgenciaService {
   private readonly http = inject(HttpClient);
   private readonly logger = inject(LoggerService);
 
-   private readonly API_REPORTES = `${environment.apiBaseUrl}/reporteria/urgencia`;
+   private readonly API_REPORTES = `${environment.apiBaseUrl}/urgencia`;
 
   /* ───────────────────────────
    * Helpers internos

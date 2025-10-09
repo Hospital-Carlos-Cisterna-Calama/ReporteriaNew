@@ -1,4 +1,5 @@
-// ⚠️ ¡Debe ser la PRIMERA línea!
+// ⚠️ ¡Deben ser las PRIMERAS líneas!
+import 'reflect-metadata'; // Necesario para decoradores de sequelize-typescript
 import 'dotenv/config'; // Carga variables del .env ANTES de usar Sequelize o cualquier config
 
 import app from './app';

@@ -1,68 +1,53 @@
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
   <!-- Fecha Inicio -->
-  <div class="group">
-    <label class="text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
-      <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div>
+    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+      Fecha Inicio
+    </label>
+    <div class="relative">
+      <input
+        #inputInicio
+        type="text"
+        placeholder="Selecciona fecha de inicio"
+        readonly
+        class="w-full px-4 pr-10 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl transition-all bg-white text-left
+               hover:border-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-500
+               cursor-pointer font-medium text-gray-900 placeholder:text-gray-400"
+      />
+      <svg
+        class="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
       </svg>
-      <span>Fecha Inicio</span>
-    </label>
-    <mat-form-field
-      class="w-full custom-datepicker"
-      appearance="outline"
-      [formGroup]="rangoFechas"
-    >
-      <input
-        matInput
-        [matDatepicker]="pickerInicio"
-        formControlName="fechaInicio"
-        placeholder="Selecciona fecha de inicio"
-        (dateChange)="alCambiarFecha()"
-        class="cursor-pointer"
-        readonly
-      >
-      <mat-datepicker-toggle matIconSuffix [for]="pickerInicio">
-        <mat-icon matDatepickerToggleIcon>
-          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
-        </mat-icon>
-      </mat-datepicker-toggle>
-      <mat-datepicker #pickerInicio xPosition="end"></mat-datepicker>
-    </mat-form-field>
+    </div>
   </div>
 
   <!-- Fecha Fin -->
-  <div class="group">
-    <label class="text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
-      <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div>
+    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+      Fecha Fin
+    </label>
+    <div class="relative">
+      <input
+        #inputFin
+        type="text"
+        placeholder="Selecciona fecha de fin"
+        readonly
+        class="w-full px-4 pr-10 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl transition-all bg-white text-left
+               hover:border-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-500
+               cursor-pointer font-medium text-gray-900 placeholder:text-gray-400"
+      />
+      <svg
+        class="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
       </svg>
-      <span>Fecha Fin</span>
-    </label>
-    <mat-form-field
-      class="w-full custom-datepicker"
-      appearance="outline"
-      [formGroup]="rangoFechas"
-    >
-      <input
-        matInput
-        [matDatepicker]="pickerFin"
-        formControlName="fechaFin"
-        placeholder="Selecciona fecha de fin"
-        [min]="rangoFechas.value.fechaInicio"
-        (dateChange)="alCambiarFecha()"
-        class="cursor-pointer"
-        readonly
-      >
-      <mat-datepicker-toggle matIconSuffix [for]="pickerFin">
-        <mat-icon matDatepickerToggleIcon>
-          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
-        </mat-icon>
-      </mat-datepicker-toggle>
-      <mat-datepicker #pickerFin xPosition="end"></mat-datepicker>
-    </mat-form-field>
+    </div>
   </div>
 </div>

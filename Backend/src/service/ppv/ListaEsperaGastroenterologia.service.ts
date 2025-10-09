@@ -132,3 +132,7 @@
 //     await this.generarArchivoExcel(datosProcesados, res);
 //   }
 // }
+
+// Exportar vacío para que no falle la importación
+export class ListaEsperaGastroenterologiaService {}
+
