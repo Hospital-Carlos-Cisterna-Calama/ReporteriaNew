@@ -29,11 +29,12 @@
             [usarSelectorMes]="false"
             [mostrarSelectorHospitalizacion]="false"
             [mostrarSelectorEspecialidad]="mostrarSelectorEspecialidad"
-            [especialidades]="especialidades()"
-            [subEspecialidades]="subEspecialidades()"
+            [especialidades]="especialidadesParaFiltros()"
+            [subEspecialidades]="subEspecialidadesParaFiltros()"
             [cargando]="cargandoReporte()"
             (descargar)="descargarReporte($event)"
             (limpiar)="limpiarFiltros()"
+            (especialidadChange)="onEspecialidadChange($event)"
           >
             <span titulo>{{ reporteSeleccionado() }}</span>
           </app-filtros-reporte>

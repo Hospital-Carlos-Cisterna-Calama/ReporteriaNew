@@ -1,13 +1,13 @@
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../config/databaseEnti';
+import { sequelize } from '../../config/initDatabase';
 import {
   UrgenciaDoceHoraFila,
   InformeUrgenciaFila,
   UrgenciaIrasFila,
   UrgenciaHospPabllFila,
   UrgenciaCategorizacion,
-} from '../interfaces/RpaFormularario.interface';
-import { convertirFecha } from '../utils/helperRPA';
+} from '../../interfaces/RpaFormularario.interface';
+import { convertirFecha } from '../../utils/helperRPA';
 
 export class RpaFormularioService {
   async ObtenerUrgencia(fechaIni: string, fechaTerm: string, tipo: 'A' | 'U' | 'M' | string): Promise<InformeUrgenciaFila[]> {

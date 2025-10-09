@@ -3,8 +3,8 @@ import morgan from 'morgan';
 import cors from 'cors';
 import { errorHandler } from './middlewares/error.middleware';
 import { validateToken } from './middlewares/verifyToken';
-import reporteriaRouter from './routes/Reporteria';
-import ppvRouter from './routes/Reporteria/PPV.routes';
+import reporteriaRouter from './routes';
+import ppvRouter from './routes/ppv/PPV.routes';
 
 const app = express();
 

@@ -18,7 +18,7 @@ const PORT = Number(process.env.PORT) || 3002;
     // ✅ Conecta a todas las bases
     await connectDatabase();
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`✅ Servidor escuchando en: http://localhost:${PORT}`);
       console.log(`⚡ Modo: ${process.env.NODE_ENV || 'Desarrollo'}`);
     });

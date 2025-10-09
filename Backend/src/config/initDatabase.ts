@@ -41,6 +41,9 @@ import {
   ProcCitas,
   ProcRegClinico,
 } from '../models';
+import TabActivos from '../models/BdProcedimientos/TabActivos';
+import NetActivoTipoProg from '../models/BdProcedimientos/NetActivoTipoProg';
+import TabEquipamiento from '../models/BdProcedimientos/TabEquipamiento';
 import { asociaciones } from '../models/Asociaciones';
 
 dotenv.config();
@@ -140,7 +143,7 @@ export const sequelizeProcedimiento = new Sequelize({
       requestTimeout: 30000,
     },
   },
-  models: [ProcCitas, ProcRegClinico],
+  models: [ProcCitas, ProcRegClinico, TabActivos, NetActivoTipoProg, TabEquipamiento],
 });
 
 export async function connectDatabase() {

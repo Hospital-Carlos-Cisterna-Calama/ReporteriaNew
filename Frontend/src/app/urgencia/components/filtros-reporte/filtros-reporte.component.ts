@@ -1,4 +1,4 @@
-import { Component, input, output, viewChild } from '@angular/core';
+import { Component, input, output, viewChild, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SelectorRangoFechasComponent, type RangoFechas } from '../../../shared/components/ui';
 import { SelectorMesComponent, type SeleccionMes } from '../../../shared/components/ui';
@@ -78,7 +78,7 @@ export interface FiltrosReporte {
               </label>
               <div class="relative">
                 <select
-                  [value]="especialidadSeleccionada ?? ''"
+                  [value]="especialidadSeleccionada() ?? ''"
                   (change)="alCambiarEspecialidad($event)"
                   class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white hover:border-gray-300 appearance-none cursor-pointer"
                 >
@@ -108,11 +108,11 @@ export interface FiltrosReporte {
                 <select
                   [value]="subEspecialidadSeleccionada ?? ''"
                   (change)="alCambiarSubEspecialidad($event)"
-                  [disabled]="!especialidadSeleccionada"
+                  [disabled]="!especialidadSeleccionada()"
                   class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white hover:border-gray-300 appearance-none cursor-pointer disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
                 >
                   <option value="">Todas las Sub Especialidades</option>
-                  @for (subEspecialidad of subEspecialidadesFiltradas; track subEspecialidad.id) {
+                  @for (subEspecialidad of subEspecialidadesFiltradas(); track subEspecialidad.id) {
                     <option [value]="subEspecialidad.id">{{ subEspecialidad.nombre }}</option>
                   }
                 </select>
@@ -273,12 +273,13 @@ export class FiltrosReporteComponent {
   readonly usarSelectorMes = input<boolean>(false);
   readonly mostrarSelectorHospitalizacion = input<boolean>(false);
   readonly mostrarSelectorEspecialidad = input<boolean>(false);
-  readonly especialidades = input<Array<{id: number, nombre: string}>>([]);
-  readonly subEspecialidades = input<Array<{id: number, nombre: string, especialidadId: number}>>([]);
+  readonly especialidades = input<Array<{id: number, nombre: string, codigo?: string}>>([]);
+  readonly subEspecialidades = input<Array<{id: number, nombre: string, especialidadId: number, codigo?: string}>>([]);
   readonly cargando = input<boolean>(false);
 
   readonly descargar = output<FiltrosReporte>();
   readonly limpiar = output<void>();
+  readonly especialidadChange = output<number>();
 
   readonly selectorFechas = viewChild(SelectorRangoFechasComponent);
   readonly selectorMes = viewChild(SelectorMesComponent);
@@ -290,8 +291,16 @@ export class FiltrosReporteComponent {
   anio: number | null = null;
   tipoReporteSeleccionado: 'todos' | 'urgencias' | 'maternidad' = 'todos';
   tipoHospitalizacionSeleccionado: 'hospitalizado' | 'pabellon' = 'hospitalizado';
-  especialidadSeleccionada: number | null = null;
+  especialidadSeleccionada = signal<number | null>(null);
   subEspecialidadSeleccionada: number | null = null;
+
+  // Computed signal para las sub-especialidades filtradas
+  readonly subEspecialidadesFiltradas = computed(() => {
+    const especialidadId = this.especialidadSeleccionada();
+    const subEspecialidades = this.subEspecialidades();
+
+    return !especialidadId ? [] : subEspecialidades;
+  });
 
   alCambiarFecha(rango: RangoFechas) {
     this.fechaInicio = rango.fechaInicio;
@@ -305,9 +314,15 @@ export class FiltrosReporteComponent {
 
   alCambiarEspecialidad(event: Event) {
     const select = event.target as HTMLSelectElement;
-    this.especialidadSeleccionada = select.value ? Number(select.value) : null;
+    const nuevaEspecialidad = select.value ? Number(select.value) : null;
+    this.especialidadSeleccionada.set(nuevaEspecialidad);
+
     // Limpiar sub especialidad cuando cambia la especialidad
     this.subEspecialidadSeleccionada = null;
+
+    // Emitir el evento para cargar sub-especialidades dinámicamente
+    const idAEmitir = this.especialidadSeleccionada() || 0;
+    this.especialidadChange.emit(idAEmitir);
   }
 
   alCambiarSubEspecialidad(event: Event) {
@@ -315,14 +330,7 @@ export class FiltrosReporteComponent {
     this.subEspecialidadSeleccionada = select.value ? Number(select.value) : null;
   }
 
-  get subEspecialidadesFiltradas() {
-    if (!this.especialidadSeleccionada) {
-      return this.subEspecialidades();
-    }
-    return this.subEspecialidades().filter(
-      sub => sub.especialidadId === this.especialidadSeleccionada
-    );
-  }
+
 
   alDescargar() {
     const filtros: FiltrosReporte = {};
@@ -344,7 +352,7 @@ export class FiltrosReporteComponent {
     }
 
     if (this.mostrarSelectorEspecialidad()) {
-      filtros.especialidadId = this.especialidadSeleccionada;
+      filtros.especialidadId = this.especialidadSeleccionada();
       filtros.subEspecialidadId = this.subEspecialidadSeleccionada;
     }
 
@@ -358,7 +366,7 @@ export class FiltrosReporteComponent {
     this.anio = null;
     this.tipoReporteSeleccionado = 'todos';
     this.tipoHospitalizacionSeleccionado = 'hospitalizado';
-    this.especialidadSeleccionada = null;
+    this.especialidadSeleccionada.set(null);
     this.subEspecialidadSeleccionada = null;
     this.selectorFechas()?.limpiar();
     this.selectorMes()?.limpiar();

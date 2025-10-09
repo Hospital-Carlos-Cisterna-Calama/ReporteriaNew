@@ -151,9 +151,39 @@ export const pacientesHospitalizadosSchema = Joi.object({
 });
 
 export const procedimientosSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required(),
-  fechaFin: Joi.string().isoDate().required(),
-  especialidad: Joi.string().required().messages({
-    'any.required': 'Debe indicar la especialidad',
-  }),
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaTermino: fechaSchema.label('Fecha de término'),
+  especialidadId: Joi.string()
+    .optional()
+    .allow(null, '')
+    .messages({
+      'string.base': 'El ID de especialidad debe ser un texto válido'
+    })
+    .label('ID de Especialidad'),
+  subEspecialidadId: Joi.number()
+    .integer()
+    .optional()
+    .allow(null)
+    .messages({
+      'number.base': 'El ID de sub especialidad debe ser un número',
+      'number.integer': 'El ID de sub especialidad debe ser un número entero'
+    })
+    .label('ID de Sub Especialidad')
+});
+
+// ============================================================================
+// SCHEMAS DE VALIDACIÓN PARA ESPECIALIDADES
+// ============================================================================
+
+/**
+ * Schema de validación para obtener sub especialidades por especialidad
+ */
+export const subEspecialidadesSchema = Joi.object({
+  especialidadId: Joi.string()
+    .required()
+    .messages({
+      'string.empty': 'El ID de especialidad es requerido',
+      'any.required': 'El ID de especialidad es requerido'
+    })
+    .label('ID de Especialidad')
 });

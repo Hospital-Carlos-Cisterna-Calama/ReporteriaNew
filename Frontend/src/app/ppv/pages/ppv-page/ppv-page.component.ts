@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import {
   LucideAngularModule,
   Ambulance,
@@ -14,6 +14,8 @@ import { SidebarComponent, type SidebarItem } from '../../../shared/components/s
 import { FiltrosReporteComponent, type FiltrosReporte } from '../../../urgencia/components/filtros-reporte/filtros-reporte.component';
 import { EstadisticaReporte, EstadoVacioComponent } from '../../../urgencia/components/estado-vacio/estado-vacio.component';
 import { BannerInstruccionesComponent } from '../../../shared/components/ui';
+import { EspecialidadService } from '../../services/especialidad.service';
+import { Especialidad, SubEspecialidad } from '../../interfaces';
 
 @Component({
   selector: 'app-ppv-page',
@@ -27,7 +29,8 @@ import { BannerInstruccionesComponent } from '../../../shared/components/ui';
   ],
   templateUrl: './ppv-page.component.html',
 })
-export class PpvPageComponent {
+export class PpvPageComponent implements OnInit {
+  private readonly especialidadService = inject(EspecialidadService);
   // Iconos de Lucide
   readonly iconos: Record<string, LucideIconData> = {
     Ambulance,
@@ -82,51 +85,41 @@ export class PpvPageComponent {
     }
   ]);
 
-  // Datos mock de Especialidades (para lo visual)
-  readonly especialidades = signal([
-    { id: 1, nombre: 'Cardiología' },
-    { id: 2, nombre: 'Cirugía General' },
-    { id: 3, nombre: 'Traumatología' },
-    { id: 4, nombre: 'Neurología' },
-    { id: 5, nombre: 'Pediatría' },
-    { id: 6, nombre: 'Ginecología' },
-    { id: 7, nombre: 'Oftalmología' },
-    { id: 8, nombre: 'Otorrinolaringología' },
-    { id: 9, nombre: 'Urología' },
-    { id: 10, nombre: 'Dermatología' }
-  ]);
+  // Datos reales desde el servicio
+  readonly especialidades = signal<Especialidad[]>([]);
+  readonly subEspecialidades = signal<SubEspecialidad[]>([]);
+  readonly cargandoEspecialidades = signal(false);
 
-  // Datos mock de Sub Especialidades (para lo visual)
-  readonly subEspecialidades = signal([
-    { id: 1, nombre: 'Cardiología Intervencionista', especialidadId: 1 },
-    { id: 2, nombre: 'Electrofisiología', especialidadId: 1 },
-    { id: 3, nombre: 'Cirugía Laparoscópica', especialidadId: 2 },
-    { id: 4, nombre: 'Cirugía Bariátrica', especialidadId: 2 },
-    { id: 5, nombre: 'Cirugía de Columna', especialidadId: 3 },
-    { id: 6, nombre: 'Artroplastia', especialidadId: 3 },
-    { id: 7, nombre: 'Neurocirugía', especialidadId: 4 },
-    { id: 8, nombre: 'Neurología Pediátrica', especialidadId: 4 },
-    { id: 9, nombre: 'Neonatología', especialidadId: 5 },
-    { id: 10, nombre: 'Pediatría Crítica', especialidadId: 5 },
-    { id: 11, nombre: 'Obstetricia', especialidadId: 6 },
-    { id: 12, nombre: 'Ginecología Oncológica', especialidadId: 6 },
-    { id: 13, nombre: 'Retina y Vítreo', especialidadId: 7 },
-    { id: 14, nombre: 'Glaucoma', especialidadId: 7 },
-    { id: 15, nombre: 'Cirugía de Cabeza y Cuello', especialidadId: 8 },
-    { id: 16, nombre: 'Otología', especialidadId: 8 },
-    { id: 17, nombre: 'Urología Pediátrica', especialidadId: 9 },
-    { id: 18, nombre: 'Oncología Urológica', especialidadId: 9 },
-    { id: 19, nombre: 'Dermatología Estética', especialidadId: 10 },
-    { id: 20, nombre: 'Dermatología Oncológica', especialidadId: 10 }
-  ]);
+  // Señales computadas - se actualizan automáticamente
+  readonly especialidadesParaFiltros = computed(() =>
+    this.especialidades().map((esp, index) => ({
+      id: index + 1,
+      nombre: esp.nombre,
+      codigo: esp.id.trim()
+    }))
+  );
 
-    // Estadísticas del sistema
+  readonly subEspecialidadesParaFiltros = computed(() => {
+    const subEspecialidades = this.subEspecialidades();
+    return subEspecialidades.map((subEsp, index) => ({
+      id: index + 1, // ID numérico para el componente de filtros
+      nombre: subEsp.nombre,
+      especialidadId: 1, // Siempre 1 porque solo mostramos las de la especialidad seleccionada
+      codigo: subEsp.id // Usar el ID original (ej: 'D2801') como código
+    }));
+  });
+
+  // Estadísticas del sistema
   readonly estadisticas = signal<EstadisticaReporte[]>([
-      { etiqueta: 'Reportes Disponibles', valor: '5', icono: '📊' },
-      { etiqueta: 'Última Actualización', valor: 'Hoy', icono: '🕐' },
-      { etiqueta: 'Formatos', valor: 'Excel', icono: '📑' },
-      { etiqueta: 'Estado', valor: 'Activo', icono: '✅' }
- ]);
+    { etiqueta: 'Reportes Disponibles', valor: '5', icono: '📊' },
+    { etiqueta: 'Última Actualización', valor: 'Hoy', icono: '🕐' },
+    { etiqueta: 'Formatos', valor: 'Excel', icono: '📑' },
+    { etiqueta: 'Estado', valor: 'Activo', icono: '✅' }
+  ]);
+
+  ngOnInit(): void {
+    this.cargarEspecialidades();
+  }
 
   seleccionarReporte(reporteTitle: string) {
     this.reporteSeleccionado.set(reporteTitle);
@@ -151,5 +144,63 @@ export class PpvPageComponent {
   get mostrarSelectorEspecialidad(): boolean {
     return this.reporteSeleccionado() === 'Procedimientos';
   }
+
+  /**
+   * Carga solo las especialidades inicialmente
+   */
+  private cargarEspecialidades(): void {
+    this.cargandoEspecialidades.set(true);
+
+    this.especialidadService.listarEspecialidades().subscribe({
+      next: (especialidades) => {
+        this.especialidades.set(especialidades);
+        // Sub-especialidades se cargan dinámicamente, empezar con array vacío
+        this.subEspecialidades.set([]);
+        this.cargandoEspecialidades.set(false);
+
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar especialidades:', error);
+        this.cargandoEspecialidades.set(false);
+        // Mantener arrays vacíos en caso de error
+        this.especialidades.set([]);
+        this.subEspecialidades.set([]);
+      }
+    });
+  }
+
+  /**
+   * Carga sub-especialidades cuando se selecciona una especialidad
+   */
+  private cargarSubEspecialidades(especialidadId: string): void {
+    this.especialidadService.obtenerSubEspecialidades(especialidadId).subscribe({
+      next: (data) => {
+        this.subEspecialidades.set(data);
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar sub-especialidades:', error);
+        this.subEspecialidades.set([]);
+      }
+    });
+  }
+
+  /**
+   * Maneja el cambio de especialidad seleccionada
+   */
+  onEspecialidadChange(especialidadIndexId: number): void {
+    if (especialidadIndexId > 0) {
+      // Obtener la especialidad directamente por índice (ID numérico secuencial)
+      const especialidad = this.especialidades()[especialidadIndexId - 1];
+
+      if (especialidad) {
+        this.cargarSubEspecialidades(especialidad.id.trim());
+      }
+    } else {
+      // Limpiar sub-especialidades si no hay selección
+      this.subEspecialidades.set([]);
+    }
+  }
+
+
 }
 
