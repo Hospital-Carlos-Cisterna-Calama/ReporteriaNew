@@ -94,6 +94,7 @@ export class UrgenciaController {
         {
           dateKeys: ['fecha_ingreso_siclope', 'fecha_ingreso_helios', 'fecha_traslado_helios'],
           headerColorArgb: 'FF59ACA5',
+          columnWidths: { fecha_ingreso_siclope: 18, fecha_ingreso_helios: 18, fecha_traslado_helios: 18, servicio_traslado: 40 },
         }
       );
     } catch (error) {
