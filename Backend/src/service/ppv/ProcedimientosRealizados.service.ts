@@ -1,94 +1,90 @@
-import { Response } from 'express';
-import { Op } from 'sequelize';
 import ExcelJS from 'exceljs';
+import { Response } from 'express';
+import { ProcedimientosRealizados } from '../../sql/PpvConsulta';
 import dayjs from 'dayjs';
-import  ProcCitas  from '../../models/BdProcedimientos/ProcCitas';
-import  ProcRegClinico  from '../../models/BdProcedimientos/ProcRegClinico';
-import  Paciente  from '../../models/BdCorporativa/Paciente';
 
 export class ProcedimientosRealizadosService {
-  async obtenerProcedimientosRealizados(fechaInicio: Date, fechaFin: Date, especialidadId: string) {
-    const citas = await ProcCitas.findAll({
-      where: {
-        PROC_CIT_Fecha: { [Op.between]: [fechaInicio, fechaFin] },
-        PROC_PER_Equip: especialidadId,
-      },
-      include: [
-        { model: Paciente, as: 'paciente', required: true },
-        {
-          model: ProcRegClinico,
-          as: 'registros',
-          required: true,
-          include: [{ model: Paciente, as: 'paciente' }],
-        },
-      ],
-    });
+  async exportarReporte(res: Response, fechaInicio: string, fechaFin: string, especialidad: string, subEspecialidad?: string) {
+    const registros: any[] = await ProcedimientosRealizados(fechaInicio, fechaFin, especialidad, subEspecialidad);
 
-    return citas;
-  }
+    console.log('📊 Cantidad de registros:', registros.length);
+    console.log('📁 Ejemplo registro:', registros[0]);
 
-  async procesarProcedimientos(citas: any[]) {
-    return citas.map((c: any) => {
-      const p = c.paciente;
-      const r = c.registros?.[0];
+    if (!registros.length) {
+      return res.status(404).json({ message: 'No se encontraron procedimientos en el rango indicado.' });
+    }
 
-      const edad = p?.PAC_PAC_FechaNacim ? Math.floor(dayjs().diff(dayjs(p.PAC_PAC_FechaNacim), 'year')) : '—';
-
-      let prevision = 'No Informado';
-      switch (p?.PAC_PAC_Prevision) {
-        case 'F':
-          prevision = 'Fonasa';
-          break;
-        case 'P':
-          prevision = 'Particular';
-          break;
-        case 'C':
-          prevision = 'Convenio';
-          break;
-      }
-
-      return {
-        Folio: c.ID_ListaEspera,
-        Nombre_Paciente: `${p?.PAC_PAC_Nombre ?? ''} ${p?.PAC_PAC_ApellPater ?? ''} ${p?.PAC_PAC_ApellMater ?? ''}`,
-        RUT: p?.PAC_PAC_Rut ?? '',
-        Etnia: p?.PAC_PAC_Etnia ?? '',
-        Sexo: p?.PAC_PAC_Sexo === 'M' ? 'Masculino' : 'Femenino',
-        Edad: edad,
-        Prevision: `${prevision} ${p?.PAC_PAC_TipoBenef ?? ''}`,
-        Informe: r?.PROC_RC_TextoInforme?.replace(/\n/g, ' - ') ?? '',
-        Hallazgo: r?.PROC_RC_TextoHallazgo?.replace(/\n/g, ' - ') ?? '',
-        Conclusión: r?.PROC_RC_TextoConclusion?.replace(/\n/g, ' - ') ?? '',
-      };
-    });
-  }
-
-  async generarArchivoExcel(datos: any[], res: Response) {
     const workbook = new ExcelJS.Workbook();
-    const hoja = workbook.addWorksheet('Procedimientos');
+    const hoja = workbook.addWorksheet('Procedimientos Realizados');
 
-    const encabezados = Object.keys(datos[0] || {});
+    const encabezados = [
+      'Folio',
+      'Nombre Paciente',
+      'RUT',
+      'Etnia',
+      'Sexo',
+      'Edad',
+      'Previsión',
+      'Informe',
+      'Hallazgo',
+      'Conclusión',
+      'Especialidad',
+      'SubEspecialidad',
+    ];
+
     hoja.addRow(encabezados);
 
-    hoja.getRow(1).font = { bold: true };
-    hoja.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
+    const headerRow = hoja.getRow(1);
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF2563EB' },
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow.height = 20;
 
-    hoja.columns.forEach((col, idx) => {
-      col.width = idx < 7 ? 15 : 60;
+    registros.forEach(r =>
+      hoja.addRow([
+        r.Folio,
+        r.Nombre_Paciente,
+        r.RUT,
+        r.Etnia,
+        r.Sexo,
+        r.Edad,
+        r.Prevision,
+        r.Informe,
+        r.Hallazgo,
+        r.Conclusion,
+        r.Especialidad,
+        r.Sub_Especialidad,
+      ])
+    );
+
+    const anchoCol = [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25];
+    hoja.columns.forEach((col, i) => (col.width = anchoCol[i] || 15));
+
+    hoja.eachRow({ includeEmpty: false }, row => {
+      row.eachCell(cell => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+        cell.alignment = { wrapText: true, vertical: 'middle' };
+      });
     });
 
-    datos.forEach(fila => hoja.addRow(Object.values(fila)));
-    hoja.getRow(1).alignment = { wrapText: true };
+    hoja.views = [{ state: 'frozen', ySplit: 1 }];
 
-    const nombreArchivo = `Procedimientos_${dayjs().format('YYYYMMDD_HHmm')}.xlsx`;
+    // ✅ Usar buffer en vez de write(res)
+    const nombreArchivo = `Procedimientos_${dayjs(fechaInicio).format('YYYYMMDD')}_${dayjs(fechaFin).format('YYYYMMDD')}.xlsx`;
+    const buffer = await workbook.xlsx.writeBuffer();
+
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    await workbook.xlsx.write(res);
-    res.end();
-  }
-
-  async exportarReporte(fechaInicio: Date, fechaFin: Date, especialidadId: string, res: Response) {
-    const citas = await this.obtenerProcedimientosRealizados(fechaInicio, fechaFin, especialidadId);
-    const procesados = await this.procesarProcedimientos(citas);
-    await this.generarArchivoExcel(procesados, res);
+    res.setHeader('Content-Length', buffer.byteLength);
+    return res.send(buffer);
   }
 }

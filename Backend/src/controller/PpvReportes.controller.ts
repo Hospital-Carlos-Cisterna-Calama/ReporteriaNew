@@ -10,7 +10,22 @@ import { ProcedimientosRealizadosService } from '../service/ppv/ProcedimientosRe
 export class PpvReportesController {
   static async exportarHospitalizacionesPorServicios(req: Request, res: Response) {
     try {
-      const { fechaInicio, fechaFin, servicios } = req.body; 
+      const servicios = req.query.servicios
+        ? Array.isArray(req.query.servicios)
+          ? req.query.servicios.map(Number)
+          : String(req.query.servicios).split(',').map(Number)
+        : [];
+
+      const fechaInicio = String(req.query.fechaInicio);
+      const fechaFin = String(req.query.fechaFin);
+
+      if (!servicios.length) {
+        return res.status(400).json({ message: 'Debe indicar al menos un servicio (servicios=1,2,3)' });
+      }
+      if (!fechaInicio || !fechaFin) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio y fechaFin' });
+      }
+
       const servicio = new HospitalizacionesPorServicioService();
       await servicio.exportarReporte(servicios, fechaInicio, fechaFin, res);
     } catch (error) {
@@ -32,19 +47,34 @@ export class PpvReportesController {
 
   static async exportarIntervencionPabellon(req: Request, res: Response) {
     try {
-      const { fechaInicio, fechaFin } = req.body;
+      const { fechaInicio, fechaFin } = req.query;
+
+      if (!fechaInicio || !fechaFin) {
+        return res.status(400).json({
+          message: 'Debe indicar fechaInicio y fechaFin en la URL',
+        });
+      }
       const servicio = new IntervencionPabellonService();
-      const resultado = await servicio.exportarReporte(fechaInicio, fechaFin);
-      res.json(resultado);
+      await servicio.exportarReporte(fechaInicio.toString(), fechaFin.toString(), res);
     } catch (error) {
-      console.error('❌ Error al exportar intervenciones de pabellón:', error);
-      res.status(500).json({ message: 'Error al generar el reporte de intervenciones de pabellón' });
+      console.error('❌ Error al exportar Intervención Pabellón:', error);
+      res.status(500).json({
+        message: 'Error al generar el reporte de Intervención Pabellón',
+      });
     }
   }
 
   static async exportarIrGrd(req: Request, res: Response) {
     try {
-      const { fechaInicio, fechaFin } = req.body;
+      const fechaInicio = req.query.fechaInicio?.toString() || req.body.fechaInicio;
+      const fechaFin = req.query.fechaFin?.toString() || req.body.fechaFin;
+
+      if (!fechaInicio || !fechaFin) {
+        return res.status(400).json({
+          message: 'Debe especificar "fechaInicio" y "fechaFin" como parámetros o en el cuerpo.',
+        });
+      }
+
       const servicio = new IrGrdService();
       await servicio.exportarTxt(res, fechaInicio, fechaFin);
     } catch (error) {
@@ -69,9 +99,15 @@ export class PpvReportesController {
 
   static async exportarPacientesHospitalizados(req: Request, res: Response) {
     try {
-      const { fechaInicio, fechaFin, servicioId } = req.body;
+      const fechaInicio = req.query.fechaInicio?.toString();
+      const fechaFin = req.query.fechaFin?.toString();
+
+      if (!fechaInicio || !fechaFin) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio y fechaFin' });
+      }
+
       const servicio = new PacienteHospitalizadoService();
-      await servicio.exportarReporte(fechaInicio, fechaFin, servicioId, res);
+      await servicio.exportarReporte(fechaInicio, fechaFin, res);
     } catch (error) {
       console.error('❌ Error al exportar pacientes hospitalizados:', error);
       res.status(500).json({ message: 'Error al generar el reporte de pacientes hospitalizados' });
@@ -80,12 +116,25 @@ export class PpvReportesController {
 
   static async exportarProcedimientos(req: Request, res: Response) {
     try {
-      const { fechaInicio, fechaFin, especialidad } = req.body;
+      const fechaInicio = req.query.finic?.toString() || req.body.finic;
+      const fechaFin = req.query.ftermin?.toString() || req.body.ftermin;
+      const especialidad = req.query.selectEspec?.toString() || req.body.selectEspec;
+      const padreEsp = req.query.PadreEsp?.toString() || req.body.PadreEsp;
+
+      console.log('📅 Inicio:', fechaInicio);
+      console.log('📅 Fin:', fechaFin);
+      console.log('👨‍⚕️ Especialidad:', especialidad);
+      console.log('🏥 PadreEsp:', padreEsp);
+
+      if (!fechaInicio || !fechaFin || !especialidad) {
+        return res.status(400).json({ message: 'Debe indicar finic, ftermin y selectEspec.' });
+      }
+
       const servicio = new ProcedimientosRealizadosService();
-      await servicio.exportarReporte(fechaInicio, fechaFin, especialidad, res);
+      await servicio.exportarReporte(res, fechaInicio, fechaFin, especialidad, padreEsp);
     } catch (error) {
       console.error('❌ Error al exportar procedimientos:', error);
-      res.status(500).json({ message: 'Error al generar el reporte de procedimientos' });
+      res.status(500).json({ message: 'Error al generar el reporte de procedimientos.' });
     }
   }
 }
