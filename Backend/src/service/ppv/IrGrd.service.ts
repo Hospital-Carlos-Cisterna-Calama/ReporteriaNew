@@ -2,11 +2,16 @@ import dayjs from 'dayjs';
 import { Response } from 'express';
 import { Sequelize, QueryTypes } from 'sequelize';
 import { sequelize } from '../../config/initDatabase';
+import { convertirFecha } from '../../utils/helperRPA';
 
 export class IrGrdService {
   async obtenerIrGrd(fechaInicio: string, fechaFin: string) {
-    const finic = dayjs(fechaInicio).format('DD-MM-YYYY');
-    const ftermin = dayjs(fechaFin).format('DD-MM-YYYY');
+    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD y luego a DD-MM-YYYY para el SP
+    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
+    const finStr = convertirFecha(fechaFin, true).split(' ')[0];
+    
+    const finic = dayjs(inicioStr).format('DD-MM-YYYY');
+    const ftermin = dayjs(finStr).format('DD-MM-YYYY');
 
     const resultados = await sequelize.query('EXEC IR_GRD_PAC_Datost_JUN2020 :finic, :ftermin', {
       replacements: { finic, ftermin },

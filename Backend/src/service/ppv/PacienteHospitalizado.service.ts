@@ -2,10 +2,15 @@ import { Response } from 'express';
 import ExcelJS from 'exceljs';
 import dayjs from 'dayjs';
 import { PacienteHospitalizado } from '../../sql/PpvConsulta';
+import { convertirFecha } from '../../utils/helperRPA';
 
 export class PacienteHospitalizadoService {
   async obtenerPacienteHospitalizado(fechaInicio: string, fechaFin: string) {
-    const resultado = await PacienteHospitalizado(fechaInicio, fechaFin);
+    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
+    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
+    const finStr = convertirFecha(fechaFin, true).split(' ')[0];
+    
+    const resultado = await PacienteHospitalizado(inicioStr, finStr);
     return resultado;
   }
 
@@ -50,7 +55,7 @@ export class PacienteHospitalizadoService {
     }));
   }
 
-  async generarArchivoExcel(datos: any[], res: Response) {
+  async generarArchivoExcel(datos: any[], res: Response, fechaInicio: string, fechaFin: string) {
     const workbook = new ExcelJS.Workbook();
     const hoja = workbook.addWorksheet('Pacientes Hospitalizados');
 
@@ -67,22 +72,28 @@ export class PacienteHospitalizadoService {
         fgColor: { argb: 'FFD9D9D9' },
       };
 
-      datos.forEach(fila => hoja.addRow(Object.values(fila)));
+      // Agregar datos en lotes para mejor rendimiento
+      const batchSize = 1000;
+      for (let i = 0; i < datos.length; i += batchSize) {
+        const batch = datos.slice(i, i + batchSize);
+        batch.forEach(fila => hoja.addRow(Object.values(fila)));
+      }
+      
       hoja.columns.forEach(col => (col.width = 20));
     }
 
-    const nombreArchivo = `Pacientes_Hospitalizados_${dayjs().format('YYYYMMDD_HHmm')}.xlsx`;
+    const nombreArchivo = `Pacientes_Hospitalizados_${dayjs(fechaInicio, 'DD/MM/YYYY').format('YYYYMMDD')}_${dayjs(fechaFin, 'DD/MM/YYYY').format('YYYYMMDD')}.xlsx`;
+    const buffer = await workbook.xlsx.writeBuffer();
 
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-    await workbook.xlsx.write(res);
-    res.end();
+    res.setHeader('Content-Length', buffer.byteLength);
+    return res.send(buffer);
   }
 
   async exportarReporte(fechaInicio: string, fechaFin: string, res: Response) {
     const lista = await this.obtenerPacienteHospitalizado(fechaInicio, fechaFin);
     const procesados = await this.procesarPacienteHospitalizado(lista);
-    await this.generarArchivoExcel(procesados, res);
+    await this.generarArchivoExcel(procesados, res, fechaInicio, fechaFin);
   }
 }

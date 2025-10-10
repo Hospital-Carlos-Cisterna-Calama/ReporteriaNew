@@ -32,7 +32,7 @@ app.use(morgan('dev'));
 ────────────────────────────── */
 // app.use('/api', validateToken, reporteriaRouter); // 👈 activar si necesitas protección por token
 app.use('/api', reporteriaRouter);
-app.use('/api/ppv', ppvRouter);
+app.use('/api', ppvRouter);
 
 /* ──────────────────────────────
    🔹 Ruta raíz (prueba rápida)

@@ -89,24 +89,33 @@ export const reporteUrgIrasSchema = Joi.object({
 });
 
 export const hospitalizacionesPorServicioSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required().messages({
-    'string.empty': 'Debe indicar la fecha de inicio',
-    'any.required': 'La fecha de inicio es obligatoria',
-  }),
-  fechaFin: Joi.string().isoDate().required().messages({
-    'string.empty': 'Debe indicar la fecha de término',
-    'any.required': 'La fecha de término es obligatoria',
-  }),
-  servicios: Joi.array().items(Joi.number().integer()).min(1).required().messages({
-    'array.base': 'El campo servicios debe ser un arreglo de números',
-    'array.min': 'Debe seleccionar al menos un servicio',
-    'any.required': 'Debe indicar los servicios a consultar',
-  }),
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaFin: fechaSchema.label('Fecha de término'),
+  servicios: Joi.alternatives()
+    .try(
+      Joi.array().items(Joi.number().integer()),
+      Joi.string().custom((value, helpers) => {
+        // Convertir string separado por comas a array de números
+        const serviciosArray = value.split(',').map((s: string) => {
+          const num = parseInt(s.trim(), 10);
+          if (isNaN(num)) {
+            return helpers.error('any.invalid');
+          }
+          return num;
+        });
+        return serviciosArray;
+      })
+    )
+    .required()
+    .messages({
+      'alternatives.match': 'El campo servicios debe ser un arreglo de números o una lista separada por comas',
+      'any.required': 'Debe indicar los servicios a consultar',
+    }),
 });
 
 export const ingresosEgresosSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required(),
-  fechaFin: Joi.string().isoDate().required(),
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaFin: fechaSchema.label('Fecha de término'),
   unidad: Joi.string().required().messages({ 'any.required': 'Debe indicar la unidad' }),
   filtro: Joi.string().valid('ingreso', 'egreso', 'todos').default('todos').messages({
     'any.only': 'El filtro debe ser "ingreso", "egreso" o "todos"',
@@ -114,18 +123,19 @@ export const ingresosEgresosSchema = Joi.object({
 });
 
 export const intervencionPabellonSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required(),
-  fechaFin: Joi.string().isoDate().required(),
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaFin: fechaSchema.label('Fecha de término'),
+
 });
 
 export const irGrdSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required(),
-  fechaFin: Joi.string().isoDate().required(),
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaFin: fechaSchema.label('Fecha de término'),
 });
 
 export const listaEsperaSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required(),
-  fechaFin: Joi.string().isoDate().required(),
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaFin: fechaSchema.label('Fecha de término'),
   tipo: Joi.number().valid(1, 2).required().messages({
     'any.only': 'El tipo debe ser 1 (Solicitud) o 2 (Realización)',
   }),
@@ -133,16 +143,15 @@ export const listaEsperaSchema = Joi.object({
 
 export const procedimientosSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
-  fechaTermino: fechaSchema.label('Fecha de término'),
-  especialidadId: Joi.string()
+  fechaFin: fechaSchema.label('Fecha de término'),
+  PadreEsp: Joi.string()
     .optional()
     .allow(null, '')
     .messages({
       'string.base': 'El ID de especialidad debe ser un texto válido'
     })
     .label('ID de Especialidad'),
-  subEspecialidadId: Joi.number()
-    .integer()
+  selectEspec: Joi.string()
     .optional()
     .allow(null)
     .messages({
@@ -170,12 +179,6 @@ export const subEspecialidadesSchema = Joi.object({
 });
 
 export const pacientesHospitalizadosSchema = Joi.object({
-  fechaInicio: Joi.string().isoDate().required().messages({
-    'string.empty': 'Debe indicar la fecha de inicio',
-    'any.required': 'La fecha de inicio es obligatoria',
-  }),
-  fechaFin: Joi.string().isoDate().required().messages({
-    'string.empty': 'Debe indicar la fecha de término',
-    'any.required': 'La fecha de término es obligatoria',
-  }),
+  fechaInicio: fechaSchema.label('Fecha de inicio'),
+  fechaFin: fechaSchema.label('Fecha de término'),
 });

@@ -1,7 +1,9 @@
-import { Component, signal, inject, OnInit, computed, HostListener, viewChild } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, HostListener, viewChild, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 import { LucideAngularModule, Ambulance, Syringe, FileBarChart, Clock, Database, FileText, BedDouble, LucideIconData } from 'lucide-angular';
 import { SidebarComponent } from '@shared/components/sidebar/sidebar.component';
-import { EstadoVacioComponent, BannerInstruccionesComponent } from '@shared/components/ui';
+import { EstadoVacioComponent, BannerInstruccionesComponent, ModalResultadoComponent, type ConfiguracionModal } from '@shared/components/ui';
 import type { SidebarItem } from '@shared/components/sidebar/sidebar.component';
 import type { EstadisticaReporte } from '@shared/components/ui/estado-vacio/estado-vacio.component';
 import type { Especialidad, SubEspecialidad } from '../../interfaces';
@@ -9,6 +11,8 @@ import type { PpvServicio } from '../../interfaces/servicio.interface';
 import type { FiltrosPpvReporte } from '@app/ppv/interfaces/filtro.interface';
 import { FiltrosPpvReporteComponent } from '../../components/filtros-reporte/filtros-reporte.component';
 import { CatalogosService } from '../../services/catalogos.service';
+import { PpvService } from '../../services/ppv.service';
+import { AuthService } from '@auth/services/auth.service';
 
 @Component({
   selector: 'app-ppv-page',
@@ -17,12 +21,16 @@ import { CatalogosService } from '../../services/catalogos.service';
     LucideAngularModule,
     FiltrosPpvReporteComponent,
     EstadoVacioComponent,
-    BannerInstruccionesComponent
+    BannerInstruccionesComponent,
+    ModalResultadoComponent
   ],
   templateUrl: './ppv-page.component.html',
 })
 export class PpvPageComponent implements OnInit {
   private readonly catalogosService = inject(CatalogosService);
+  private readonly ppvService = inject(PpvService);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly BREAKPOINT_MOBILE = 768;
 
   readonly iconos: Record<string, LucideIconData> = { Ambulance, Syringe, FileBarChart, Clock, Database, FileText, BedDouble };
@@ -30,6 +38,13 @@ export class PpvPageComponent implements OnInit {
   readonly sidebarAbierto = signal(this.obtenerEstadoInicialSidebar());
   readonly cargandoReporte = signal(false);
   readonly reporteSeleccionado = signal<string | null>(null);
+  readonly mostrarModal = signal(false);
+
+  readonly configuracionModal = signal<ConfiguracionModal>({
+    tipo: 'info',
+    titulo: '',
+    mensaje: '',
+  });
 
   readonly especialidades = signal<Especialidad[]>([]);
   readonly subEspecialidades = signal<SubEspecialidad[]>([]);
@@ -117,13 +132,25 @@ export class PpvPageComponent implements OnInit {
   }
 
   descargarReporte(filtros: FiltrosPpvReporte): void {
-    console.log('Descargar reporte PPV:', this.reporteSeleccionado(), filtros);
-    this.cargandoReporte.set(true);
+    const reporte = this.reporteSeleccionado();
+    if (!reporte) return;
 
-    setTimeout(() => {
-      this.cargandoReporte.set(false);
-      alert(`Reporte "${this.reporteSeleccionado()}" generado exitosamente!`);
-    }, 2000);
+    const generadores: Record<string, () => void> = {
+      'Intervenciones Pabellón': () => this.generarReportePabellon(filtros),
+      'Procedimientos': () => this.generarReporteProcedimientos(filtros),
+      'IR-GRD': () => this.generarReporteIrGrd(filtros),
+      'Lista de Espera': () => this.generarReporteListaEspera(filtros),
+      'Base Consultas': () => this.generarReporteBaseConsultas(filtros),
+      'RPHs': () => this.generarReporteRphs(filtros),
+      'Camas Críticas': () => this.generarReporteCamasCriticas(filtros),
+    };
+
+    const generador = generadores[reporte];
+    if (generador) {
+      generador();
+    } else {
+      console.warn('Reporte no implementado:', reporte);
+    }
   }
 
   limpiarFiltros(): void {
@@ -197,5 +224,208 @@ export class PpvPageComponent implements OnInit {
       const filtros = this.filtrosComponent();
       filtros?.seleccionarTodosServicios();
     }, 0);
+  }
+
+  // ============================================================================
+  // GENERADORES DE REPORTES
+  // ============================================================================
+
+  private generarReportePabellon(filtros: FiltrosPpvReporte): void {
+    if (!this.validarFechas(filtros)) return;
+
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+    };
+
+    this.ejecutarDescarga(
+      this.ppvService.generarReportePpvPabellon(query),
+      `reporte-pabellon-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de Intervenciones de Pabellón generado correctamente'
+    );
+  }
+
+  private generarReporteProcedimientos(filtros: FiltrosPpvReporte): void {
+    if (!this.validarFechas(filtros)) return;
+
+    // Obtener códigos de especialidad y subespecialidad seleccionadas
+    let especialidadCodigo: string | undefined;
+    let subEspecialidadCodigo: string | undefined;
+
+    if (filtros.especialidadId && filtros.especialidadId > 0) {
+      const especialidad = this.especialidades()[filtros.especialidadId - 1];
+      especialidadCodigo = especialidad?.id.trim();
+    }
+
+    if (filtros.subEspecialidadId && filtros.subEspecialidadId > 0) {
+      const subEspecialidad = this.subEspecialidades()[filtros.subEspecialidadId - 1];
+      subEspecialidadCodigo = subEspecialidad?.id;
+    }
+
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+      ...(subEspecialidadCodigo && { selectEspec: subEspecialidadCodigo }),
+      ...(especialidadCodigo && { PadreEsp: especialidadCodigo }),
+    };
+
+    this.ejecutarDescarga(
+      this.ppvService.generarReportePpvProcedimientos(query),
+      `reporte-procedimientos-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de Procedimientos generado correctamente'
+    );
+  }
+
+  private generarReporteIrGrd(filtros: FiltrosPpvReporte): void {
+    if (!this.validarFechas(filtros)) return;
+
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+    };
+
+    this.ejecutarDescarga(
+      this.ppvService.generarReportePpvIrGrd(query),
+      `reporte-ir-grd-${query.fechaInicio}-${query.fechaFin}.txt`,
+      'Reporte IR-GRD generado correctamente'
+    );
+  }
+
+  private generarReporteListaEspera(filtros: FiltrosPpvReporte): void {
+    if (!this.validarFechas(filtros)) return;
+
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+      tipo: filtros.tipoFecha === 'solicitud' ? 1 : 2,
+    };
+
+    this.ejecutarDescarga(
+      this.ppvService.generarReportePpvListaEspera(query),
+      `reporte-lista-espera-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de Lista de Espera generado correctamente'
+    );
+  }
+
+  private generarReporteBaseConsultas(filtros: FiltrosPpvReporte): void {
+    if (!this.validarFechas(filtros)) return;
+
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+    };
+
+    this.ejecutarDescarga(
+      this.ppvService.generarReportePpvPacHospitalizado(query),
+      `reporte-base-consultas-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de Base de Consultas generado correctamente'
+    );
+  }
+
+  private generarReporteRphs(filtros: FiltrosPpvReporte): void {
+    if (!this.validarFechas(filtros)) return;
+
+    if (!filtros.serviciosSeleccionados || filtros.serviciosSeleccionados.length === 0) {
+      this.mostrarError('Debe seleccionar al menos un servicio');
+      return;
+    }
+
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+      servicios: filtros.serviciosSeleccionados.map(Number),
+    };
+
+    this.ejecutarDescarga(
+      this.ppvService.generarReportePpvHospitalizacion(query),
+      `reporte-rphs-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de RPHs generado correctamente'
+    );
+  }
+
+  private generarReporteCamasCriticas(filtros: FiltrosPpvReporte): void {
+    if (!this.validarFechas(filtros)) return;
+
+    const accessData = this.authService.accessData();
+    const unidadUsuario = accessData?.servicio || '';
+
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+      unidad: unidadUsuario,
+      filtro: 'ingreso' as const,
+    };
+
+    this.ejecutarDescarga(
+      this.ppvService.generarReportePpvIngEgr(query),
+      `reporte-camas-criticas-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de Camas Críticas generado correctamente'
+    );
+  }
+
+  // ============================================================================
+  // MÉTODOS DE UTILIDAD
+  // ============================================================================
+
+  private ejecutarDescarga(observable: any, nombreArchivo: string, mensajeExito: string): void {
+    this.cargandoReporte.set(true);
+    observable
+      .pipe(
+        finalize(() => this.cargandoReporte.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (blob: Blob) => {
+          this.descargarBlob(blob, nombreArchivo);
+          this.mostrarExito(mensajeExito);
+        },
+        error: (err: any) => this.mostrarError(err.message),
+      });
+  }
+
+  private validarFechas(filtros: FiltrosPpvReporte): boolean {
+    if (!filtros.fechaInicio || !filtros.fechaFin) {
+      this.mostrarError('Debe seleccionar una fecha de inicio y una fecha de término');
+      return false;
+    }
+    return true;
+  }
+
+  private formatearFecha(fecha: Date): string {
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+  }
+
+  private descargarBlob(blob: Blob, nombreArchivo: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nombreArchivo;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  private mostrarExito(mensaje: string): void {
+    this.configuracionModal.set({
+      tipo: 'exito',
+      titulo: '¡Reporte Generado!',
+      mensaje,
+      textoBotonPrincipal: 'Aceptar',
+      autoCerrarMs: 3000,
+    });
+    this.mostrarModal.set(true);
+  }
+
+  private mostrarError(mensaje: string): void {
+    this.configuracionModal.set({
+      tipo: 'error',
+      titulo: 'Error al Generar Reporte',
+      mensaje,
+      detalles: 'Por favor, verifica los filtros seleccionados e intenta nuevamente.',
+      textoBotonPrincipal: 'Entendido',
+    });
+    this.mostrarModal.set(true);
   }
 }
