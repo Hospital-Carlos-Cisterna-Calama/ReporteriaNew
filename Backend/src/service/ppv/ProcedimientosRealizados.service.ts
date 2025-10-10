@@ -52,37 +52,40 @@ export class ProcedimientosRealizadosService {
       mensajeRow.getCell(1).font = { italic: true, color: { argb: 'FF666666' } };
       hoja.mergeCells(mensajeRow.number, 1, mensajeRow.number, encabezados.length);
     } else {
-      registros.forEach(r =>
-        hoja.addRow([
-          r.Folio,
-          r.Nombre_Paciente,
-          r.RUT,
-          r.Etnia,
-          r.Sexo,
-          r.Edad,
-          r.Prevision,
-          r.Informe,
-          r.Hallazgo,
-          r.Conclusion,
-          r.Especialidad,
-          r.Sub_Especialidad,
-        ])
-      );
+      // Agregar filas en lotes para mejor rendimiento
+      const batchSize = 1000;
+      for (let i = 0; i < registros.length; i += batchSize) {
+        const batch = registros.slice(i, i + batchSize);
+        batch.forEach(r =>
+          hoja.addRow([
+            r.Folio,
+            r.Nombre_Paciente,
+            r.RUT,
+            r.Etnia,
+            r.Sexo,
+            r.Edad,
+            r.Prevision,
+            r.Informe,
+            r.Hallazgo,
+            r.Conclusion,
+            r.Especialidad,
+            r.Sub_Especialidad,
+          ])
+        );
+      }
     }
 
     const anchoCol = [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25];
     hoja.columns.forEach((col, i) => (col.width = anchoCol[i] || 15));
 
-    hoja.eachRow({ includeEmpty: false }, row => {
-      row.eachCell(cell => {
-        cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        };
-        cell.alignment = { wrapText: true, vertical: 'middle' };
-      });
+    // ✅ Aplicar bordes solo al encabezado para mejor rendimiento
+    headerRow.eachCell(cell => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
     });
 
     hoja.views = [{ state: 'frozen', ySplit: 1 }];

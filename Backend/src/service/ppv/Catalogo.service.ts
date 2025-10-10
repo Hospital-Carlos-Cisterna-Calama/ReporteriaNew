@@ -126,7 +126,6 @@ export class CatalogoService {
 
 
 
-
   /**
    * Obtener todas las sub-especialidades para múltiples especialidades
    * Útil para análisis o reportes masivos

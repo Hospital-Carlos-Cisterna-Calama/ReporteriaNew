@@ -60,7 +60,7 @@ export const sequelize = new Sequelize({
     options: {
       encrypt: false,
       trustServerCertificate: true,
-      requestTimeout: 30000,
+      requestTimeout: 300000, // 5 minutos para reportes grandes
     },
   },
   models: [
@@ -104,7 +104,7 @@ export const sequelizePPV = new Sequelize({
     options: {
       encrypt: false,
       trustServerCertificate: true,
-      requestTimeout: 30000,
+      requestTimeout: 300000, // 5 minutos para reportes grandes
     },
   },
   models: [CamasCritica, Donaciones, IngresoPpv, Ppv, PpvCopdigo, PpvServicios, Prestacion, Rph, RphEspecialidad, SolicitudPrestacion],
@@ -122,7 +122,7 @@ export const sequelizeHCE = new Sequelize({
     options: {
       encrypt: false,
       trustServerCertificate: true,
-      requestTimeout: 30000,
+      requestTimeout: 300000, // 5 minutos para reportes grandes
     },
   },
   models: [EvolucionHospitalizacion, IngresoCerradaEstablecer],
@@ -140,7 +140,7 @@ export const sequelizeProcedimiento = new Sequelize({
     options: {
       encrypt: false,
       trustServerCertificate: true,
-      requestTimeout: 30000,
+      requestTimeout: 300000, // 5 minutos para reportes grandes
     },
   },
   models: [ProcCitas, ProcRegClinico, TabActivos, NetActivoTipoProg, TabEquipamiento],
