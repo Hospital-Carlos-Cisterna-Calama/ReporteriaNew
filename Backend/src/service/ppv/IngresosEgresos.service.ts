@@ -2,6 +2,7 @@ import ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { IngresosEgresos } from '../../sql/PpvConsulta';
 import { convertirFecha } from '../../utils/helperRPA';
+import dayjs from 'dayjs';
 
 export class IngresosEgresosService {
   async obtenerIngresosEgresos(unidadId: number, fechaInicio: string, fechaFin: string, filtro: 'ingreso' | 'egreso') {
@@ -15,11 +16,6 @@ export class IngresosEgresosService {
   async exportarReporte(res: Response, unidadId: number, fechaInicio: string, fechaFin: string, filtro: 'ingreso' | 'egreso') {
     try {
       const registros = await this.obtenerIngresosEgresos(unidadId, fechaInicio, fechaFin, filtro);
-
-      if (!registros.length) {
-        res.status(404).json({ message: 'No se encontraron datos para el rango de fechas.' });
-        return;
-      }
 
       const workbook = new ExcelJS.Workbook();
       const hoja = workbook.addWorksheet('Ingresos y Egresos');
@@ -60,16 +56,27 @@ export class IngresosEgresosService {
       };
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
 
-      registros.forEach((fila: any) => hoja.addRow(Object.values(fila)));
+      if (registros.length === 0) {
+        // Agregar fila con mensaje cuando no hay datos
+        const mensajeRow = hoja.addRow(['No se encontraron datos en el rango de fechas especificado']);
+        mensajeRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+        mensajeRow.getCell(1).font = { italic: true, color: { argb: 'FF666666' } };
+        hoja.mergeCells(mensajeRow.number, 1, mensajeRow.number, encabezados.length);
+      } else {
+        // 🔹 Agregar registros al Excel
+        registros.forEach((fila: any) => hoja.addRow(Object.values(fila)));
+      }
 
       hoja.columns.forEach(col => (col.width = 20));
 
-      const nombreArchivo = `IngresosEgresos_${filtro}_${fechaInicio}_a_${fechaFin}.xlsx`;
+      // ✅ Usar buffer en vez de write(res)
+      const nombreArchivo = `IngresosEgresos_${filtro}_${dayjs(fechaInicio, 'DD/MM/YYYY').format('YYYYMMDD')}_${dayjs(fechaFin, 'DD/MM/YYYY').format('YYYYMMDD')}.xlsx`;
+      const buffer = await workbook.xlsx.writeBuffer();
+
       res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-      await workbook.xlsx.write(res);
-      res.end();
+      res.setHeader('Content-Length', buffer.byteLength);
+      return res.send(buffer);
     } catch (error) {
       console.error('❌ Error al generar el reporte Ingresos/Egresos:', error);
       res.status(500).json({ message: 'Error al generar el reporte de Ingresos y Egresos.' });

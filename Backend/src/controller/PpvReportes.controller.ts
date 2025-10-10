@@ -6,6 +6,7 @@ import { IrGrdService } from '../service/ppv/IrGrd.service';
 import { ListaEsperaGastroenterologiaService } from '../service/ppv/ListaEsperaGastroenterologia.service';
 import { PacienteHospitalizadoService } from '../service/ppv/PacienteHospitalizado.service';
 import { ProcedimientosRealizadosService } from '../service/ppv/ProcedimientosRealizados.service';
+import { CatalogoService } from '../service/ppv';
 
 export class PpvReportesController {
   static async exportarHospitalizacionesPorServicios(req: Request, res: Response) {
@@ -36,9 +37,23 @@ export class PpvReportesController {
 
   static async exportarIngresosEgresos(req: Request, res: Response) {
     try {
-      const { fechaInicio, fechaFin, unidad, filtro } = req.body;
+      const { fechaInicio, fechaFin, unidad, filtro } = req.query as any;
+      
+      if (!fechaInicio || !fechaFin || !unidad) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin y unidad' });
+      }
+
       const servicio = new IngresosEgresosService();
-      await servicio.exportarReporte(res, unidad, fechaInicio, fechaFin, filtro);
+      const catalogo = new CatalogoService(); 
+      const ppvServicio = await catalogo.obtenerServicioPorNombre(unidad);
+      
+      if (!ppvServicio) {
+        console.error(`❌ No se encontró el servicio con nombre: "${unidad}"`);
+        return res.status(404).json({ message: `No se encontró el servicio "${unidad}". Verifique el nombre del servicio.` });
+      }
+
+      console.log(`✅ Servicio encontrado: ${ppvServicio.Servicio} (ID: ${ppvServicio.ID})`);
+      await servicio.exportarReporte(res, ppvServicio.ID, fechaInicio, fechaFin, filtro);
     } catch (error) {
       console.error('❌ Error al exportar ingresos/egresos:', error);
       res.status(500).json({ message: 'Error al generar el reporte de ingresos y egresos' });
@@ -66,8 +81,7 @@ export class PpvReportesController {
 
   static async exportarIrGrd(req: Request, res: Response) {
     try {
-      const fechaInicio = req.query.fechaInicio?.toString() || req.body.fechaInicio;
-      const fechaFin = req.query.fechaFin?.toString() || req.body.fechaFin;
+      const {fechaInicio, fechaFin} = req.query as any;
 
       if (!fechaInicio || !fechaFin) {
         return res.status(400).json({

@@ -114,38 +114,37 @@ export class IntervencionPabellonService {
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;
 
-    dataFinal.forEach(fila => hoja.addRow(Object.values(fila)));
+    // Agregar datos en lotes para mejor rendimiento
+    const batchSize = 1000;
+    for (let i = 0; i < dataFinal.length; i += batchSize) {
+      const batch = dataFinal.slice(i, i + batchSize);
+      batch.forEach(fila => hoja.addRow(Object.values(fila)));
+    }
 
-    hoja.eachRow({ includeEmpty: false }, row => {
-      row.eachCell(cell => {
-        cell.border = {
-          top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-          left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-          bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-          right: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-        };
-        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-      });
+    // Aplicar bordes solo al encabezado
+    headerRow.eachCell(cell => {
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+        left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+        bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+        right: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+      };
     });
 
-    hoja.columns.forEach(col => {
-      let maxLength = 10;
-      col.eachCell?.({ includeEmpty: true }, cell => {
-        const val = cell.value ? cell.value.toString() : '';
-        if (val.length > maxLength) maxLength = val.length;
-      });
-      col.width = Math.min(maxLength + 2, 45);
-    });
+    // Ajustar anchos de columna de forma simple
+    hoja.columns.forEach(col => (col.width = 20));
 
     hoja.autoFilter = {
       from: 'A1',
       to: hoja.getRow(1).getCell(encabezados.length).address,
     };
 
-    const nombreArchivo = `IntyProc.xlsx`;
+    const nombreArchivo = `Intervencion_Pabellon_${dayjs(fechaInicio, 'DD/MM/YYYY').format('YYYYMMDD')}_${dayjs(fechaFin, 'DD/MM/YYYY').format('YYYYMMDD')}.xlsx`;
+    const buffer = await workbook.xlsx.writeBuffer();
+    
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    await workbook.xlsx.write(res);
-    res.end();
+    res.setHeader('Content-Length', buffer.byteLength);
+    return res.send(buffer);
   }
 }

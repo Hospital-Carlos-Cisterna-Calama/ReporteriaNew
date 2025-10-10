@@ -12,6 +12,7 @@ import type { FiltrosPpvReporte } from '@app/ppv/interfaces/filtro.interface';
 import { FiltrosPpvReporteComponent } from '../../components/filtros-reporte/filtros-reporte.component';
 import { CatalogosService } from '../../services/catalogos.service';
 import { PpvService } from '../../services/ppv.service';
+import { AuthService } from '@auth/services/auth.service';
 
 @Component({
   selector: 'app-ppv-page',
@@ -28,6 +29,7 @@ import { PpvService } from '../../services/ppv.service';
 export class PpvPageComponent implements OnInit {
   private readonly catalogosService = inject(CatalogosService);
   private readonly ppvService = inject(PpvService);
+  private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly BREAKPOINT_MOBILE = 768;
 
@@ -295,6 +297,7 @@ export class PpvPageComponent implements OnInit {
     const query = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaFin: this.formatearFecha(filtros.fechaFin!),
+      tipo: filtros.tipoFecha === 'solicitud' ? 1 : 2,
     };
 
     this.ejecutarDescarga(
@@ -343,10 +346,13 @@ export class PpvPageComponent implements OnInit {
   private generarReporteCamasCriticas(filtros: FiltrosPpvReporte): void {
     if (!this.validarFechas(filtros)) return;
 
+    const accessData = this.authService.accessData();
+    const unidadUsuario = accessData?.servicio || '';
+
     const query = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaFin: this.formatearFecha(filtros.fechaFin!),
-      unidad: 1, // TODO: Obtener de filtros si es necesario
+      unidad: unidadUsuario,
       filtro: 'ingreso' as const,
     };
 

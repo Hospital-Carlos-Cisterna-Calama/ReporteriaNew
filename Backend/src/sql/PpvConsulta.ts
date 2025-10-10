@@ -82,7 +82,7 @@ export async function IngresosEgresos(unidadId: number, fechaInicio: string, fec
       cc.caidas,
       cc.error_medico,
       cc.diagnostico_egreso
-    FROM BD_PPV.dbo.CamasCritica AS cc
+    FROM BD_PPV.dbo.Camas_Criticas AS cc
     LEFT JOIN BD_ENTI_CORPORATIVA.dbo.PAC_Paciente AS p
       ON p.PAC_PAC_Numero = cc.pac_numero
     LEFT JOIN BD_ENTI_CORPORATIVA.dbo.SER_Profesiona AS sp
