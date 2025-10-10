@@ -1,10 +1,15 @@
 import ExcelJS from 'exceljs';
 import { Response } from 'express';
-import { IngresosEgresos } from '../../sql/PpvConsulta'; 
+import { IngresosEgresos } from '../../sql/PpvConsulta';
+import { convertirFecha } from '../../utils/helperRPA';
 
 export class IngresosEgresosService {
   async obtenerIngresosEgresos(unidadId: number, fechaInicio: string, fechaFin: string, filtro: 'ingreso' | 'egreso') {
-    return await IngresosEgresos(unidadId, fechaInicio, fechaFin, filtro);
+    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
+    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
+    const finStr = convertirFecha(fechaFin, true).split(' ')[0];
+    
+    return await IngresosEgresos(unidadId, inicioStr, finStr, filtro);
   }
 
   async exportarReporte(res: Response, unidadId: number, fechaInicio: string, fechaFin: string, filtro: 'ingreso' | 'egreso') {

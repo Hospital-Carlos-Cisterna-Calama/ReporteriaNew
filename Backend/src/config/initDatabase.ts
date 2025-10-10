@@ -146,6 +146,8 @@ export const sequelizeProcedimiento = new Sequelize({
   models: [ProcCitas, ProcRegClinico, TabActivos, NetActivoTipoProg, TabEquipamiento],
 });
 
+ asociaciones();
+
 export async function connectDatabase() {
   try {
     await sequelize.authenticate();
@@ -160,7 +162,7 @@ export async function connectDatabase() {
     await sequelizeProcedimiento.authenticate();
     console.log('✅ Conexión a la base de datos PROCEDIMIENTOS establecida');
 
-    asociaciones();
+   
 
     return true;
   } catch (error: any) {

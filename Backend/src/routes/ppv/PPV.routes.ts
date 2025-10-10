@@ -15,19 +15,21 @@ import {
 
 const ppvRouter = Router();
 
-ppvRouter.get('/hospitalizaciones', asyncHandler(PpvReportesController.exportarHospitalizacionesPorServicios));
+ppvRouter.get('/hospitalizaciones', validateSchema(hospitalizacionesPorServicioSchema), asyncHandler(PpvReportesController.exportarHospitalizacionesPorServicios));
 
 ppvRouter.get('/ingresosEgresos', validateSchema(ingresosEgresosSchema), asyncHandler(PpvReportesController.exportarIngresosEgresos));
 
 ppvRouter.get('/pabellon', validateSchema(intervencionPabellonSchema), asyncHandler(PpvReportesController.exportarIntervencionPabellon));
 
-ppvRouter.get('/irGrd', asyncHandler(PpvReportesController.exportarIrGrd));
+ppvRouter.get('/irGrd', validateSchema(irGrdSchema), asyncHandler(PpvReportesController.exportarIrGrd));
 
-ppvRouter.get('/listaEspera', validateSchema(listaEsperaSchema), asyncHandler(PpvReportesController.exportarListaEspera));
+ ppvRouter.get('/listaEspera', validateSchema(listaEsperaSchema), asyncHandler(PpvReportesController.exportarListaEspera));
 
  ppvRouter.get('/pacientesHospitalizados', validateSchema(pacientesHospitalizadosSchema), asyncHandler(PpvReportesController.exportarPacientesHospitalizados));
 
-ppvRouter.get('/procedimientos', asyncHandler(PpvReportesController.exportarProcedimientos));
+ppvRouter.get('/procedimientos', validateSchema(procedimientosSchema), asyncHandler(PpvReportesController.exportarProcedimientos));
+
+
 
 export default ppvRouter;
   

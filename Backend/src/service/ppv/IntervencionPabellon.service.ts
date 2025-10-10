@@ -4,12 +4,17 @@ import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import 'dayjs/locale/es';
 import { IntervencionPabellon, obtenerPatologiasPorSolicitud } from '../../sql/PpvConsulta';
+import { convertirFecha } from '../../utils/helperRPA';
 
 dayjs.extend(weekOfYear);
 
 export class IntervencionPabellonService {
   async exportarReporte(fechaInicio: string, fechaFin: string, res: Response) {
-    const registros: any[] = await IntervencionPabellon(fechaInicio, fechaFin);
+    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD directamente
+    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0]; // Solo la fecha, sin hora
+    const finStr = convertirFecha(fechaFin, true).split(' ')[0]; // Solo la fecha, sin hora
+
+    const registros: any[] = await IntervencionPabellon(inicioStr, finStr);
     const dataFinal: any[] = [];
 
     for (const r of registros) {

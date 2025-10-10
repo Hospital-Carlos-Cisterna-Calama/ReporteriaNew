@@ -1,10 +1,15 @@
 import ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { HospitalizacionesPorServicio } from '../../sql/PpvConsulta';
+import { convertirFecha } from '../../utils/helperRPA';
 
 export class HospitalizacionesPorServicioService {
   async obtenerHospitalizacionesPorServicios(servicios: number[], fechaInicio: string, fechaFin: string) {
-    return HospitalizacionesPorServicio(servicios, fechaInicio, fechaFin);
+    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
+    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
+    const finStr = convertirFecha(fechaFin, true).split(' ')[0];
+    
+    return HospitalizacionesPorServicio(servicios, inicioStr, finStr);
   }
 
   async procesarHospitalizaciones(registros: any[]) {

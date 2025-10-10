@@ -1,11 +1,16 @@
 import ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { ProcedimientosRealizados } from '../../sql/PpvConsulta';
+import { convertirFecha } from '../../utils/helperRPA';
 import dayjs from 'dayjs';
 
 export class ProcedimientosRealizadosService {
   async exportarReporte(res: Response, fechaInicio: string, fechaFin: string, especialidad: string, subEspecialidad?: string) {
-    const registros: any[] = await ProcedimientosRealizados(fechaInicio, fechaFin, especialidad, subEspecialidad);
+    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
+    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
+    const finStr = convertirFecha(fechaFin, true).split(' ')[0];
+
+    const registros: any[] = await ProcedimientosRealizados(inicioStr, finStr, especialidad, subEspecialidad);
 
     console.log('📊 Cantidad de registros:', registros.length);
     console.log('📁 Ejemplo registro:', registros[0]);
