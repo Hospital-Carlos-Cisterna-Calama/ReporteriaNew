@@ -9,7 +9,7 @@ export class PacienteHospitalizadoService {
     // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
-    
+
     const resultado = await PacienteHospitalizado(inicioStr, finStr);
     return resultado;
   }
@@ -69,7 +69,7 @@ export class PacienteHospitalizadoService {
       hoja.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FFD9D9D9' },
+        fgColor: { argb: '#59ACA5' },
       };
 
       datos.forEach(fila => hoja.addRow(Object.values(fila)));

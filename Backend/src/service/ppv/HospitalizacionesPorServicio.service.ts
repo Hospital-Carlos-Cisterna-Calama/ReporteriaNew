@@ -8,7 +8,7 @@ export class HospitalizacionesPorServicioService {
     // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
-    
+
     return HospitalizacionesPorServicio(servicios, inicioStr, finStr);
   }
 
@@ -60,34 +60,23 @@ export class HospitalizacionesPorServicioService {
       'Servicio',
     ];
 
-    hoja.addTable({
-      name: 'HospitalizacionesTable',
-      ref: 'A1',
-      headerRow: true,
-      totalsRow: false,
-      style: {
-        theme: undefined, 
-        showRowStripes: false, 
-      },
-      columns: encabezados.map(h => ({ name: h, filterButton: true })),
-      rows: datos.map(fila => Object.values(fila)),
-    });
+    hoja.addRow(encabezados);
 
     const headerRow = hoja.getRow(1);
-    headerRow.eachCell(cell => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FF0D9488' }, 
-      };
-      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; 
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
-    });
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '#59ACA5' },
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;
 
     hoja.columns.forEach(col => {
       col.width = Math.max(15, col.header ? col.header.toString().length + 5 : 15);
     });
+
+    datos.forEach(fila => hoja.addRow(Object.values(fila)));
 
     return workbook;
   }

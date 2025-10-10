@@ -48,7 +48,7 @@ export class IntervencionPabellonService {
         };
 
         const start = parseTime(r.Hora_Ingreso);
-        const end = parseTime(r.Hora_Salida); 
+        const end = parseTime(r.Hora_Salida);
 
         let totalMinutos = end.hours * 60 + end.minutes - (start.hours * 60 + start.minutes);
         if (totalMinutos < 0) totalMinutos += 1440;
@@ -110,7 +110,7 @@ export class IntervencionPabellonService {
 
     const headerRow = hoja.getRow(1);
     headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D9488' } };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '#59ACA5' } };
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;
 

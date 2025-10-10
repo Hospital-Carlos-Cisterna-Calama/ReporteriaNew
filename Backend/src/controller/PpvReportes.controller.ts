@@ -87,10 +87,10 @@ export class PpvReportesController {
     try {
       // TODO: Implementar servicio de lista de espera
       res.status(501).json({ message: 'Servicio de lista de espera en desarrollo' });
-      
-      // const { fechaInicio, fechaFin, tipo } = req.body;
-      // const servicio = new ListaEsperaGastroenterologiaService();
-      // await servicio.exportarReporte(fechaInicio, fechaFin, tipo, res);
+
+      const { fechaInicio, fechaFin, tipo_reporte } = req.body;
+      const servicio = new ListaEsperaGastroenterologiaService();
+      await servicio.exportarReporte(fechaInicio, fechaFin, tipo_reporte, res);
     } catch (error) {
       console.error('❌ Error al exportar lista de espera:', error);
       res.status(500).json({ message: 'Error al generar el reporte de lista de espera' });
@@ -116,7 +116,6 @@ export class PpvReportesController {
 
   static async exportarProcedimientos(req: Request, res: Response) {
     try {
-
       const { fechaInicio, fechaFin, selectEspec, PadreEsp } = req.query as any;
 
       console.log('📅 Inicio:', fechaInicio);

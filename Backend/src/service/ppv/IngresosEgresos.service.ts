@@ -56,11 +56,10 @@ export class IngresosEgresosService {
       headerRow.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FF2E8B57' }, // verde institucional
+        fgColor: { argb: '#59ACA5' },
       };
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
 
-      // 🔹 Agregar registros al Excel
       registros.forEach((fila: any) => hoja.addRow(Object.values(fila)));
 
       hoja.columns.forEach(col => (col.width = 20));
