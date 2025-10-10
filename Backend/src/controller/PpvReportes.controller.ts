@@ -36,7 +36,7 @@ export class PpvReportesController {
 
   static async exportarIngresosEgresos(req: Request, res: Response) {
     try {
-      const { fechaInicio, fechaFin, unidad, filtro } = req.body;
+      const { fechaInicio, fechaFin, unidad, filtro } = req.query as any;
       const servicio = new IngresosEgresosService();
       await servicio.exportarReporte(res, unidad, fechaInicio, fechaFin, filtro);
     } catch (error) {
@@ -66,8 +66,7 @@ export class PpvReportesController {
 
   static async exportarIrGrd(req: Request, res: Response) {
     try {
-      const fechaInicio = req.query.fechaInicio?.toString() || req.body.fechaInicio;
-      const fechaFin = req.query.fechaFin?.toString() || req.body.fechaFin;
+      const {fechaInicio, fechaFin} = req.query as any;
 
       if (!fechaInicio || !fechaFin) {
         return res.status(400).json({

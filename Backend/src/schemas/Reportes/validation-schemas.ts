@@ -91,11 +91,26 @@ export const reporteUrgIrasSchema = Joi.object({
 export const hospitalizacionesPorServicioSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
   fechaFin: fechaSchema.label('Fecha de término'),
-  servicios: Joi.array().items(Joi.number().integer()).min(1).required().messages({
-    'array.base': 'El campo servicios debe ser un arreglo de números',
-    'array.min': 'Debe seleccionar al menos un servicio',
-    'any.required': 'Debe indicar los servicios a consultar',
-  }),
+  servicios: Joi.alternatives()
+    .try(
+      Joi.array().items(Joi.number().integer()),
+      Joi.string().custom((value, helpers) => {
+        // Convertir string separado por comas a array de números
+        const serviciosArray = value.split(',').map((s: string) => {
+          const num = parseInt(s.trim(), 10);
+          if (isNaN(num)) {
+            return helpers.error('any.invalid');
+          }
+          return num;
+        });
+        return serviciosArray;
+      })
+    )
+    .required()
+    .messages({
+      'alternatives.match': 'El campo servicios debe ser un arreglo de números o una lista separada por comas',
+      'any.required': 'Debe indicar los servicios a consultar',
+    }),
 });
 
 export const ingresosEgresosSchema = Joi.object({
