@@ -31,4 +31,5 @@ export interface JwtPayload {
 export interface AclData {
   roles?: string[];
   profesiones?: string[];
+  servicios?: string[];
 }

@@ -2,6 +2,7 @@ import ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { IngresosEgresos } from '../../sql/PpvConsulta';
 import { convertirFecha } from '../../utils/helperRPA';
+import dayjs from 'dayjs';
 
 export class IngresosEgresosService {
   async obtenerIngresosEgresos(unidadId: number, fechaInicio: string, fechaFin: string, filtro: 'ingreso' | 'egreso') {
@@ -68,12 +69,14 @@ export class IngresosEgresosService {
 
       hoja.columns.forEach(col => (col.width = 20));
 
-      const nombreArchivo = `IngresosEgresos_${filtro}_${fechaInicio}_a_${fechaFin}.xlsx`;
+      // ✅ Usar buffer en vez de write(res)
+      const nombreArchivo = `IngresosEgresos_${filtro}_${dayjs(fechaInicio, 'DD/MM/YYYY').format('YYYYMMDD')}_${dayjs(fechaFin, 'DD/MM/YYYY').format('YYYYMMDD')}.xlsx`;
+      const buffer = await workbook.xlsx.writeBuffer();
+
       res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-      await workbook.xlsx.write(res);
-      res.end();
+      res.setHeader('Content-Length', buffer.byteLength);
+      return res.send(buffer);
     } catch (error) {
       console.error('❌ Error al generar el reporte Ingresos/Egresos:', error);
       res.status(500).json({ message: 'Error al generar el reporte de Ingresos y Egresos.' });

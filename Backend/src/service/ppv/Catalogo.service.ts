@@ -86,6 +86,44 @@ export class CatalogoService {
       });
   }
 
+  async obtenerServicioPorNombre(nombre: string): Promise<PpvServicio | null> {
+
+    // La BD usa Latin1_General_CS_AS (Case Sensitive, Accent Sensitive)
+    // Necesitamos convertir a CI_AI (Case Insensitive, Accent Insensitive)
+    const nombreLimpio = nombre.trim();
+    
+    const query = `SELECT servicio.ID as id, 
+        servicio.servicio as serv,
+        servicio.cod_rel_servicio,
+        servicio.ambito_id
+      FROM BD_PPV.dbo.PPV_Servicios AS servicio
+      WHERE vigente = 'V' 
+      AND servicio.servicio COLLATE Latin1_General_CI_AI = '${nombreLimpio}' COLLATE Latin1_General_CI_AI`;
+      
+ 
+    
+    const result = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
+    }) as any[];
+
+    console.log(`📊 Resultados encontrados: ${result.length}`);
+    
+    if (result.length > 0) {
+      const row = result[0];
+
+      return {
+        ID: row.id,
+        Servicio: row.serv,
+        Vigente: 'V',
+        Cod_Rel_Servicio: row.cod_rel_servicio ?? null,
+        Ambito_Id: row.ambito_id ?? null
+      } as PpvServicio;
+    }
+    
+    console.log(`❌ No se encontró el servicio "${nombreLimpio}"`);
+    return null;
+  }
+
 
 
 

@@ -10,7 +10,7 @@ export interface ReportePpvHosQuery {
 export interface ReportePpvIngEgrQuery {
   fechaInicio: string;
   fechaFin: string;
-  unidad: number;
+  unidad: string;
   filtro: ResportesPPVEgrIngrTypo;
 
 }

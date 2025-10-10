@@ -14,7 +14,8 @@ export const aclGuard: CanActivateFn = (route: ActivatedRouteSnapshot): Observab
   const checkPermissions = (accessData: any): boolean => {
     const hasValidRole = !data.roles || data.roles.includes(accessData.rol);
     const hasValidProfession = !data.profesiones || data.profesiones.includes(accessData.profesion);
-    return hasValidRole && hasValidProfession;
+    const hasValidService = !data.servicios || data.servicios.includes(accessData.servicio);
+    return hasValidRole && hasValidProfession && hasValidService;
   };
 
   const denyAccess = (): boolean => {
