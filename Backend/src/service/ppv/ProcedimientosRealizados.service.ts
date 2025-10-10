@@ -15,10 +15,6 @@ export class ProcedimientosRealizadosService {
     console.log('📊 Cantidad de registros:', registros.length);
     console.log('📁 Ejemplo registro:', registros[0]);
 
-    if (!registros.length) {
-      return res.status(404).json({ message: 'No se encontraron procedimientos en el rango indicado.' });
-    }
-
     const workbook = new ExcelJS.Workbook();
     const hoja = workbook.addWorksheet('Procedimientos Realizados');
 
@@ -49,22 +45,30 @@ export class ProcedimientosRealizadosService {
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;
 
-    registros.forEach(r =>
-      hoja.addRow([
-        r.Folio,
-        r.Nombre_Paciente,
-        r.RUT,
-        r.Etnia,
-        r.Sexo,
-        r.Edad,
-        r.Prevision,
-        r.Informe,
-        r.Hallazgo,
-        r.Conclusion,
-        r.Especialidad,
-        r.Sub_Especialidad,
-      ])
-    );
+    if (registros.length === 0) {
+      // Agregar fila con mensaje cuando no hay datos
+      const mensajeRow = hoja.addRow(['No se encontraron procedimientos en el rango de fechas especificado']);
+      mensajeRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+      mensajeRow.getCell(1).font = { italic: true, color: { argb: 'FF666666' } };
+      hoja.mergeCells(mensajeRow.number, 1, mensajeRow.number, encabezados.length);
+    } else {
+      registros.forEach(r =>
+        hoja.addRow([
+          r.Folio,
+          r.Nombre_Paciente,
+          r.RUT,
+          r.Etnia,
+          r.Sexo,
+          r.Edad,
+          r.Prevision,
+          r.Informe,
+          r.Hallazgo,
+          r.Conclusion,
+          r.Especialidad,
+          r.Sub_Especialidad,
+        ])
+      );
+    }
 
     const anchoCol = [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25];
     hoja.columns.forEach((col, i) => (col.width = anchoCol[i] || 15));

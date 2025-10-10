@@ -17,6 +17,7 @@ export interface ReportePpvIngEgrQuery {
 export interface ReportePpvListaEsperaQuery {
   fechaInicio: string;
   fechaFin: string;
+  tipo: number;
 }
 
 export interface ReportePpvPabellonQuery {

@@ -16,11 +16,6 @@ export class IngresosEgresosService {
     try {
       const registros = await this.obtenerIngresosEgresos(unidadId, fechaInicio, fechaFin, filtro);
 
-      if (!registros.length) {
-        res.status(404).json({ message: 'No se encontraron datos para el rango de fechas.' });
-        return;
-      }
-
       const workbook = new ExcelJS.Workbook();
       const hoja = workbook.addWorksheet('Ingresos y Egresos');
 
@@ -60,8 +55,16 @@ export class IngresosEgresosService {
       };
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
 
-      // 🔹 Agregar registros al Excel
-      registros.forEach((fila: any) => hoja.addRow(Object.values(fila)));
+      if (registros.length === 0) {
+        // Agregar fila con mensaje cuando no hay datos
+        const mensajeRow = hoja.addRow(['No se encontraron datos en el rango de fechas especificado']);
+        mensajeRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+        mensajeRow.getCell(1).font = { italic: true, color: { argb: 'FF666666' } };
+        hoja.mergeCells(mensajeRow.number, 1, mensajeRow.number, encabezados.length);
+      } else {
+        // 🔹 Agregar registros al Excel
+        registros.forEach((fila: any) => hoja.addRow(Object.values(fila)));
+      }
 
       hoja.columns.forEach(col => (col.width = 20));
 

@@ -295,6 +295,7 @@ export class PpvPageComponent implements OnInit {
     const query = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaFin: this.formatearFecha(filtros.fechaFin!),
+      tipo: filtros.tipoFecha === 'solicitud' ? 1 : 2,
     };
 
     this.ejecutarDescarga(
