@@ -119,6 +119,7 @@ export class UrgenciaController {
         `Categorizaciones_${fecha}.xlsx`,
         'Categorizaciones',
         [
+          { header: 'DAU', key: 'numpa' },
           { header: 'Piso', key: 'piso' },
           { header: 'Usuario', key: 'usuario' },
           { header: 'Categorizacion', key: 'cat' },
@@ -126,13 +127,15 @@ export class UrgenciaController {
           { header: 'Sexo', key: 'sexo' },
           { header: 'Rut', key: 'rut' },
           { header: 'Fecha', key: 'fecha' },
-          { header: 'Fecha', key: 'numpa' },
         ],
         results,
         {
-          dateKeys: ['Piso', 'Usuario', 'Categorizacion', 'Nombre', 'Sexo', 'Rut', 'Fecha'],
+          dateKeys: ['fecha'],
           headerColorArgb: 'FF59ACA5',
-          borders: true,
+          columnWidths: {
+            piso: 25,
+            fecha: 20,
+          },
         }
       );
     } catch (error) {

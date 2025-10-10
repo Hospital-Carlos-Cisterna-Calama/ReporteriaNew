@@ -160,7 +160,7 @@ export async function connectDatabase() {
     await sequelizeProcedimiento.authenticate();
     console.log('✅ Conexión a la base de datos PROCEDIMIENTOS establecida');
 
-    asociaciones();
+    //asociaciones();
 
     return true;
   } catch (error: any) {
