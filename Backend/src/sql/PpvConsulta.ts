@@ -229,7 +229,12 @@ export async function obtenerPatologiasPorSolicitud(numeroSolicitud: string) {
   });
 }
 
-export async function ListaEsperaGastroenterologia(fechaInicio: string, fechaFin: string, tipo: number) {
+export async function ListaEsperaGastroenterologia(fechaInicio: string, fechaFin: string, tipo_reporte: number) {
+  const [dIni, mIni, yIni] = fechaInicio.split('/');
+  const [dFin, mFin, yFin] = fechaFin.split('/');
+  const fechaInicioISO = `${yIni}-${mIni}-${dIni}`;
+  const fechaFinISO = `${yFin}-${mFin}-${dFin}`;
+
   let query = `
     SELECT
       ss = '03',
@@ -300,7 +305,7 @@ export async function ListaEsperaGastroenterologia(fechaInicio: string, fechaFin
       AND pr.prestacion IN ('18-01-006', '18-01-001')
   `;
 
-  if (tipo === 1) {
+  if (tipo_reporte === 1) {
     query += ` AND pr.fecha_solicitud BETWEEN :fechaInicio AND :fechaFin`;
   } else {
     query += ` AND pr.fecha_realizacion BETWEEN :fechaInicio AND :fechaFin`;
@@ -310,8 +315,8 @@ export async function ListaEsperaGastroenterologia(fechaInicio: string, fechaFin
 
   return await sequelizePPV.query(query, {
     replacements: {
-      fechaInicio,
-      fechaFin,
+      fechaInicio: fechaInicioISO,
+      fechaFin: fechaFinISO,
     },
     type: QueryTypes.SELECT,
   });
@@ -389,12 +394,7 @@ export async function PacienteHospitalizado(fechaInicio: string, fechaFin: strin
   return results;
 }
 
-export async function ProcedimientosRealizados(
-  finic: string,
-  ftermin: string,
-  selectEspec: string,
-  PadreEsp?: string
-) {
+export async function ProcedimientosRealizados(finic: string, ftermin: string, selectEspec: string, PadreEsp?: string) {
   const query = `
     SELECT
       c.ID_ListaEspera AS Folio,
@@ -438,6 +438,3 @@ export async function ProcedimientosRealizados(
     type: QueryTypes.SELECT,
   });
 }
-
-
-
