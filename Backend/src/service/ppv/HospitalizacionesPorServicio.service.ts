@@ -67,7 +67,7 @@ export class HospitalizacionesPorServicioService {
     headerRow.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: '#59ACA5' },
+      fgColor: { argb: 'FF59ACA5' },
     };
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;

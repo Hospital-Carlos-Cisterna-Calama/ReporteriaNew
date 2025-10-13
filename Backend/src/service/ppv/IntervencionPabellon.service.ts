@@ -10,9 +10,8 @@ dayjs.extend(weekOfYear);
 
 export class IntervencionPabellonService {
   async exportarReporte(fechaInicio: string, fechaFin: string, res: Response) {
-    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD directamente
-    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0]; // Solo la fecha, sin hora
-    const finStr = convertirFecha(fechaFin, true).split(' ')[0]; // Solo la fecha, sin hora
+    const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
+    const finStr = convertirFecha(fechaFin, true).split(' ')[0];
 
     const registros: any[] = await IntervencionPabellon(inicioStr, finStr);
     const dataFinal: any[] = [];
@@ -110,18 +109,16 @@ export class IntervencionPabellonService {
 
     const headerRow = hoja.getRow(1);
     headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '#59ACA5' } };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;
 
-    // Agregar datos en lotes para mejor rendimiento
     const batchSize = 1000;
     for (let i = 0; i < dataFinal.length; i += batchSize) {
       const batch = dataFinal.slice(i, i + batchSize);
       batch.forEach(fila => hoja.addRow(Object.values(fila)));
     }
 
-    // Aplicar bordes solo al encabezado
     headerRow.eachCell(cell => {
       cell.border = {
         top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
@@ -131,7 +128,6 @@ export class IntervencionPabellonService {
       };
     });
 
-    // Ajustar anchos de columna de forma simple
     hoja.columns.forEach(col => (col.width = 20));
 
     hoja.autoFilter = {
@@ -141,7 +137,7 @@ export class IntervencionPabellonService {
 
     const nombreArchivo = `Intervencion_Pabellon_${dayjs(fechaInicio, 'DD/MM/YYYY').format('YYYYMMDD')}_${dayjs(fechaFin, 'DD/MM/YYYY').format('YYYYMMDD')}.xlsx`;
     const buffer = await workbook.xlsx.writeBuffer();
-    
+
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Length', buffer.byteLength);

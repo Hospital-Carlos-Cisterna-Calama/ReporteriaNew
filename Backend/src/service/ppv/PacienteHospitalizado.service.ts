@@ -6,7 +6,6 @@ import { convertirFecha } from '../../utils/helperRPA';
 
 export class PacienteHospitalizadoService {
   async obtenerPacienteHospitalizado(fechaInicio: string, fechaFin: string) {
-    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
 
@@ -69,7 +68,7 @@ export class PacienteHospitalizadoService {
       hoja.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: '#59ACA5' },
+        fgColor: { argb: 'FF59ACA5' },
       };
 
       // Agregar datos en lotes para mejor rendimiento
@@ -78,7 +77,7 @@ export class PacienteHospitalizadoService {
         const batch = datos.slice(i, i + batchSize);
         batch.forEach(fila => hoja.addRow(Object.values(fila)));
       }
-      
+
       hoja.columns.forEach(col => (col.width = 20));
     }
 

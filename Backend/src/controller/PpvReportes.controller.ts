@@ -39,8 +39,19 @@ export class PpvReportesController {
     try {
       const { fechaInicio, fechaFin, unidad, filtro } = req.query as any;
 
+      console.log('📥 Parámetros recibidos en Ingresos/Egresos:', {
+        fechaInicio,
+        fechaFin,
+        unidad,
+        filtro,
+      });
+
       if (!fechaInicio || !fechaFin || !unidad) {
-        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin y unidad' });
+        console.error('❌ Faltan parámetros requeridos');
+        return res.status(400).json({
+          message: 'Debe indicar fechaInicio, fechaFin y unidad',
+          parametrosRecibidos: { fechaInicio, fechaFin, unidad, filtro },
+        });
       }
 
       const servicio = new IngresosEgresosService();
@@ -53,6 +64,7 @@ export class PpvReportesController {
       }
 
       console.log(`✅ Servicio encontrado: ${ppvServicio.Servicio} (ID: ${ppvServicio.ID})`);
+      console.log(`📊 Generando reporte con filtro: ${filtro || 'todos'}`);
       await servicio.exportarReporte(res, ppvServicio.ID, fechaInicio, fechaFin, filtro);
     } catch (error) {
       console.error('❌ Error al exportar ingresos/egresos:', error);

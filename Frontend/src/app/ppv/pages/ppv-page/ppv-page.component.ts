@@ -146,7 +146,12 @@ export class PpvPageComponent implements OnInit {
 
   get mostrarSelectorSolicitudRealizacion(): boolean {
     const reporte = this.reporteSeleccionado();
-    return reporte === 'Lista de Espera' || reporte === 'Camas Críticas';
+    return reporte === 'Lista de Espera';
+  }
+
+  get mostrarSelectorIngresoEgreso(): boolean {
+    const reporte = this.reporteSeleccionado();
+    return reporte === 'Camas Críticas';
   }
 
   get mostrarSelectorServicios(): boolean {
@@ -398,20 +403,43 @@ export class PpvPageComponent implements OnInit {
   private generarReporteCamasCriticas(filtros: FiltrosPpvReporte): void {
     if (!this.validarFechas(filtros)) return;
 
+    // Obtener datos del usuario desde la sesión
     const accessData = this.authService.accessData();
     const unidadUsuario = accessData?.servicio || '';
+
+    console.log('👤 Datos del usuario logueado:', {
+      username: accessData?.username,
+      rol: accessData?.rol,
+      servicio: accessData?.servicio,
+      nombre: accessData?.nombre_completo,
+    });
+
+    if (!unidadUsuario) {
+      console.error('❌ Error: El usuario no tiene una unidad/servicio asignado');
+      alert(
+        'Error: Su usuario no tiene una unidad asignada. Por favor, contacte al administrador del sistema.'
+      );
+      return;
+    }
+
+    // Usar el tipo seleccionado en el filtro (ingreso o egreso)
+    const tipoMovimiento = filtros.tipoFecha === 'egreso' ? 'egreso' : 'ingreso';
 
     const query = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaFin: this.formatearFecha(filtros.fechaFin!),
       unidad: unidadUsuario,
-      filtro: 'ingreso' as const,
+      filtro: tipoMovimiento as 'ingreso' | 'egreso',
     };
+
+    console.log('� Enviando petición al backend:', query);
 
     this.ejecutarDescarga(
       this.ppvService.generarReportePpvIngEgr(query),
-      `reporte-camas-criticas-${query.fechaInicio}-${query.fechaFin}.xlsx`,
-      'Reporte de Camas Críticas generado correctamente'
+      `reporte-camas-criticas-${tipoMovimiento}-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      `Reporte de Camas Críticas (${
+        tipoMovimiento === 'ingreso' ? 'Ingresos' : 'Egresos'
+      }) generado correctamente`
     );
   }
 

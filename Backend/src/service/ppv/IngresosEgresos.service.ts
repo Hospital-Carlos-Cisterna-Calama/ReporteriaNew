@@ -9,7 +9,7 @@ export class IngresosEgresosService {
     // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
-    
+
     return await IngresosEgresos(unidadId, inicioStr, finStr, filtro);
   }
 
@@ -52,7 +52,7 @@ export class IngresosEgresosService {
       headerRow.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: '#59ACA5' },
+        fgColor: { argb: 'FF59ACA5' },
       };
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
 

@@ -22,7 +22,7 @@ export class ListaEsperaGastroenterologiaService {
       hoja.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: '#59ACA5' },
+        fgColor: { argb: 'FF59ACA5' },
       };
 
       datos.forEach(fila => hoja.addRow(Object.values(fila)));
