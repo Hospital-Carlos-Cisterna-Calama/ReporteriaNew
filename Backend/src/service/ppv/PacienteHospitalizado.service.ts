@@ -2,14 +2,14 @@ import { Response } from 'express';
 import ExcelJS from 'exceljs';
 import dayjs from 'dayjs';
 import { PacienteHospitalizado } from '../../sql/PpvConsulta';
-import { convertirFecha } from '../../utils/helperRPA';
+import { convertirFecha } from '../../utils/ExportarExcel';
 
 export class PacienteHospitalizadoService {
   async obtenerPacienteHospitalizado(fechaInicio: string, fechaFin: string) {
     // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
-    
+
     const resultado = await PacienteHospitalizado(inicioStr, finStr);
     return resultado;
   }
@@ -78,7 +78,7 @@ export class PacienteHospitalizadoService {
         const batch = datos.slice(i, i + batchSize);
         batch.forEach(fila => hoja.addRow(Object.values(fila)));
       }
-      
+
       hoja.columns.forEach(col => (col.width = 20));
     }
 

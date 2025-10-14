@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { IngresosEgresos } from '../../sql/PpvConsulta';
-import { convertirFecha } from '../../utils/helperRPA';
+import { convertirFecha } from '../../utils/ExportarExcel';
 import dayjs from 'dayjs';
 
 export class IngresosEgresosService {
@@ -9,7 +9,7 @@ export class IngresosEgresosService {
     // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
-    
+
     return await IngresosEgresos(unidadId, inicioStr, finStr, filtro);
   }
 

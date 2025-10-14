@@ -2,14 +2,14 @@ import dayjs from 'dayjs';
 import { Response } from 'express';
 import { Sequelize, QueryTypes } from 'sequelize';
 import { sequelize } from '../../config/initDatabase';
-import { convertirFecha } from '../../utils/helperRPA';
+import { convertirFecha } from '../../utils/ExportarExcel';
 
 export class IrGrdService {
   async obtenerIrGrd(fechaInicio: string, fechaFin: string) {
     // Convertir fechas DD/MM/YYYY a YYYY-MM-DD y luego a DD-MM-YYYY para el SP
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
-    
+
     const finic = dayjs(inicioStr).format('DD-MM-YYYY');
     const ftermin = dayjs(finStr).format('DD-MM-YYYY');
 

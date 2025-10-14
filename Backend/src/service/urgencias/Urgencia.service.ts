@@ -1,95 +1,58 @@
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '../../config/initDatabase';
-import {
-  UrgenciaDoceHoraFila,
-  InformeUrgenciaFila,
-  UrgenciaIrasFila,
-  UrgenciaHospPabllFila,
-  UrgenciaCategorizacion,
-} from '../../interfaces/RpaFormularario.interface';
-import { convertirFecha } from '../../utils/helperRPA';
+import { Response } from 'express';
+import { UrgenciaDoceHoraFila, InformeUrgenciaFila, UrgenciaIrasFila, UrgenciaHospPabllFila, UrgenciaCategorizacion } from '../../interfaces';
+import { generarArchivoExcel, procesarDatos, convertirFecha, procesarIras, procesarCategorizadores, procesarDoceHoras, procesarUrgencia } from '../../utils';
 
 export class UrgenciaService {
-  async ObtenerUrgencia(fechaIni: string, fechaTerm: string, tipo: 'A' | 'U' | 'M' | string): Promise<InformeUrgenciaFila[]> {
+  async ObtenerUrgencia(fechaIni: string, fechaTermino: string, tipo: 'A' | 'U' | 'M' | string, res: Response) {
     const tipoFormu = '04';
-
-    const inicio = new Date(convertirFecha(fechaIni, false));
-    const fin = new Date(convertirFecha(fechaTerm, true));
-
-    const intervaloMs = 1000 * 60 * 60 * 24 * 14; // 2 semanas en milisegundos
-
-    let fechaInicioIntervalo = new Date(inicio);
-
-    const resultadosTotales: InformeUrgenciaFila[] = [];
-
-    while (fechaInicioIntervalo <= fin) {
-      const fechaFinIntervalo = new Date(Math.min(fechaInicioIntervalo.getTime() + intervaloMs, fin.getTime()));
-
-      const fechaInicioFmt = convertirFecha(fechaInicioIntervalo.toISOString().slice(0, 10), false);
-      const fechaFinFmt = convertirFecha(fechaFinIntervalo.toISOString().slice(0, 10), true);
-
-      const sql = `EXEC REPORTERIA_URG_GetUrgenciaInforme @FechaInicio= :fechaInicio, @FechaFin= :fechaFin, @tipoFormu= :tipoFormu, @tipo= :tipo`;
-
-      const intervaloResultados = await sequelize.query<InformeUrgenciaFila>(sql, {
-        type: QueryTypes.SELECT,
-        replacements: { fechaInicio: fechaInicioFmt, fechaFin: fechaFinFmt, tipoFormu, tipo },
-      });
-
-      resultadosTotales.push(...intervaloResultados);
-
-      // Avanza 2 semanas
-      fechaInicioIntervalo = new Date(fechaInicioIntervalo.getTime() + intervaloMs);
-    }
-
-    return resultadosTotales;
+    const fechaInicio = convertirFecha(fechaIni, false);
+    const fechaFin = convertirFecha(fechaTermino, true);
+    const sql = `EXEC REPORTERIA_URG_GetUrgenciaInforme @FechaInicio= :fechaInicio, @FechaFin= :fechaFin, @tipoFormu= :tipoFormu, @tipo= :tipo`;
+    const resultadosTotales = await sequelize.query<InformeUrgenciaFila>(sql, {
+      replacements: { fechaInicio, fechaFin, tipoFormu, tipo },
+      type: QueryTypes.SELECT,
+    });
+    const mapeoCabecera = procesarUrgencia(resultadosTotales);
+    return await generarArchivoExcel(mapeoCabecera, res, 'Urgencia');
   }
 
-  async ObtenerUrgenciaDoceHoras(fechaInicio: string, fechaTermino: string): Promise<UrgenciaDoceHoraFila[]> {
+  async ObtenerUrgenciaDoceHoras(fechaInicio: string, fechaFin: string, res: Response) {
     const desde = convertirFecha(fechaInicio, false);
-    const hasta = convertirFecha(fechaTermino, true);
+    const hasta = convertirFecha(fechaFin, true);
     const sql = `EXEC REPORTERIA_URG_GetUrgenciaDoceHoras @desde=:desde, @hasta=:hasta`;
-    const resultados = await sequelize.query<UrgenciaDoceHoraFila>(sql, {
-      replacements: { desde, hasta },
-      type: QueryTypes.SELECT,
-    });
-    return resultados;
+    const resultados = await sequelize.query<UrgenciaDoceHoraFila>(sql, { replacements: { desde, hasta }, type: QueryTypes.SELECT });
+    const mapeoCabecera = procesarDoceHoras(resultados);
+    return await generarArchivoExcel(mapeoCabecera, res, 'DoceHoras');
   }
 
-  async ObtenerCategorizadores(fecha: string): Promise<UrgenciaCategorizacion[]> {
-    const desde = `${fecha}-01 00:00:00.000`;
-    const [year, month] = fecha.split('-').map(Number);
+  async ObtenerCategorizadores(fechaInicio: string, res: Response) {
+    const desde = `${fechaInicio}-01 00:00:00.000`;
+    const [year, month] = fechaInicio.split('-').map(Number);
     const ultimoDia = new Date(year, month, 0).getDate();
-    const hasta = `${fecha}-${String(ultimoDia).padStart(2, '0')} 23:59:59.997`;
+    const hasta = `${fechaInicio}-${String(ultimoDia).padStart(2, '0')} 23:59:59.997`;
     const sql = `EXEC REPORTERIA_URG_GetUrgenciaCategorizaciones @desde=:desde, @hasta=:hasta`;
-    const resultados = await sequelize.query<UrgenciaCategorizacion>(sql, {
-      replacements: { desde, hasta },
-      type: QueryTypes.SELECT,
-    });
-    return resultados;
+    const resultados = await sequelize.query<UrgenciaCategorizacion>(sql, { replacements: { desde, hasta }, type: QueryTypes.SELECT });
+    const mapeoCabecera = procesarCategorizadores(resultados);
+    return await generarArchivoExcel(mapeoCabecera, res, 'Categorizaciones');
   }
 
-  async ObtenerUrgenciaHospitalizado(fechaIni: string, fechaTerm: string, tipo: 'H' | 'P' | string): Promise<UrgenciaHospPabllFila[]> {
-    const desde = convertirFecha(fechaIni, false);
-    const hasta = convertirFecha(fechaTerm, true);
-    const sql =
-      tipo !== 'H'
-        ? `EXEC REPORTERIA_URG_GetUrgenciaPabellon @desde=:desde, @hasta=:hasta`
-        : `EXEC REPORTERIA_URG_GetUrgenciaHospitalizado @desde=:desde, @hasta=:hasta`;
-    const resultados = await sequelize.query<UrgenciaHospPabllFila>(sql, {
-      replacements: { desde, hasta },
-      type: QueryTypes.SELECT,
-    });
-    return resultados;
+  async ObtenerUrgenciaHospitalizado(fechaInicio: string, fechaFin: string, tipo: 'H' | 'P' | string, res: Response) {
+    const desde = convertirFecha(fechaInicio, false);
+    const hasta = convertirFecha(fechaFin, true);
+    const sql = `EXEC REPORTERIA_URG_GetUrgencia${tipo !== 'H' ? 'Pabellon' : 'Hospitalizado'} @desde=:desde, @hasta=:hasta`;
+    const resultados = await sequelize.query<UrgenciaHospPabllFila>(sql, { replacements: { desde, hasta }, type: QueryTypes.SELECT });
+    const mapeoCabecera = procesarDatos(resultados, tipo !== 'H' ? 'Pabellon' : 'Hospitalizado');
+    return await generarArchivoExcel(mapeoCabecera, res, tipo !== 'H' ? 'Pabellón' : 'Hospitalizado');
   }
 
-  async ObtenerInformeIras(fechaInicio: string, fechaFin: string, tipo: 'M' | 'U' | string): Promise<UrgenciaIrasFila[]> {
+  async ObtenerInformeIras(fechaInicio: string, fechaFin: string, tipo: 'M' | 'U' | string, res: Response) {
     const desde = convertirFecha(fechaInicio, false);
     const hasta = convertirFecha(fechaFin, true);
     const sql = `EXEC REPORTERIA_URG_GetUrgenciaIras @desde=:desde, @hasta=:hasta, @tipo=:tipo`;
-    const resultados = await sequelize.query<UrgenciaIrasFila>(sql, {
-      replacements: { desde, hasta, tipo },
-      type: QueryTypes.SELECT,
-    });
-    return resultados;
+    const resultados = await sequelize.query<UrgenciaIrasFila>(sql, { replacements: { desde, hasta, tipo }, type: QueryTypes.SELECT });
+    const mapeoCabecera = procesarIras(resultados);
+    return await generarArchivoExcel(mapeoCabecera, res, 'IRAS');
   }
 }

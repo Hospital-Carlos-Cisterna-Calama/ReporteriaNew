@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import 'dayjs/locale/es';
 import { IntervencionPabellon, obtenerPatologiasPorSolicitud } from '../../sql/PpvConsulta';
-import { convertirFecha } from '../../utils/helperRPA';
+import { convertirFecha } from '../../utils/ExportarExcel';
 
 dayjs.extend(weekOfYear);
 
@@ -48,7 +48,7 @@ export class IntervencionPabellonService {
         };
 
         const start = parseTime(r.Hora_Ingreso);
-        const end = parseTime(r.Hora_Salida); 
+        const end = parseTime(r.Hora_Salida);
 
         let totalMinutos = end.hours * 60 + end.minutes - (start.hours * 60 + start.minutes);
         if (totalMinutos < 0) totalMinutos += 1440;
@@ -141,7 +141,7 @@ export class IntervencionPabellonService {
 
     const nombreArchivo = `Intervencion_Pabellon_${dayjs(fechaInicio, 'DD/MM/YYYY').format('YYYYMMDD')}_${dayjs(fechaFin, 'DD/MM/YYYY').format('YYYYMMDD')}.xlsx`;
     const buffer = await workbook.xlsx.writeBuffer();
-    
+
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Length', buffer.byteLength);

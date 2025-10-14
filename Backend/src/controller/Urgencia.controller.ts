@@ -1,232 +1,100 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { UrgenciaService } from '../service/urgencias/Urgencia.service';
-import {
-  UrgenciaDoceHoraFila,
-  InformeUrgenciaFila,
-  UrgenciaIrasFila,
-  UrgenciaHospPabllFila,
-  UrgenciaCategorizacion,
-} from '../interfaces/RpaFormularario.interface';
-import ExcelJS from 'exceljs';
-import { buildSheet, sendOneSheetStream, sendWorkbook } from '../utils/excel';
 const UrgenciaServices = new UrgenciaService();
 
 export class UrgenciaController {
-  static async reporteUrgencia(req: Request, res: Response, next: NextFunction) {
+  static async reporteUrgencia(req: Request, res: Response) {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await UrgenciaServices.ObtenerUrgencia(fechaInicio, fechaTermino, tipo);
+      if (!fechaInicio || !fechaTermino || !tipo) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin y tipo' });
+      }
+      const registros = await UrgenciaServices.ObtenerUrgencia(fechaInicio, fechaTermino, tipo, res);
 
-      await sendOneSheetStream<InformeUrgenciaFila>(
-        res,
-        `InformeUrgencia_${fechaInicio}_a_${fechaTermino}.xlsx`,
-        'Informe Urgencia',
-        [
-          { header: 'Formulario', key: 'formulario' },
-          { header: 'Tipo Folio', key: 'tipo_folio' },
-          { header: 'Sector', key: 'Sector' },
-          { header: 'Admisión', key: 'admision' },
-          { header: 'Fecha Cat', key: 'FechaCat' },
-          { header: 'Ingreso', key: 'FechaIngreso' },
-          { header: 'Egreso', key: 'FechaEgreso' },
-          { header: 'Rut Médico Ingreso', key: 'RutMedicoIngreso' },
-          { header: 'Médico Ingreso', key: 'MedicoIngreso' },
-          { header: 'Médico Alta (RUT)', key: 'RPA_FDA_MedicoAlta' },
-          { header: 'Médico Alta (Nombre)', key: 'NomMedico' },
-          { header: 'RUT Paciente', key: 'PAC_PAC_Rut' },
-          { header: 'Paciente', key: 'paciente' },
-          { header: 'Sexo', key: 'PAC_PAC_Sexo' },
-          { header: 'Edad', key: 'edad' },
-          { header: 'Fecha Nacimiento', key: 'PAC_PAC_FechaNacim' },
-          { header: 'Categorización', key: 'categorizacion' },
-          { header: 'Especialidad', key: 'esp' },
-          { header: 'Diagnóstico', key: 'diag' },
-          { header: 'Tratamiento', key: 'trat' },
-          { header: 'Medio Traslado', key: 'MedioT' },
-          { header: 'Dirección', key: 'Direccion' },
-          { header: 'Previsión', key: 'prevision' },
-          { header: 'Beneficio', key: 'Beneficio' },
-          { header: 'Vigente', key: 'Vigente' },
-          { header: 'Destino', key: 'Destino' },
-        ],
-        results,
-        {
-          dateKeys: ['admision', 'FechaCat', 'FechaIngreso', 'FechaEgreso', 'PAC_PAC_FechaNacim'],
-          wrapKeys: ['diag', 'trat', 'Direccion', 'Beneficio', 'Destino', 'MedicoIngreso', 'NomMedico'],
-          borders: true, // ⚠️ activa con cautela en datasets enormes
-          // headerColorArgb: 'FF4F46E5',
-          // columnWidths: { diag: 40, trat: 35, Direccion: 30 }, // opcional
-        }
-      );
+      if (!registros) {
+        console.error(`❌ No se encontró registros `);
+        return res.status(404).json({ message: `No se encontró registros. Verifique el nombre del servicio.` });
+      }
     } catch (error) {
-      next(error);
+      console.error('❌ Error al exportar ingresos/egresos:', error);
+      res.status(500).json({ message: 'Error al generar el reporte de ingresos y egresos' });
     }
   }
 
-  static async reporteUrgenciaDoceHoras(req: Request, res: Response, next: NextFunction) {
+  static async reporteUrgenciaDoceHoras(req: Request, res: Response) {
     try {
       const { fechaInicio, fechaTermino } = req.query as any;
 
-      const results = await UrgenciaServices.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino);
+      if (!fechaInicio || !fechaTermino) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin' });
+      }
+      const registros = await UrgenciaServices.ObtenerUrgenciaDoceHoras(fechaInicio, fechaTermino, res);
 
-      await sendOneSheetStream<UrgenciaDoceHoraFila>(
-        res,
-        `Urgencia-${fechaInicio}_${fechaTermino}.xlsx`,
-        'Urgencia',
-        [
-          { header: 'Rut', key: 'rut' },
-          { header: 'Nombre', key: 'nombre' },
-          { header: 'Edad', key: 'edad' },
-          { header: 'Sexo', key: 'sexo' },
-          { header: 'Previsión', key: 'prevision' },
-          { header: 'DAU', key: 'dau' },
-          { header: 'Fecha Ingreso Siclope', key: 'fecha_ingreso_siclope' },
-          { header: 'Servicio Ingreso', key: 'servicio_ingreso' },
-          { header: 'Fecha Ingreso (Helios)', key: 'fecha_ingreso_helios' },
-          { header: 'Servicio Traslado', key: 'servicio_traslado' },
-          { header: 'Fecha Traslado (Helios)', key: 'fecha_traslado_helios' },
-          { header: 'Diferencia(Ingreso/Indicacion Siclope)', key: 'diferencia_ingreso_indicacion_siclope' },
-          { header: 'Profesional Reg. Siclope', key: 'nombre_profesional' },
-          { header: 'RUT Profesional', key: 'rut_profesional' },
-        ],
-        results,
-        {
-          dateKeys: ['fecha_ingreso_siclope', 'fecha_ingreso_helios', 'fecha_traslado_helios'],
-          headerColorArgb: 'FF59ACA5',
-          columnWidths: {
-            fecha_ingreso_siclope: 18,
-            fecha_ingreso_helios: 18,
-            fecha_traslado_helios: 18,
-            servicio_traslado: 40,
-            diferencia_ingreso_indicacion_siclope: 35,
-            servicio_ingreso: 35,
-          },
-        }
-      );
+      if (!registros) {
+        console.error(`❌ No se encontró registros `);
+        return res.status(404).json({ message: `No se encontró registros. Verifique el nombre del servicio.` });
+      }
     } catch (error) {
-      next(error);
+      console.error('❌ Error al exportar ingresos/egresos:', error);
+      res.status(500).json({ message: 'Error al generar el reporte de ingresos y egresos' });
     }
   }
 
-  static async reporteUrgenciaCategorizaciones(req: Request, res: Response, next: NextFunction) {
+  static async reporteUrgenciaCategorizaciones(req: Request, res: Response) {
     try {
       const { fecha } = req.query as any;
-      const results = await UrgenciaServices.ObtenerCategorizadores(fecha);
 
-      await sendOneSheetStream<UrgenciaCategorizacion>(
-        res,
-        `Categorizaciones_${fecha}.xlsx`,
-        'Categorizaciones',
-        [
-          { header: 'DAU', key: 'numpa' },
-          { header: 'Piso', key: 'piso' },
-          { header: 'Usuario', key: 'usuario' },
-          { header: 'Categorizacion', key: 'cat' },
-          { header: 'Nombre', key: 'nom' },
-          { header: 'Sexo', key: 'sexo' },
-          { header: 'Rut', key: 'rut' },
-          { header: 'Fecha', key: 'fecha' },
-        ],
-        results,
-        {
-          dateKeys: ['fecha'],
-          headerColorArgb: 'FF59ACA5',
-          columnWidths: {
-            piso: 25,
-            fecha: 20,
-          },
-        }
-      );
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async reporteUrgenciaHospitalizado(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { fechaInicio, fechaTermino, tipo } = req.query as any;
-
-      const results = await UrgenciaServices.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo);
-
-      const wb = new ExcelJS.Workbook();
-
-      if (tipo === 'H') {
-        // UrgenciaHospitalizadoFila
-        await buildSheet<UrgenciaHospPabllFila>(
-          wb,
-          'Hospitalizados',
-          [
-            { header: 'RUT', key: 'rut' },
-            { header: 'Paciente', key: 'paciente' },
-            { header: 'Sexo', key: 'PAC_PAC_Sexo' },
-            { header: 'Edad', key: 'edad' },
-            { header: 'Previsión', key: 'prevision' },
-            { header: 'Beneficio', key: 'Beneficio' },
-            { header: 'N° Paciente', key: 'PAC_PAC_Numero' },
-            { header: 'Fecha (Ingreso Urg.)', key: 'fecha' },
-            { header: 'Egreso Urgencias', key: 'egreso_Urgencias' },
-            { header: 'Ingreso Hospitalizado', key: 'Ingreso_Hospitalizado' },
-            { header: 'Piso', key: 'TAB_DescripcionPiso' },
-            { header: 'Diagnóstico', key: 'diag' },
-          ],
-          results as any,
-          { dateKeys: ['fecha', 'Ingreso_Hospitalizado'], headerColorArgb: 'FF59ACA5' }
-        );
-      } else {
-        // Pabellón
-        await buildSheet<UrgenciaHospPabllFila>(
-          wb,
-          'Pabellón',
-          [
-            { header: 'RUT', key: 'rut' },
-            { header: 'Paciente', key: 'paciente' },
-            { header: 'Sexo', key: 'PAC_PAC_Sexo' },
-            { header: 'Edad', key: 'edad' },
-            { header: 'Previsión', key: 'prevision' },
-            { header: 'Beneficio', key: 'Beneficio' },
-            { header: 'Ingreso Urgencias', key: 'Ingreso_Urg' },
-            { header: 'Egreso Urgencias', key: 'Egreso_Urg' },
-            { header: 'Ingreso Pabellón', key: 'Ingreso_Pabe' },
-            { header: 'Destino', key: 'destino' },
-            { header: 'Diagnóstico', key: 'diag' },
-          ],
-          results as any,
-          { dateKeys: ['Ingreso_Urg', 'Ingreso_Pabe'], headerColorArgb: 'FF59ACA5' }
-        );
+      if (!fecha) {
+        return res.status(400).json({ message: 'Debe indicar fecha' });
       }
+      const registros = await UrgenciaServices.ObtenerCategorizadores(fecha, res);
 
-      await sendWorkbook(res, wb, `Urg_${tipo === 'H' ? 'Hospitalizado' : 'Pabellon'}_${fechaInicio}_a_${fechaTermino}.xlsx`);
+      if (!registros) {
+        console.error(`❌ No se encontró registros `);
+        return res.status(404).json({ message: `No se encontró registros. Verifique el nombre del servicio.` });
+      }
     } catch (error) {
-      next(error);
+      console.error('❌ Error al exportar ingresos/egresos:', error);
+      res.status(500).json({ message: 'Error al generar el reporte de ingresos y egresos' });
     }
   }
 
-  static async reporteIras(req: Request, res: Response, next: NextFunction) {
+  static async reporteUrgenciaHospitalizado(req: Request, res: Response) {
     try {
       const { fechaInicio, fechaTermino, tipo } = req.query as any;
 
-      const results = await UrgenciaServices.ObtenerInformeIras(fechaInicio, fechaTermino, tipo);
+      if (!fechaInicio || !fechaTermino || !tipo) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin y tipo' });
+      }
+      const registros = await UrgenciaServices.ObtenerUrgenciaHospitalizado(fechaInicio, fechaTermino, tipo, res);
 
-      const wb = new ExcelJS.Workbook();
-      await buildSheet<UrgenciaIrasFila>(
-        wb,
-        'IRAS',
-        [
-          { header: 'Fecha Admisión', key: 'Fecha_Admision' },
-          { header: 'RUT Paciente', key: 'Rut_Paciente' },
-          { header: 'Nombre Paciente', key: 'Nombre_Paciente' },
-          { header: 'Sexo', key: 'Sexo' },
-          { header: 'Edad', key: 'Edad' },
-          { header: 'Diagnóstico', key: 'Diagnostico' },
-        ],
-        results,
-        { dateKeys: ['Fecha_Admision'], headerColorArgb: 'FF59ACA5' }
-      );
-
-      await sendWorkbook(res, wb, `IRAS_${tipo}_${fechaInicio}_a_${fechaTermino}.xlsx`);
+      if (!registros) {
+        console.error(`❌ No se encontró registros `);
+        return res.status(404).json({ message: `No se encontró registros. Verifique el nombre del servicio.` });
+      }
     } catch (error) {
-      next(error);
+      console.error('❌ Error al exportar ingresos/egresos:', error);
+      res.status(500).json({ message: 'Error al generar el reporte de ingresos y egresos' });
+    }
+  }
+
+  static async reporteIras(req: Request, res: Response) {
+    try {
+      const { fechaInicio, fechaTermino, tipo } = req.query as any;
+
+      if (!fechaInicio || !fechaTermino || !tipo) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin y tipo' });
+      }
+      const registros = await UrgenciaServices.ObtenerInformeIras(fechaInicio, fechaTermino, tipo, res);
+
+      if (!registros) {
+        console.error(`❌ No se encontró registros `);
+        return res.status(404).json({ message: `No se encontró registros. Verifique el nombre del servicio.` });
+      }
+    } catch (error) {
+      console.error('❌ Error al exportar ingresos/egresos:', error);
+      res.status(500).json({ message: 'Error al generar el reporte de ingresos y egresos' });
     }
   }
 }

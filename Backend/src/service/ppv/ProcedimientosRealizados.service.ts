@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { ProcedimientosRealizados } from '../../sql/PpvConsulta';
-import { convertirFecha } from '../../utils/helperRPA';
+import { convertirFecha } from '../../utils/ExportarExcel';
 import dayjs from 'dayjs';
 
 export class ProcedimientosRealizadosService {

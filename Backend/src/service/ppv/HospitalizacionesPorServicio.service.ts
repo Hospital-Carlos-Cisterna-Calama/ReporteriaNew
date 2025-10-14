@@ -1,14 +1,14 @@
 import ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { HospitalizacionesPorServicio } from '../../sql/PpvConsulta';
-import { convertirFecha } from '../../utils/helperRPA';
+import { convertirFecha } from '../../utils/ExportarExcel';
 
 export class HospitalizacionesPorServicioService {
   async obtenerHospitalizacionesPorServicios(servicios: number[], fechaInicio: string, fechaFin: string) {
     // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
-    
+
     return HospitalizacionesPorServicio(servicios, inicioStr, finStr);
   }
 
@@ -66,8 +66,8 @@ export class HospitalizacionesPorServicioService {
       headerRow: true,
       totalsRow: false,
       style: {
-        theme: undefined, 
-        showRowStripes: false, 
+        theme: undefined,
+        showRowStripes: false,
       },
       columns: encabezados.map(h => ({ name: h, filterButton: true })),
       rows: datos.map(fila => Object.values(fila)),
@@ -78,9 +78,9 @@ export class HospitalizacionesPorServicioService {
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FF0D9488' }, 
+        fgColor: { argb: 'FF0D9488' },
       };
-      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; 
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
     });
     headerRow.height = 20;
