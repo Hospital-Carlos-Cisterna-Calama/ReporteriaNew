@@ -1,4 +1,4 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, output, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 export interface SeleccionMes {
@@ -15,7 +15,7 @@ export interface SeleccionMes {
   imports: [FormsModule],
   templateUrl: './selector-mes.component.html'
 })
-export class SelectorMesComponent {
+export class SelectorMesComponent implements OnInit {
   readonly cambioMes = output<SeleccionMes>();
 
   mesSeleccionado = new Date().getMonth() + 1; // 1-12
@@ -29,6 +29,11 @@ export class SelectorMesComponent {
     )
   );
 
+  ngOnInit() {
+    // Emitir valores iniciales al cargar el componente
+    this.alCambiar();
+  }
+
   alCambiar() {
     this.cambioMes.emit({
       mes: this.mesSeleccionado,
@@ -39,5 +44,6 @@ export class SelectorMesComponent {
   limpiar() {
     this.mesSeleccionado = new Date().getMonth() + 1;
     this.anioSeleccionado = new Date().getFullYear();
+    this.alCambiar(); // Emitir también al limpiar
   }
 }
