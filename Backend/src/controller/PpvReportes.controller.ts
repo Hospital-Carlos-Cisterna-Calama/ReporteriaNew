@@ -38,21 +38,33 @@ export class PpvReportesController {
   static async exportarIngresosEgresos(req: Request, res: Response) {
     try {
       const { fechaInicio, fechaFin, unidad, filtro } = req.query as any;
-      
+
+      console.log('📥 Parámetros recibidos en Ingresos/Egresos:', {
+        fechaInicio,
+        fechaFin,
+        unidad,
+        filtro,
+      });
+
       if (!fechaInicio || !fechaFin || !unidad) {
-        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin y unidad' });
+        console.error('❌ Faltan parámetros requeridos');
+        return res.status(400).json({
+          message: 'Debe indicar fechaInicio, fechaFin y unidad',
+          parametrosRecibidos: { fechaInicio, fechaFin, unidad, filtro },
+        });
       }
 
       const servicio = new IngresosEgresosService();
-      const catalogo = new CatalogoService(); 
+      const catalogo = new CatalogoService();
       const ppvServicio = await catalogo.obtenerServicioPorNombre(unidad);
-      
+
       if (!ppvServicio) {
         console.error(`❌ No se encontró el servicio con nombre: "${unidad}"`);
         return res.status(404).json({ message: `No se encontró el servicio "${unidad}". Verifique el nombre del servicio.` });
       }
 
       console.log(`✅ Servicio encontrado: ${ppvServicio.Servicio} (ID: ${ppvServicio.ID})`);
+      console.log(`📊 Generando reporte con filtro: ${filtro || 'todos'}`);
       await servicio.exportarReporte(res, ppvServicio.ID, fechaInicio, fechaFin, filtro);
     } catch (error) {
       console.error('❌ Error al exportar ingresos/egresos:', error);
@@ -81,7 +93,7 @@ export class PpvReportesController {
 
   static async exportarIrGrd(req: Request, res: Response) {
     try {
-      const {fechaInicio, fechaFin} = req.query as any;
+      const { fechaInicio, fechaFin } = req.query as any;
 
       if (!fechaInicio || !fechaFin) {
         return res.status(400).json({
@@ -99,12 +111,16 @@ export class PpvReportesController {
 
   static async exportarListaEspera(req: Request, res: Response) {
     try {
-      // TODO: Implementar servicio de lista de espera
-      res.status(501).json({ message: 'Servicio de lista de espera en desarrollo' });
-      
-      // const { fechaInicio, fechaFin, tipo } = req.body;
-      // const servicio = new ListaEsperaGastroenterologiaService();
-      // await servicio.exportarReporte(fechaInicio, fechaFin, tipo, res);
+      const fechaInicio = String(req.query.fechaInicio);
+      const fechaFin = String(req.query.fechaFin);
+      const tipo_reporte = Number(req.query.tipo_reporte);
+
+      if (!fechaInicio || !fechaFin || !tipo_reporte) {
+        return res.status(400).json({ message: 'Debe indicar fechaInicio, fechaFin y tipo_reporte' });
+      }
+
+      const servicio = new ListaEsperaGastroenterologiaService();
+      await servicio.exportarReporte(fechaInicio, fechaFin, tipo_reporte, res);
     } catch (error) {
       console.error('❌ Error al exportar lista de espera:', error);
       res.status(500).json({ message: 'Error al generar el reporte de lista de espera' });
@@ -130,7 +146,6 @@ export class PpvReportesController {
 
   static async exportarProcedimientos(req: Request, res: Response) {
     try {
-
       const { fechaInicio, fechaFin, selectEspec, PadreEsp } = req.query as any;
 
       console.log('📅 Inicio:', fechaInicio);

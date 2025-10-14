@@ -3,7 +3,7 @@
 // ============================================================================
 
 /** Tipo de fecha para reportes que lo requieren */
-export type TipoFecha = 'solicitud' | 'realizacion';
+export type TipoFecha = 'solicitud' | 'realizacion' | 'ingreso' | 'egreso';
 
 /** Estructura de datos para catálogos de filtros */
 export interface ItemCatalogo {

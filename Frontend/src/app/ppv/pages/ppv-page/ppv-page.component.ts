@@ -1,9 +1,33 @@
-import { Component, signal, inject, OnInit, computed, HostListener, viewChild, DestroyRef } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  OnInit,
+  computed,
+  HostListener,
+  viewChild,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { LucideAngularModule, Ambulance, Syringe, FileBarChart, Clock, Database, FileText, BedDouble, LucideIconData } from 'lucide-angular';
+import {
+  LucideAngularModule,
+  Ambulance,
+  Syringe,
+  FileBarChart,
+  Clock,
+  Database,
+  FileText,
+  BedDouble,
+  LucideIconData,
+} from 'lucide-angular';
 import { SidebarComponent } from '@shared/components/sidebar/sidebar.component';
-import { EstadoVacioComponent, BannerInstruccionesComponent, ModalResultadoComponent, type ConfiguracionModal } from '@shared/components/ui';
+import {
+  EstadoVacioComponent,
+  BannerInstruccionesComponent,
+  ModalResultadoComponent,
+  type ConfiguracionModal,
+} from '@shared/components/ui';
 import type { SidebarItem } from '@shared/components/sidebar/sidebar.component';
 import type { EstadisticaReporte } from '@shared/components/ui/estado-vacio/estado-vacio.component';
 import type { Especialidad, SubEspecialidad } from '../../interfaces';
@@ -22,7 +46,7 @@ import { AuthService } from '@auth/services/auth.service';
     FiltrosPpvReporteComponent,
     EstadoVacioComponent,
     BannerInstruccionesComponent,
-    ModalResultadoComponent
+    ModalResultadoComponent,
   ],
   templateUrl: './ppv-page.component.html',
 })
@@ -33,7 +57,15 @@ export class PpvPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly BREAKPOINT_MOBILE = 768;
 
-  readonly iconos: Record<string, LucideIconData> = { Ambulance, Syringe, FileBarChart, Clock, Database, FileText, BedDouble };
+  readonly iconos: Record<string, LucideIconData> = {
+    Ambulance,
+    Syringe,
+    FileBarChart,
+    Clock,
+    Database,
+    FileText,
+    BedDouble,
+  };
 
   readonly sidebarAbierto = signal(this.obtenerEstadoInicialSidebar());
   readonly cargandoReporte = signal(false);
@@ -55,27 +87,47 @@ export class PpvPageComponent implements OnInit {
   readonly filtrosComponent = viewChild<FiltrosPpvReporteComponent>('filtrosReporte');
 
   readonly reportes = signal<SidebarItem[]>([
-    { title: 'Intervenciones Pabellón', icon: 'Ambulance', description: 'Reporte de intervenciones en pabellón' },
+    {
+      title: 'Intervenciones Pabellón',
+      icon: 'Ambulance',
+      description: 'Reporte de intervenciones en pabellón',
+    },
     { title: 'Procedimientos', icon: 'Syringe', description: 'Reporte de procedimientos médicos' },
-    { title: 'IR-GRD', icon: 'FileBarChart', description: 'Informe de grupos relacionados de diagnóstico' },
-    { title: 'Lista de Espera', icon: 'Clock', description: 'Gestión de lista de espera quirúrgica' },
-    { title: 'Base Consultas', icon: 'Database', description: 'Base de datos de consultas médicas' },
+    {
+      title: 'IR-GRD',
+      icon: 'FileBarChart',
+      description: 'Informe de grupos relacionados de diagnóstico',
+    },
+    {
+      title: 'Lista de Espera',
+      icon: 'Clock',
+      description: 'Gestión de lista de espera quirúrgica',
+    },
+    {
+      title: 'Base Consultas',
+      icon: 'Database',
+      description: 'Base de datos de consultas médicas',
+    },
     { title: 'RPHs', icon: 'FileText', description: 'Registro de prestaciones hospitalarias' },
-    { title: 'Camas Críticas', icon: 'BedDouble', description: 'Gestión de camas en unidades críticas' }
+    {
+      title: 'Camas Críticas',
+      icon: 'BedDouble',
+      description: 'Gestión de camas en unidades críticas',
+    },
   ]);
 
   readonly estadisticas = signal<EstadisticaReporte[]>([
     { etiqueta: 'Reportes Disponibles', valor: '7', icono: '📊' },
     { etiqueta: 'Última Actualización', valor: 'Hoy', icono: '🕐' },
     { etiqueta: 'Formatos', valor: 'Excel', icono: '📑' },
-    { etiqueta: 'Estado', valor: 'Activo', icono: '✅' }
+    { etiqueta: 'Estado', valor: 'Activo', icono: '✅' },
   ]);
 
   readonly especialidadesParaFiltros = computed(() =>
     this.especialidades().map((esp, index) => ({
       id: index + 1,
       nombre: esp.nombre,
-      codigo: esp.id.trim()
+      codigo: esp.id.trim(),
     }))
   );
 
@@ -84,7 +136,7 @@ export class PpvPageComponent implements OnInit {
       id: index + 1,
       nombre: subEsp.nombre,
       especialidadId: 1,
-      codigo: subEsp.id
+      codigo: subEsp.id,
     }))
   );
 
@@ -94,7 +146,12 @@ export class PpvPageComponent implements OnInit {
 
   get mostrarSelectorSolicitudRealizacion(): boolean {
     const reporte = this.reporteSeleccionado();
-    return reporte === 'Lista de Espera' || reporte === 'Camas Críticas';
+    return reporte === 'Lista de Espera';
+  }
+
+  get mostrarSelectorIngresoEgreso(): boolean {
+    const reporte = this.reporteSeleccionado();
+    return reporte === 'Camas Críticas';
   }
 
   get mostrarSelectorServicios(): boolean {
@@ -137,11 +194,11 @@ export class PpvPageComponent implements OnInit {
 
     const generadores: Record<string, () => void> = {
       'Intervenciones Pabellón': () => this.generarReportePabellon(filtros),
-      'Procedimientos': () => this.generarReporteProcedimientos(filtros),
+      Procedimientos: () => this.generarReporteProcedimientos(filtros),
       'IR-GRD': () => this.generarReporteIrGrd(filtros),
       'Lista de Espera': () => this.generarReporteListaEspera(filtros),
       'Base Consultas': () => this.generarReporteBaseConsultas(filtros),
-      'RPHs': () => this.generarReporteRphs(filtros),
+      RPHs: () => this.generarReporteRphs(filtros),
       'Camas Críticas': () => this.generarReporteCamasCriticas(filtros),
     };
 
@@ -176,7 +233,7 @@ export class PpvPageComponent implements OnInit {
         this.especialidades.set([]);
         this.subEspecialidades.set([]);
         this.cargandoEspecialidades.set(false);
-      }
+      },
     });
   }
 
@@ -192,7 +249,7 @@ export class PpvPageComponent implements OnInit {
         console.error('❌ Error al cargar servicios:', error);
         this.servicios.set([]);
         this.cargandoServicios.set(false);
-      }
+      },
     });
   }
 
@@ -204,7 +261,7 @@ export class PpvPageComponent implements OnInit {
       error: (error) => {
         console.error('❌ Error al cargar sub-especialidades:', error);
         this.subEspecialidades.set([]);
-      }
+      },
     });
   }
 
@@ -297,7 +354,7 @@ export class PpvPageComponent implements OnInit {
     const query = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaFin: this.formatearFecha(filtros.fechaFin!),
-      tipo: filtros.tipoFecha === 'solicitud' ? 1 : 2,
+      tipo_reporte: filtros.tipoFecha === 'solicitud' ? 1 : 2,
     };
 
     this.ejecutarDescarga(
@@ -346,20 +403,43 @@ export class PpvPageComponent implements OnInit {
   private generarReporteCamasCriticas(filtros: FiltrosPpvReporte): void {
     if (!this.validarFechas(filtros)) return;
 
+    // Obtener datos del usuario desde la sesión
     const accessData = this.authService.accessData();
     const unidadUsuario = accessData?.servicio || '';
+
+    console.log('👤 Datos del usuario logueado:', {
+      username: accessData?.username,
+      rol: accessData?.rol,
+      servicio: accessData?.servicio,
+      nombre: accessData?.nombre_completo,
+    });
+
+    if (!unidadUsuario) {
+      console.error('❌ Error: El usuario no tiene una unidad/servicio asignado');
+      alert(
+        'Error: Su usuario no tiene una unidad asignada. Por favor, contacte al administrador del sistema.'
+      );
+      return;
+    }
+
+    // Usar el tipo seleccionado en el filtro (ingreso o egreso)
+    const tipoMovimiento = filtros.tipoFecha === 'egreso' ? 'egreso' : 'ingreso';
 
     const query = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaFin: this.formatearFecha(filtros.fechaFin!),
       unidad: unidadUsuario,
-      filtro: 'ingreso' as const,
+      filtro: tipoMovimiento as 'ingreso' | 'egreso',
     };
+
+    console.log('� Enviando petición al backend:', query);
 
     this.ejecutarDescarga(
       this.ppvService.generarReportePpvIngEgr(query),
-      `reporte-camas-criticas-${query.fechaInicio}-${query.fechaFin}.xlsx`,
-      'Reporte de Camas Críticas generado correctamente'
+      `reporte-camas-criticas-${tipoMovimiento}-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      `Reporte de Camas Críticas (${
+        tipoMovimiento === 'ingreso' ? 'Ingresos' : 'Egresos'
+      }) generado correctamente`
     );
   }
 

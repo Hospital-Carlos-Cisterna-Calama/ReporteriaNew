@@ -17,7 +17,9 @@
       <!-- Banner de Instrucciones -->
       <app-banner-instrucciones
         [titulo]="'Sistema de Reportería PPV'"
-        [descripcion]="'Selecciona un reporte del menú lateral para generar informes de pabellón, procedimientos y gestión hospitalaria'"
+        [descripcion]="
+          'Selecciona un reporte del menú lateral para generar informes de pabellón, procedimientos y gestión hospitalaria'
+        "
         [colorGradient]="'teal'"
         [mostrarBotonMenu]="true"
         [sidebarAbierto]="sidebarAbierto()"
@@ -26,34 +28,37 @@
 
       <!-- Área de Reporte -->
       @if (reporteSeleccionado()) {
-        <div class="animate-fade-in">
-          <!-- Formulario de Filtros -->
-          <app-filtros-ppv-reporte
-            #filtrosReporte
-            [categoria]="'PPV'"
-            [usarSelectorMes]="false"
-            [mostrarSelectorEspecialidad]="mostrarSelectorEspecialidad"
-            [mostrarSelectorSolicitudRealizacion]="mostrarSelectorSolicitudRealizacion"
-            [mostrarSelectorServicios]="mostrarSelectorServicios"
-            [especialidades]="especialidadesParaFiltros()"
-            [subEspecialidades]="subEspecialidadesParaFiltros()"
-            [servicios]="servicios()"
-            [cargando]="cargandoReporte()"
-            (descargar)="descargarReporte($event)"
-            (limpiar)="limpiarFiltros()"
-            (especialidadChange)="onEspecialidadChange($event)"
-          >
-            <span titulo>{{ reporteSeleccionado() }}</span>
-          </app-filtros-ppv-reporte>
-        </div>
+      <div class="animate-fade-in">
+        <!-- Formulario de Filtros -->
+        <app-filtros-ppv-reporte
+          #filtrosReporte
+          [categoria]="'PPV'"
+          [usarSelectorMes]="false"
+          [mostrarSelectorEspecialidad]="mostrarSelectorEspecialidad"
+          [mostrarSelectorSolicitudRealizacion]="mostrarSelectorSolicitudRealizacion"
+          [mostrarSelectorIngresoEgreso]="mostrarSelectorIngresoEgreso"
+          [mostrarSelectorServicios]="mostrarSelectorServicios"
+          [especialidades]="especialidadesParaFiltros()"
+          [subEspecialidades]="subEspecialidadesParaFiltros()"
+          [servicios]="servicios()"
+          [cargando]="cargandoReporte()"
+          (descargar)="descargarReporte($event)"
+          (limpiar)="limpiarFiltros()"
+          (especialidadChange)="onEspecialidadChange($event)"
+        >
+          <span titulo>{{ reporteSeleccionado() }}</span>
+        </app-filtros-ppv-reporte>
+      </div>
       } @else {
-        <!-- Estado Vacío -->
-        <app-estado-vacio
-          [icono]="'📊'"
-          [titulo]="'Bienvenido a Reportes PPV'"
-          [descripcion]="'Selecciona un reporte del menú lateral para comenzar a generar informes de pabellón y procedimientos médicos.'"
-          [estadisticas]="estadisticas()"
-        />
+      <!-- Estado Vacío -->
+      <app-estado-vacio
+        [icono]="'📊'"
+        [titulo]="'Bienvenido a Reportes PPV'"
+        [descripcion]="
+          'Selecciona un reporte del menú lateral para comenzar a generar informes de pabellón y procedimientos médicos.'
+        "
+        [estadisticas]="estadisticas()"
+      />
       }
     </div>
   </main>

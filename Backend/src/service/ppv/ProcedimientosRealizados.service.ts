@@ -40,7 +40,7 @@ export class ProcedimientosRealizadosService {
     headerRow.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FF2563EB' },
+      fgColor: { argb: 'FF59ACA5' },
     };
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;
@@ -90,7 +90,6 @@ export class ProcedimientosRealizadosService {
 
     hoja.views = [{ state: 'frozen', ySplit: 1 }];
 
-    // ✅ Usar buffer en vez de write(res)
     const nombreArchivo = `Procedimientos_${dayjs(fechaInicio).format('YYYYMMDD')}_${dayjs(fechaFin).format('YYYYMMDD')}.xlsx`;
     const buffer = await workbook.xlsx.writeBuffer();
 

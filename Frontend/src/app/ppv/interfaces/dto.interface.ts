@@ -6,18 +6,16 @@ export interface ReportePpvHosQuery {
   servicios: number[];
 }
 
-
 export interface ReportePpvIngEgrQuery {
   fechaInicio: string;
   fechaFin: string;
   unidad: string;
   filtro: ResportesPPVEgrIngrTypo;
-
 }
 export interface ReportePpvListaEsperaQuery {
   fechaInicio: string;
   fechaFin: string;
-  tipo: number;
+  tipo_reporte: number;
 }
 
 export interface ReportePpvPabellonQuery {

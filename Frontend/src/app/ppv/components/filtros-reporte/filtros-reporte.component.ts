@@ -1,19 +1,35 @@
 import { Component, input, output, viewChild, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SelectorRangoFechasComponent, SelectorMesComponent, SelectorBuscadorComponent } from '@shared/components/ui';
+import {
+  SelectorRangoFechasComponent,
+  SelectorMesComponent,
+  SelectorBuscadorComponent,
+} from '@shared/components/ui';
 import type { RangoFechas, SeleccionMes, OpcionSelector } from '@shared/components/ui';
-import type { ItemCatalogo, SubEspecialidadItem, ItemServicio, FiltrosPpvReporte, TipoFecha } from '../../interfaces/filtro.interface';
+import type {
+  ItemCatalogo,
+  SubEspecialidadItem,
+  ItemServicio,
+  FiltrosPpvReporte,
+  TipoFecha,
+} from '../../interfaces/filtro.interface';
 
 @Component({
   selector: 'app-filtros-ppv-reporte',
-  imports: [FormsModule, SelectorRangoFechasComponent, SelectorMesComponent, SelectorBuscadorComponent],
-  templateUrl: './filtros-reporte.component.html'
+  imports: [
+    FormsModule,
+    SelectorRangoFechasComponent,
+    SelectorMesComponent,
+    SelectorBuscadorComponent,
+  ],
+  templateUrl: './filtros-reporte.component.html',
 })
 export class FiltrosPpvReporteComponent {
   readonly categoria = input('PPV');
   readonly usarSelectorMes = input(false);
   readonly mostrarSelectorEspecialidad = input(false);
   readonly mostrarSelectorSolicitudRealizacion = input(false);
+  readonly mostrarSelectorIngresoEgreso = input(false);
   readonly mostrarSelectorServicios = input(false);
   readonly especialidades = input<ItemCatalogo[]>([]);
   readonly subEspecialidades = input<SubEspecialidadItem[]>([]);
@@ -36,6 +52,7 @@ export class FiltrosPpvReporteComponent {
   subEspecialidadSeleccionada: number | null = null;
 
   tipoFechaSeleccionado: TipoFecha = 'solicitud';
+  tipoIngresoEgresoSeleccionado: TipoFecha = 'ingreso';
 
   readonly serviciosSeleccionados = signal<string[]>([]);
 
@@ -45,12 +62,12 @@ export class FiltrosPpvReporteComponent {
 
   // Convertir especialidades a OpcionSelector
   readonly especialidadesOpciones = computed<OpcionSelector[]>(() =>
-    this.especialidades().map(esp => ({ id: esp.id, nombre: esp.nombre }))
+    this.especialidades().map((esp) => ({ id: esp.id, nombre: esp.nombre }))
   );
 
   // Convertir sub especialidades a OpcionSelector
   readonly subEspecialidadesOpciones = computed<OpcionSelector[]>(() =>
-    this.subEspecialidadesFiltradas().map(subEsp => ({ id: subEsp.id, nombre: subEsp.nombre }))
+    this.subEspecialidadesFiltradas().map((subEsp) => ({ id: subEsp.id, nombre: subEsp.nombre }))
   );
 
   alCambiarFecha(rango: RangoFechas): void {
@@ -82,7 +99,7 @@ export class FiltrosPpvReporteComponent {
         this.serviciosSeleccionados.set([...serviciosActuales, servicioId]);
       }
     } else {
-      this.serviciosSeleccionados.set(serviciosActuales.filter(id => id !== servicioId));
+      this.serviciosSeleccionados.set(serviciosActuales.filter((id) => id !== servicioId));
     }
   }
 
@@ -91,7 +108,7 @@ export class FiltrosPpvReporteComponent {
   }
 
   seleccionarTodosServicios(): void {
-    const todosLosIds = this.servicios().map(servicio => servicio.id);
+    const todosLosIds = this.servicios().map((servicio) => servicio.id);
     this.serviciosSeleccionados.set(todosLosIds);
   }
 
@@ -119,6 +136,10 @@ export class FiltrosPpvReporteComponent {
       filtros.tipoFecha = this.tipoFechaSeleccionado;
     }
 
+    if (this.mostrarSelectorIngresoEgreso()) {
+      filtros.tipoFecha = this.tipoIngresoEgresoSeleccionado;
+    }
+
     if (this.mostrarSelectorServicios()) {
       filtros.serviciosSeleccionados = this.serviciosSeleccionados();
     }
@@ -136,6 +157,7 @@ export class FiltrosPpvReporteComponent {
     this.subEspecialidadSeleccionada = null;
 
     this.tipoFechaSeleccionado = 'solicitud';
+    this.tipoIngresoEgresoSeleccionado = 'ingreso';
 
     this.serviciosSeleccionados.set([]);
 

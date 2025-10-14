@@ -125,7 +125,6 @@ export const ingresosEgresosSchema = Joi.object({
 export const intervencionPabellonSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
   fechaFin: fechaSchema.label('Fecha de término'),
-
 });
 
 export const irGrdSchema = Joi.object({
@@ -136,8 +135,9 @@ export const irGrdSchema = Joi.object({
 export const listaEsperaSchema = Joi.object({
   fechaInicio: fechaSchema.label('Fecha de inicio'),
   fechaFin: fechaSchema.label('Fecha de término'),
-  tipo: Joi.number().valid(1, 2).required().messages({
-    'any.only': 'El tipo debe ser 1 (Solicitud) o 2 (Realización)',
+  tipo_reporte: Joi.number().valid(1, 2).required().messages({
+    'any.only': 'El tipo_reporte debe ser 1 (Solicitud) o 2 (Realización)',
+    'any.required': 'El tipo_reporte es requerido',
   }),
 });
 
@@ -148,7 +148,7 @@ export const procedimientosSchema = Joi.object({
     .optional()
     .allow(null, '')
     .messages({
-      'string.base': 'El ID de especialidad debe ser un texto válido'
+      'string.base': 'El ID de especialidad debe ser un texto válido',
     })
     .label('ID de Especialidad'),
   selectEspec: Joi.string()
@@ -156,9 +156,9 @@ export const procedimientosSchema = Joi.object({
     .allow(null)
     .messages({
       'number.base': 'El ID de sub especialidad debe ser un número',
-      'number.integer': 'El ID de sub especialidad debe ser un número entero'
+      'number.integer': 'El ID de sub especialidad debe ser un número entero',
     })
-    .label('ID de Sub Especialidad')
+    .label('ID de Sub Especialidad'),
 });
 
 // ============================================================================
@@ -173,9 +173,9 @@ export const subEspecialidadesSchema = Joi.object({
     .required()
     .messages({
       'string.empty': 'El ID de especialidad es requerido',
-      'any.required': 'El ID de especialidad es requerido'
+      'any.required': 'El ID de especialidad es requerido',
     })
-    .label('ID de Especialidad')
+    .label('ID de Especialidad'),
 });
 
 export const pacientesHospitalizadosSchema = Joi.object({

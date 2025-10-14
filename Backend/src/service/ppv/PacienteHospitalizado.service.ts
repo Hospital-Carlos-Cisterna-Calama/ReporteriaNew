@@ -6,7 +6,6 @@ import { convertirFecha } from '../../utils/ExportarExcel';
 
 export class PacienteHospitalizadoService {
   async obtenerPacienteHospitalizado(fechaInicio: string, fechaFin: string) {
-    // Convertir fechas DD/MM/YYYY a YYYY-MM-DD
     const inicioStr = convertirFecha(fechaInicio, false).split(' ')[0];
     const finStr = convertirFecha(fechaFin, true).split(' ')[0];
 
@@ -69,7 +68,7 @@ export class PacienteHospitalizadoService {
       hoja.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FFD9D9D9' },
+        fgColor: { argb: 'FF59ACA5' },
       };
 
       // Agregar datos en lotes para mejor rendimiento
