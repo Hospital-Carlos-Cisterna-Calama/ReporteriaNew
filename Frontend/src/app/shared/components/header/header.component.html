@@ -1,7 +1,8 @@
 <header class="bg-white shadow-lg border-b-4 border-teal-500 sticky top-0 z-50" [class.shadow-xl]="scrolled">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="flex h-20 items-center justify-between">
-      <div class="flex items-center space-x-3 cursor-pointer" routerLink="/" (click)="closeMobile()">
+  <div class="px-4 sm:px-6 lg:px-8">
+    <div class="flex h-20 items-center justify-between gap-4">
+      <!-- Logo y Título (izquierda) -->
+      <div class="flex items-center space-x-3 cursor-pointer flex-shrink-0" routerLink="/" (click)="closeMobile()">
         <app-icon size="sm" [shadow]="false" />
         <div class="hidden lg:block">
           <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 bg-clip-text text-transparent">Sistema de Reportería</h1>
@@ -12,15 +13,19 @@
           <p class="text-xs text-gray-600">Hospital Carlos Cisterna</p>
         </div>
       </div>
-      <nav class="hidden lg:flex flex-1 justify-center items-center space-x-1">
+
+      <!-- Navegación (centro expandido) -->
+      <nav class="hidden lg:flex flex-1 items-center justify-center space-x-1">
         <a routerLink="/" routerLinkActive="bg-teal-700 text-white shadow-md" [routerLinkActiveOptions]="{ exact: true }" class="px-4 py-2.5 rounded-md text-sm font-medium text-teal-800 hover:bg-teal-50 hover:text-teal-900 flex items-center gap-2"><lucide-icon [img]="icons.Home" class="h-4 w-4"></lucide-icon><span>Inicio</span></a>
         <a routerLink="/urgencia" routerLinkActive="bg-teal-700 text-white shadow-md" class="px-4 py-2.5 rounded-md text-sm font-medium text-teal-800 hover:bg-teal-50 hover:text-teal-900 flex items-center gap-2"><lucide-icon [img]="icons.Activity" class="h-4 w-4"></lucide-icon><span>Urgencia</span></a>
         <a routerLink="/ppv" routerLinkActive="bg-teal-700 text-white shadow-md" class="px-4 py-2.5 rounded-md text-sm font-medium text-teal-800 hover:bg-teal-50 hover:text-teal-900 flex items-center gap-2"><lucide-icon [img]="icons.ClipboardList" class="h-4 w-4"></lucide-icon><span>PPV</span></a>
         <a routerLink="/farmacia" routerLinkActive="bg-teal-700 text-white shadow-md" class="px-4 py-2.5 rounded-md text-sm font-medium text-teal-800 hover:bg-teal-50 hover:text-teal-900 flex items-center gap-2"><lucide-icon [img]="icons.Pill" class="h-4 w-4"></lucide-icon><span>Farmacia</span></a>
         <a routerLink="/ayuda" routerLinkActive="bg-teal-700 text-white shadow-md" class="px-4 py-2.5 rounded-md text-sm font-medium text-teal-700 hover:bg-teal-50 hover:text-teal-900 flex items-center gap-2"><lucide-icon [img]="icons.HelpCircle" class="h-4 w-4"></lucide-icon><span>Ayuda</span></a>
       </nav>
+
+      <!-- Usuario (derecha) -->
       @if (isLoggedIn() && userData()) {
-        <div class="hidden lg:flex items-center space-x-4">
+        <div class="hidden lg:flex items-center space-x-4 flex-shrink-0">
           <div class="text-right">
             <p class="text-sm font-semibold text-gray-900">{{ userData()!.name }}</p>
             <div class="text-xs text-teal-800 font-medium flex flex-col">
@@ -28,10 +33,21 @@
               @if (userData()!.profession) {<span class="text-gray-600">{{ userData()!.profession }}</span>}
             </div>
           </div>
-          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg ring-2 ring-white"><lucide-icon [img]="icons.UserRound" class="h-5 w-5 text-white"></lucide-icon></div>
+          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg ring-2 ring-white">
+            <lucide-icon [img]="icons.UserRound" class="h-5 w-5 text-white"></lucide-icon>
+          </div>
+          <!-- Botón de Salida -->
+          <button
+            (click)="logout()"
+            type="button"
+            class="p-2.5 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200 border border-red-200 hover:border-red-300 group"
+            title="Cerrar sesión"
+          >
+            <lucide-icon [img]="icons.LogOut" class="h-5 w-5 group-hover:scale-110 transition-transform"></lucide-icon>
+          </button>
         </div>
       } @else {
-        <div class="hidden lg:flex items-center space-x-4">
+        <div class="hidden lg:flex items-center space-x-4 flex-shrink-0">
           <div class="text-right">
             <p class="text-sm font-semibold text-gray-900">Cargando...</p>
             <p class="text-xs text-teal-800 font-medium">Usuario</p>
@@ -39,6 +55,8 @@
           <div class="h-10 w-10 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center shadow-lg ring-2 ring-white"><lucide-icon [img]="icons.UserRound" class="h-5 w-5 text-white"></lucide-icon></div>
         </div>
       }
+
+      <!-- Botón Mobile -->
       <div class="lg:hidden">
         <button type="button" class="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-teal-600 hover:bg-teal-50" (click)="toggleMobile()"><lucide-icon [img]="mobileOpen ? icons.X : icons.Menu" class="h-6 w-6"></lucide-icon></button>
       </div>
@@ -73,6 +91,18 @@
       <a routerLink="/ppv" (click)="closeMobile()" routerLinkActive="bg-teal-700 text-white" class="flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-teal-800 hover:bg-teal-50"><lucide-icon [img]="icons.ClipboardList" class="h-5 w-5"></lucide-icon><span>PPV</span></a>
       <a routerLink="/farmacia" (click)="closeMobile()" routerLinkActive="bg-teal-700 text-white" class="flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-teal-800 hover:bg-teal-50"><lucide-icon [img]="icons.Pill" class="h-5 w-5"></lucide-icon><span>Farmacia</span></a>
       <a routerLink="/ayuda" (click)="closeMobile()" routerLinkActive="bg-teal-700 text-white" class="flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-teal-800 hover:bg-teal-50"><lucide-icon [img]="icons.HelpCircle" class="h-5 w-5"></lucide-icon><span>Ayuda</span></a>
+
+      <!-- Botón de Salida Mobile -->
+      <div class="pt-3 mt-3 border-t border-gray-200">
+        <button
+          (click)="logout()"
+          type="button"
+          class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200"
+        >
+          <lucide-icon [img]="icons.LogOut" class="h-5 w-5"></lucide-icon>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
     </div>
   }
 </div>

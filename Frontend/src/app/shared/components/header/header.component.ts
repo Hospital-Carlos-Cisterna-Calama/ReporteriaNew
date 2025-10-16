@@ -1,8 +1,9 @@
 import {  Component, HostListener, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { LucideAngularModule, Home, Activity, Pill, FileText, HelpCircle, UserRound, Menu, X, ClipboardList } from 'lucide-angular';
+import { LucideAngularModule, Home, Activity, Pill, FileText, HelpCircle, UserRound, Menu, X, ClipboardList, LogOut } from 'lucide-angular';
 import { AppIconComponent } from "../ui/app-icon/app-icon.component";
 import { AuthService } from '../../../auth/services/auth.service';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -23,7 +24,8 @@ export class HeaderComponent {
     UserRound,
     Menu,
     X,
-    ClipboardList
+    ClipboardList,
+    LogOut
   };
 
   // #region State
@@ -53,6 +55,13 @@ export class HeaderComponent {
 
   closeMobile() {
     this.mobileOpen = false;
+  }
+
+  logout() {
+    // Limpiar datos de autenticación
+    this.authService.clear();
+    // Redirigir a la página de login
+    window.location.href = environment.loginApiUrl;
   }
   // #endregion
 

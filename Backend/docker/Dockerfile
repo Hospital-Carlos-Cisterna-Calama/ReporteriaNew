@@ -1,26 +1,45 @@
 # ───── Stage build ───────────────────────────────────────────────
 FROM node:22-slim AS build
+
+# Instalar pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci
+# Copiar archivos de dependencias
+COPY package.json pnpm-lock.yaml ./
 
+# Instalar dependencias con pnpm
+RUN pnpm install --frozen-lockfile
+
+# Copiar código fuente
 COPY . .
-RUN npm run build                                    # genera dist/
-RUN mkdir -p dist/template && cp -r src/template/* dist/template/
+
+# Generar build
+RUN pnpm run build
+
+# Copiar templates si existen
+RUN mkdir -p dist/template && cp -r src/template/* dist/template/ 2>/dev/null || true
 
 # (Debug opcional: elimina después de verificar)
 RUN echo "── LISTADO COMPLETO DE /app/dist:" && ls -R /app/dist | head
 
 # ───── Stage production ─────────────────────────────────────────
 FROM node:22-slim AS production
+
+# Instalar pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
 
-COPY --from=build /app/package*.json ./
+# Copiar archivos de dependencias y build
+COPY --from=build /app/package.json /app/pnpm-lock.yaml ./
 COPY --from=build /app/dist /app/dist
 
-RUN npm ci --omit=dev
+# Instalar solo dependencias de producción
+RUN pnpm install --prod --frozen-lockfile
 
+# Variables de entorno
 ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
