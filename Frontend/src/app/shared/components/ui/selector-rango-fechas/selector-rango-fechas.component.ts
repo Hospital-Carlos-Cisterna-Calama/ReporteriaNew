@@ -1,7 +1,24 @@
 import { Component, output, ElementRef, viewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import flatpickr from 'flatpickr';
-import { Spanish } from 'flatpickr/dist/l10n/es';
 import type { Instance } from 'flatpickr/dist/types/instance';
+import type { CustomLocale } from 'flatpickr/dist/types/locale';
+
+// Configuración manual de localización para evitar warning de CommonJS
+const Spanish: CustomLocale = {
+  weekdays: {
+    shorthand: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+    longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+  },
+  months: {
+    shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+  },
+  firstDayOfWeek: 1,
+  rangeSeparator: ' a ',
+  weekAbbreviation: 'Sem',
+  scrollTitle: 'Desplazar para aumentar',
+  toggleTitle: 'Hacer clic para cambiar',
+};
 
 export interface RangoFechas {
   fechaInicio: Date | null;
@@ -14,12 +31,10 @@ export interface RangoFechas {
   imports: [],
   templateUrl: './selector-rango-fechas.component.html',
   styles: [`
-    @import 'flatpickr/dist/flatpickr.css';
-
     :host ::ng-deep {
       .flatpickr-calendar {
         border-radius: 0.75rem !important;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1) !important;
         border: 2px solid #14b8a6 !important;
       }
 
@@ -28,14 +43,8 @@ export interface RangoFechas {
         border-radius: 0.625rem 0.625rem 0 0 !important;
       }
 
-      .flatpickr-month {
-        color: white !important;
-      }
-
-      .flatpickr-current-month {
-        color: white !important;
-      }
-
+      .flatpickr-month,
+      .flatpickr-current-month,
       .flatpickr-current-month input.cur-year {
         color: white !important;
         font-weight: 600 !important;
@@ -87,10 +96,9 @@ export interface RangoFechas {
       .flatpickr-day.selected,
       .flatpickr-day.startRange,
       .flatpickr-day.endRange {
-        background: linear-gradient(to bottom right, #0d9488, #14b8a6) !important;
+        background: #0d9488 !important;
         border-color: #0d9488 !important;
         color: white !important;
-        font-weight: 600 !important;
       }
 
       .flatpickr-day.inRange {
@@ -98,12 +106,6 @@ export interface RangoFechas {
         border-color: #99f6e4 !important;
         color: #0d9488 !important;
         box-shadow: none !important;
-      }
-
-      .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),
-      .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),
-      .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
-        box-shadow: -10px 0 0 #ccfbf1 !important;
       }
     }
   `]

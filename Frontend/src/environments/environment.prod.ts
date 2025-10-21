@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  systemName: 'TURNOS',
-  apiBaseUrl: '/api',
-  loginApiUrl: '/login-api', // Ajusta a la ruta real del servicio de autenticación en producción
+  systemName: 'Reporteria New',
+  apiBaseUrl: 'http://api-report.hospitalcalama.cl/api',
+  loginApiUrl: 'http://login.hospitalcalama.cl', // Ajusta a la ruta real del servicio de autenticación en producción
   appVersion: '1.0.0',
   pacienteSelectionTtlMs: 30 * 60 * 1000,
   pacienteSelectionStorageKey: 'turnos.paciente.seleccion',

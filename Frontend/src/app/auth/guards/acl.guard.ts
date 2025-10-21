@@ -12,32 +12,44 @@ export const aclGuard: CanActivateFn = (route: ActivatedRouteSnapshot): Observab
   const data = route.data as AclData;
 
   const checkPermissions = (accessData: any): boolean => {
+    // Si no hay restricciones, permitir acceso inmediato
+    if (!data.roles && !data.profesiones && !data.servicios) {
+      return true;
+    }
+
     const hasValidRole = !data.roles || data.roles.includes(accessData.rol);
     const hasValidProfession = !data.profesiones || data.profesiones.includes(accessData.profesion);
     const hasValidService = !data.servicios || data.servicios.includes(accessData.servicio);
     return hasValidRole && hasValidProfession && hasValidService;
   };
 
-  const denyAccess = (): boolean => {
+  const denyAccessUnauthorized = (): boolean => {
     router.navigate(['/errors/unauthorized']);
+    return false;
+  };
+
+  const denyAccessForbidden = (): boolean => {
+    router.navigate(['/errors/forbidden']);
     return false;
   };
 
   // Si ya hay accessData, evaluar inmediatamente
   const currentAccess = auth.accessData();
   if (currentAccess) {
-    return checkPermissions(currentAccess) || denyAccess();
+    return checkPermissions(currentAccess) || denyAccessForbidden();
   }
 
   // Si no hay accessData, validar de forma asíncrona
   return auth.ensureAccess$(environment.loginApiUrl, environment.systemName).pipe(
     map(hasValidAccess => {
-      if (!hasValidAccess) return denyAccess();
+      // Usuario NO tiene acceso al sistema (401)
+      if (!hasValidAccess) return denyAccessUnauthorized();
 
       const accessData = auth.accessData();
-      if (!accessData) return denyAccess();
+      if (!accessData) return denyAccessUnauthorized();
 
-      return checkPermissions(accessData) || denyAccess();
+      // Usuario tiene acceso pero no cumple roles/profesiones/servicios (403)
+      return checkPermissions(accessData) || denyAccessForbidden();
     })
   );
 };

@@ -9,13 +9,13 @@ WORKDIR /app
 # Copiar archivos de dependencias
 COPY package.json pnpm-lock.yaml ./
 
-# Instalar dependencias con pnpm
-RUN pnpm install --frozen-lockfile
+# Instalar TODAS las dependencias (incluidas dev) para el build
+RUN pnpm install --frozen-lockfile --include-workspace-root
 
 # Copiar código fuente
 COPY . .
 
-# Generar build
+# Generar build usando el script definido en package.json
 RUN pnpm run build
 
 # Copiar templates si existen

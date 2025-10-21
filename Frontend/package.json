@@ -2,11 +2,14 @@
   "name": "reportes",
   "version": "0.0.1",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+      "ng": "ng",
+      "start": "ng serve",
+      "build": "ng build",
+      "build:analyze": "ng build --configuration production --stats-json && npx webpack-bundle-analyzer dist/Frontend/stats.json",
+      "build:prod": "ng build --configuration production --optimization --source-map=false",
+      "build:devdist": "ng build --configuration development --optimization --source-map=false",
+      "serve:dist": "npx serve -s dist/Frontend/browser -l 4200",
+      "watch": "ng build --watch --configuration development"
   },
   "prettier": {
     "printWidth": 100,

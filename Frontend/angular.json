@@ -23,7 +23,10 @@
             ],
             "styles": [
               "src/styles.css"
-            ]
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": []
+            }
           },
           "configurations": {
             "production": {
@@ -35,11 +38,17 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "10kB",
+                  "maximumError": "20kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,

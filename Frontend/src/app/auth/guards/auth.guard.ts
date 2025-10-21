@@ -6,13 +6,17 @@ export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (!auth.getToken()) {
-    auth.initFromCookie();
-  }
+  // Solo llamar initFromCookie si no hay token
+  const token = auth.getToken();
 
-  if (!auth.getToken()) {
-    router.navigate(['/errors/unauthorized']);
-    return false;
+  if (!token) {
+    auth.initFromCookie();
+
+    // Verificar nuevamente después de init
+    if (!auth.getToken()) {
+      router.navigate(['/errors/unauthorized']);
+      return false;
+    }
   }
 
   return true;

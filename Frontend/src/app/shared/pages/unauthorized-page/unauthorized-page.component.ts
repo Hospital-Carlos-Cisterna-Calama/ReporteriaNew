@@ -1,4 +1,5 @@
 import { Component, signal } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-unauthorized-page',
@@ -19,7 +20,7 @@ import { Component, signal } from '@angular/core';
             <p class="text-gray-600 text-center mb-6 text-sm leading-relaxed">
               No tienes asignado acceso a este sistema. Si crees que deberías tener acceso, por favor contacta con el administrador para solicitar los permisos necesarios.
             </p>
-            <a href="http://login.hospitalcalama.cl"
+            <a [href]="redirectUrl"
                class="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white py-2.5 px-4 rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg w-full mb-4">
               <span class="text-sm font-medium">Redirigir a Panel de Usuario</span>
             </a>
@@ -50,7 +51,7 @@ import { Component, signal } from '@angular/core';
   `
 })
 export class UnauthorizedPageComponent {
-  readonly redirectUrl = 'http://login.hospitalcalama.cl';
+  readonly redirectUrl = environment.loginApiUrl;
   countdown = signal(15);
   visible = signal(false);
   private intervalId: any;
