@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  systemName: 'Reporteria New',
+  systemName: 'Reporteria',
   apiBaseUrl: 'http://api-report.hospitalcalama.cl/api',
   loginApiUrl: 'http://login.hospitalcalama.cl', // Ajusta a la ruta real del servicio de autenticación en producción
   appVersion: '1.0.0',

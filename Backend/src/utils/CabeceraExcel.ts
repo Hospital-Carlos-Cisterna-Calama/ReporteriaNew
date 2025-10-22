@@ -46,22 +46,22 @@ export function procesarUrgencia(dau: InformeUrgenciaFila[]) {
     Destino: h.Destino ?? '',
   }));
 }
-export function procesarDoceHoras(dau: UrgenciaDoceHoraFila[]) {
-  return dau.map((h: UrgenciaDoceHoraFila) => ({
-    Rut: h.Rut ?? '',
-    Nombre: h.Nombre ?? '',
-    Edad: h.Edad ?? '',
-    Sexo: h.Sexo ?? '',
-    Prevision: h.Prevision ?? '',
-    DAU: h.DAU ?? '',
-    Fecha_Ingreso_Siclope: h.FechaIngresoSiclope ?? '',
-    Servicio_Ingreso: h.ServicioIngreso ?? '',
-    Fecha_Ingreso_Helios: h.FechaIngresoHelios ?? '',
-    Servicio_Traslado: h.ServicioTraslado ?? '',
-    Fecha_Traslado_Helios: h.FechaTrasladoHelios ?? '',
-    Diferencia_Texto: h.DiferenciaTexto ?? '',
-    Profesional: h.Profesional ?? '',
-    Rut_Profesional: h.RutProfesional ?? '',
+export function procesarDoceHoras(dau: any[]) {
+  return dau.map((h: any) => ({
+    Rut: h.rut ?? '',
+    Nombre: h.nombre ?? '',
+    Edad: h.edad ?? '',
+    Sexo: h.sexo ?? '',
+    Prevision: h.prevision ?? '',
+    DAU: h.dau ?? '',
+    Fecha_Ingreso_Siclope: h.fecha_ingreso_siclope ?? '',
+    Servicio_Ingreso: h.servicio_ingreso ?? '',
+    Fecha_Ingreso_Helios: h.fecha_ingreso_helios ?? '',
+    Servicio_Traslado: h.servicio_traslado ?? '',
+    Fecha_Traslado_Helios: h.fecha_traslado_helios ?? '',
+    Diferencia_Texto: h.diferencia_ingreso_indicacion_siclope ?? '',
+    Profesional: h.nombre_profesional ?? '',
+    Rut_Profesional: h.rut_profesional ?? '',
   }));
 }
 export function procesarCategorizadores(dau: UrgenciaCategorizacion[]) {

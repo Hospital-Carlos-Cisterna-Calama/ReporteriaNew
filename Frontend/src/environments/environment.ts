@@ -1,9 +1,9 @@
 export const environment = {
   production: false,
   // Nombre del sistema
-  systemName: 'TURNOS',
+  systemName: 'Reporteria',
   // Backend local en desarrollo
-  apiBaseUrl: 'http://localhost:3001/api',
+  apiBaseUrl: 'http://127.0.0.1:3001/api',
   // API externa de login / validación de acceso
   loginApiUrl: 'http://127.0.0.1:8000',
   appVersion: 'dev',
