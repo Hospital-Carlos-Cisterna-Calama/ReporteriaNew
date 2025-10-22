@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Reportería - HCC Calama">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background tile -->
+  <rect x="4" y="4" width="120" height="120" rx="24" fill="url(#g)"/>
+
+  <!-- Subtle hospital cross watermark -->
+  <g transform="translate(92,16)" opacity="0.12">
+    <rect x="-8" y="0" width="16" height="40" rx="3" fill="#ffffff"/>
+    <rect x="-20" y="12" width="40" height="16" rx="3" fill="#ffffff"/>
+  </g>
+
+  <!-- Simple bar chart (reporting) -->
+  <g transform="translate(28,28)">
+    <!-- Axes -->
+    <path d="M0,64 L72,64" stroke="#ffffff" stroke-opacity="0.6" stroke-width="2"/>
+    <path d="M0,64 L0,4" stroke="#ffffff" stroke-opacity="0.6" stroke-width="2"/>
+
+    <!-- Bars -->
+    <rect x="8" y="36" width="10" height="28" rx="2" fill="#ffffff"/>
+    <rect x="28" y="24" width="10" height="40" rx="2" fill="#ffffff"/>
+    <rect x="48" y="12" width="10" height="52" rx="2" fill="#ffffff"/>
+
+    <!-- Trend line -->
+    <polyline points="8,46 33,34 53,18 68,14" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Arrow head -->
+    <path d="M66,10 L74,12 L68,18 Z" fill="#ffffff"/>
+  </g>
+
+  <!-- subtle border -->
+  <rect x="4.5" y="4.5" width="119" height="119" rx="23.5" fill="none" stroke="#ffffff" stroke-opacity="0.18"/>
+</svg>
