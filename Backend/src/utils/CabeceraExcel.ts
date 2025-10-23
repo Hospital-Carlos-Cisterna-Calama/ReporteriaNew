@@ -5,15 +5,15 @@ export function anchoCabecera(informe: string) {
     case 'Urgencia':
       return [13, 10, 15, 13, 13, 13, 13, 13, 30, 13, 30, 13, 30, 5, 5, 15, 13, 60, 60, 17, 26, 15, 15, 10, 17];
     case 'DoceHoras':
-      return [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25]; //FALTA
-    case 'IRAS':
-      return [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25]; //FALTA
-    case 'Pabellón':
-      return [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25]; //FALTA
-    case 'Hospitalizado':
-      return [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25]; //FALTA
+      return [11, 35, 5, 5, 10, 13, 23, 25, 23, 40, 23, 30, 28, 15];
     case 'Categorizaciones':
-      return [10, 30, 15, 20, 10, 8, 20, 60, 60, 60, 20, 25]; //FALTA
+      return [10, 40, 10, 15, 40, 10, 12, 15];
+    case 'Pabellón':
+      return [12, 40, 5, 5, 8, 10, 15, 15, 15, 10, 40];
+    case 'Hospitalizado':
+      return [15, 15, 20, 60, 12, 40, 5, 5, 10, 10, 40];
+    case 'IRAS':
+      return [15, 12, 40, 5, 5, 40]; //FALTA
   }
 }
 
