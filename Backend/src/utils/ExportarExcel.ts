@@ -64,11 +64,11 @@ export async function generarExcelContrareferenciaConFormato(datos: any[], resum
   hojaDatos.mergeCells('A2:J2');
   hojaDatos.getCell('A2').value = `Contrarreferencias Realizadas entre ${fechaIni} a ${fechaFin}`;
   hojaDatos.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
-  hojaDatos.getCell('A2').font = { bold: true };
+  hojaDatos.getCell('A2').font = { bold: true, color: { argb: 'FFFFFFFF' } };
   hojaDatos.mergeCells('B4:C4');
   hojaDatos.getCell('B4').value = 'Paciente';
   hojaDatos.getCell('B4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
-  hojaDatos.getCell('B4').font = { bold: true };
+  hojaDatos.getCell('B4').font = { bold: true, color: { argb: 'FFFFFFFF' } };
   hojaDatos.addRow([
     'Especialidad',
     'Nombre',
@@ -83,7 +83,7 @@ export async function generarExcelContrareferenciaConFormato(datos: any[], resum
   ]);
   hojaDatos.getRow(5).eachCell(cell => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
-    cell.font = { bold: true };
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
   });
   datos.forEach(d => {
@@ -109,7 +109,7 @@ export async function generarExcelContrareferenciaConFormato(datos: any[], resum
   hojaResumen.addRow(['Especialidad', 'CONSULTA NUEVA', 'CONSULTA DE ALTA']);
   hojaResumen.getRow(1).eachCell(cell => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
-    cell.font = { bold: true };
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
   });
   resumen.forEach(r => {
@@ -125,4 +125,16 @@ export async function generarExcelContrareferenciaConFormato(datos: any[], resum
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Length', buffer.byteLength);
   return res.send(buffer);
+}
+
+export function aFechaSqlServer(fecha: string, finDelDia = false): string {
+  if (/\d{2}\/\d{2}\/\d{4}/.test(fecha)) {
+    return finDelDia ? `${fecha} 23:59:59` : `${fecha} 00:00:00`;
+  }
+  if (/\d{4}-\d{2}-\d{2}/.test(fecha)) {
+    const [anio, mes, dia] = fecha.split('-');
+    const fechaFormateada = `${dia}/${mes}/${anio}`;
+    return finDelDia ? `${fechaFormateada} 23:59:59` : `${fechaFormateada} 00:00:00`;
+  }
+  return fecha;
 }
