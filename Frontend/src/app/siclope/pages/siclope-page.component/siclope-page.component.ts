@@ -50,14 +50,14 @@ export class SiclopePageComponent implements OnInit {
   readonly reportes = signal<SidebarItem[]>([
     { title: 'Nómina',            icon: 'FileText',       description: 'Listados y nóminas de pacientes/procesos' },
     { title: 'Contra Referencia', icon: 'ArrowLeftRight', description: 'Gestión de contra referencias' },
-    { title: 'Diagnóstico',       icon: 'Activity',       description: 'Indicadores y diagnósticos clínicos' },
+    { title: 'Diagnóstico', icon: 'Activity', description: 'Indicadores y diagnósticos clínicos' },
   ]);
 
   readonly estadisticas = signal<EstadisticaReporte[]>([
-    { etiqueta: 'Módulos',              valor: '3',     icono: '📊' },
-    { etiqueta: 'Última Actualización', valor: 'Hoy',   icono: '🕐' },
-    { etiqueta: 'Formatos',             valor: 'Excel', icono: '📑' },
-    { etiqueta: 'Estado',               valor: 'Activo',icono: '✅' }
+    { etiqueta: 'Módulos', valor: '3', icono: '📊' },
+    { etiqueta: 'Última Actualización', valor: 'Hoy', icono: '🕐' },
+    { etiqueta: 'Formatos', valor: 'Excel', icono: '📑' },
+    { etiqueta: 'Estado', valor: 'Activo', icono: '✅' }
   ]);
 
   // Computeds
@@ -71,7 +71,6 @@ export class SiclopePageComponent implements OnInit {
     return reporte ? this.iconos[reporte.icon] : this.iconos['FileText'];
   });
 
-  // 👇 Igual que PPV: mapeo a opciones para el componente de filtros
   readonly especialidadesParaFiltros = computed(() =>
     this.especialidades().map((esp, index) => ({
       id: index + 1,           // índice 1-based para correlacionar selección -> código real

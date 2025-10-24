@@ -36,7 +36,7 @@
           [valorSeleccionado]="idEspecialidadSeleccionada"
           [label]="'Especialidad'"
           [placeholder]="'Todas las Especialidades'"
-          [deshabilitado]="cargando() || (especialidades()?.length ?? 0) === 0"
+          [deshabilitado]="cargando() || especialidades().length === 0"
           (cambioSeleccion)="alCambiarEspecialidad($event)"
         />
       </div>
