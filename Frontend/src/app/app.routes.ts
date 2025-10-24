@@ -23,6 +23,12 @@ export const routes: Routes = [
     loadChildren: () => import('./urgencia/urgencia.routes').then(m => m.urgenciaRoutes),
   },
   {
+    path: 'siclope',
+    canActivate: [authGuard, aclGuard],
+    data: { roles: ['Admin']},
+    loadChildren: () => import('./siclope/siclope.routes').then(m => m.siclopeRoutes),
+  },
+  {
     path: 'ppv',
     canActivate: [authGuard, aclGuard],
     data: { roles: ['Admin','Consultor']},
