@@ -6,7 +6,7 @@ import { EstadoVacioComponent, BannerInstruccionesComponent } from '@shared/comp
 import type { SidebarItem } from '@shared/components/sidebar/sidebar.component';
 import type { EstadisticaReporte } from '@shared/components/ui/estado-vacio/estado-vacio.component';
 import { FiltrosFarmaciaReporteComponent } from '../../components';
-import type { FiltrosFarmaciaReporte } from '../../components';
+import type { FiltrosFarmaciaReporte } from '../../interfaces/filtro.interface';
 
 @Component({
   selector: 'app-farmacia-page',
