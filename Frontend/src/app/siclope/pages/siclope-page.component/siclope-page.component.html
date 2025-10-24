@@ -27,11 +27,13 @@
       @if (reporteSeleccionado()) {
         <!-- Área de Contenido -->
         <div class="animate-fade-in">
-          <!-- Filtros con componente reutilizable -->
+          <!-- Filtros -->
           <app-filtros-siclope-reporte
             [categoria]="'SICLOPE'"
             [usarSelectorMes]="false"
             [cargando]="cargandoReporte()"
+            [mostrarSelectorEspecialidad]="mostrarSelectorEspecialidad"
+            [especialidades]="especialidadesParaFiltros()"
             (descargar)="descargarReporte($event)"
             (limpiar)="limpiarFiltros()"
           >
@@ -45,8 +47,7 @@
           [titulo]="'Bienvenido a Reportes de SICLOPE'"
           [descripcion]="'Elige un módulo del menú lateral para comenzar a generar tus informes'"
           [estadisticas]="estadisticas()"
-        >
-        </app-estado-vacio>
+        />
       }
     </div>
   </main>
