@@ -46,6 +46,7 @@ export function procesarUrgencia(dau: InformeUrgenciaFila[]) {
     Destino: h.Destino ?? '',
   }));
 }
+
 export function procesarDoceHoras(dau: any[]) {
   return dau.map((h: any) => ({
     Rut: h.rut ?? '',
@@ -64,6 +65,7 @@ export function procesarDoceHoras(dau: any[]) {
     Rut_Profesional: h.rut_profesional ?? '',
   }));
 }
+
 export function procesarCategorizadores(dau: UrgenciaCategorizacion[]) {
   return dau.map((h: UrgenciaCategorizacion) => ({
     DAU: h.numpa ?? '',
@@ -76,6 +78,7 @@ export function procesarCategorizadores(dau: UrgenciaCategorizacion[]) {
     Fecha: h.fecha ?? '',
   }));
 }
+
 export function procesarHospitalizado(dau: UrgenciaHospPabllFila[]) {
   return dau.map((h: UrgenciaHospPabllFila) => ({
     Ingreso_Urgencias: h.fecha ?? '',
@@ -107,6 +110,7 @@ export function procesarPabellon(dau: UrgenciaHospPabllFila[]) {
     Diagnóstico: h.diag ?? '',
   }));
 }
+
 export function procesarIras(dau: UrgenciaIrasFila[]) {
   return dau.map((h: UrgenciaIrasFila) => ({
     Fecha_Admisión: h.Fecha_Admision ?? '',
@@ -117,3 +121,27 @@ export function procesarIras(dau: UrgenciaIrasFila[]) {
     Diagnóstico: h.Diagnostico ?? '',
   }));
 }
+
+export function procesarContrareferencia(contrareferencia: any[]) {
+  return contrareferencia.map((h: any) => ({
+    Especialidad: h.Especialidad ?? '',
+    Nombre: h.Nombre ?? '',
+    Rut: h.Rut ?? '',
+    Procedencia: h.Procedencia ?? '',
+    Medico: h.Medico ?? '',
+    FechaCitacion: h.FechaCitacion ?? '',
+    FechaAlta: h.FechaAlta ?? '',
+    Diagnostico: h.Diagnostico ?? '',
+    TipoContrareferencia: h.TipoContrareferencia ?? '',
+    Fecha: h.Fecha ?? '',
+  }));
+}
+
+export function procesarResumenPorServicio(resumen: any[]) {
+  return resumen.map((h: any) => ({
+    Especialidad: h.Especialidad ?? '',
+    ConsultaNueva: h.ConsultaNueva ?? '',
+    ConsultaAlta: h.ConsultaAlta ?? '',
+  }));
+}
+

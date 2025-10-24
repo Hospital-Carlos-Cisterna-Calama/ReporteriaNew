@@ -28,7 +28,7 @@ export function convertirFecha(dateLike: string, endOfDay = false): string {
 export async function generarArchivoExcel(
   datos: any[],
   res: Response,
-  nombreInforme: 'IRAS' | 'Pabellón' | 'Hospitalizado' | 'Categorizaciones' | 'Urgencia' | string = 'Registros'
+  nombreInforme: 'IRAS' | 'Pabellón' | 'Hospitalizado' | 'Categorizaciones' | 'Urgencia' | 'DATOS' | string = 'Registros'
 ) {
   const workbook = new ExcelJS.Workbook();
   const hoja = workbook.addWorksheet(nombreInforme);
@@ -51,6 +51,77 @@ export async function generarArchivoExcel(
   }
   const buffer = await workbook.xlsx.writeBuffer();
   res.setHeader('Content-Disposition', `attachment; filename="Reporte.xlsx"`);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Length', buffer.byteLength);
+  return res.send(buffer);
+}
+
+export async function generarExcelContrareferenciaConFormato(datos: any[], resumen: any[], fechaIni: string, fechaFin: string, res: Response) {
+  const workbook = new ExcelJS.Workbook();
+
+  const hojaDatos = workbook.addWorksheet('DATOS');
+  hojaDatos.addRow([]);
+  hojaDatos.mergeCells('A2:J2');
+  hojaDatos.getCell('A2').value = `Contrarreferencias Realizadas entre ${fechaIni} a ${fechaFin}`;
+  hojaDatos.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
+  hojaDatos.getCell('A2').font = { bold: true };
+  hojaDatos.mergeCells('B4:C4');
+  hojaDatos.getCell('B4').value = 'Paciente';
+  hojaDatos.getCell('B4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
+  hojaDatos.getCell('B4').font = { bold: true };
+  hojaDatos.addRow([
+    'Especialidad',
+    'Nombre',
+    'Rut',
+    'Procedencia',
+    'Medico',
+    'Fecha Citacion',
+    'Fecha Alta',
+    'Diagnostico',
+    'Tipo de Contrareferencia',
+    'Fecha',
+  ]);
+  hojaDatos.getRow(5).eachCell(cell => {
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
+    cell.font = { bold: true };
+    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+  });
+  datos.forEach(d => {
+    hojaDatos.addRow([
+      d.Especialidad ?? '',
+      d.Nombre ?? '',
+      d.Rut ?? '',
+      d.Procedencia ?? '',
+      d.Medico ?? '',
+      d.FechaCitacion ?? '',
+      d.FechaAlta ?? '',
+      d.Diagnostico ?? '',
+      d.TipoContrareferencia ?? '',
+      d.Fecha ?? '',
+    ]);
+  });
+  hojaDatos.autoFilter = {
+    from: 'A5',
+    to: 'J5',
+  };
+
+  const hojaResumen = workbook.addWorksheet('RESUMEN POR SERVICIO');
+  hojaResumen.addRow(['Especialidad', 'CONSULTA NUEVA', 'CONSULTA DE ALTA']);
+  hojaResumen.getRow(1).eachCell(cell => {
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
+    cell.font = { bold: true };
+    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+  });
+  resumen.forEach(r => {
+    hojaResumen.addRow([r.Especialidad ?? '', r.ConsultaNueva ?? '', r.ConsultaAlta ?? '']);
+  });
+  hojaResumen.autoFilter = {
+    from: 'A1',
+    to: 'C1',
+  };
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  res.setHeader('Content-Disposition', `attachment; filename="Contrarreferencias.xlsx"`);
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Length', buffer.byteLength);
   return res.send(buffer);

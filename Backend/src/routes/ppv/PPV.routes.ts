@@ -29,7 +29,5 @@ ppvRouter.get('/irGrd', validateSchema(irGrdSchema), asyncHandler(PpvReportesCon
 
 ppvRouter.get('/procedimientos', validateSchema(procedimientosSchema), asyncHandler(PpvReportesController.exportarProcedimientos));
 
-
-
 export default ppvRouter;
   
