@@ -3,12 +3,12 @@ import { Router } from 'express';
 import reporteriaRouter from './Reporteria/Reporteria.routes';
 import ppvRouter from './ppv/PPV.routes';
 import especialidadRouter from './ppv/catalogos.routes';
-import siclopeRouter from './siclope/Siclope.routes';
 import { validateToken } from '../middlewares/verifyToken';
+import siclopeRouter from './siclope/Siclope.routes';
 
 const router = Router();
 
-// router.use(validateToken); // Desactivado para pruebas sin token
+// router.use(validateToken);
 
 // ▸ /api/reporteria/*
 router.use('/urgencia', reporteriaRouter);
