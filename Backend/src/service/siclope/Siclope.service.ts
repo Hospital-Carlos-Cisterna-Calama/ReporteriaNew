@@ -2,7 +2,7 @@ import { generarArchivoExcel, convertirFecha } from '../../utils';
 import { QueryTypes } from 'sequelize';
 import { sequelizeHCE } from '../../config/initDatabase';
 import { response, Response } from 'express';
-import { servicioPdf } from '../pdf.service';
+import { servicioPdf } from '../pdf/pdf.service';
 
 export class SiclopeService {
 

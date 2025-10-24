@@ -1,6 +1,6 @@
 // src/servicios/opodf.service.ts
 import puppeteer, { PDFOptions } from 'puppeteer';
-import { PoolPaginas } from '../infra/pool-paginas';
+import { PoolPaginas } from '../../infra/pool-paginas';
 
 // Utilidades del generador HTML de nóminas
 import {
