@@ -1,125 +1,231 @@
-import puppeteer from 'puppeteer';
+// src/servicios/opodf.service.ts
+import puppeteer, { PDFOptions } from 'puppeteer';
+import { PoolPaginas } from '../infra/pool-paginas';
 
-/**
- * Servicio para generación de PDFs usando Puppeteer.
- * Contiene métodos reutilizables para generar PDFs desde HTML.
- */
-export class PdfService {
+// Utilidades del generador HTML de nóminas
+import {
+  mapDesdeNombres,
+  agruparNominas,
+  generarHTMLNominas,
+  FilaNomina,
+} from './nominas-html';
 
-  /**
-   * Genera un PDF a partir de contenido HTML.
-   * @param html - string con el HTML completo a renderizar
-   * @returns Buffer con el contenido del PDF
-   */
-  async generatePdfFromHtml(html: string): Promise<Buffer> {
-    let browser: puppeteer.Browser | null = null;
-    try {
-      browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      });
+import path from 'path';
+import { pathToFileURL } from 'url';
+import fs from 'fs';
 
-      const page = await browser.newPage();
-      // Asegurar que las reglas @media print se apliquen
-      await page.setContent(html, { waitUntil: 'networkidle0' });
-      await page.emulateMediaType('print');
-
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '16mm', bottom: '16mm', left: '12mm', right: '12mm' },
-      });
-
-      return pdfBuffer;
-    } catch (err) {
-      console.error('[PdfService] Error generating PDF:', err);
-      throw err;
-    } finally {
-      if (browser) {
-        try { await browser.close(); } catch (e) { /* ignore */ }
-      }
-    }
-  }
-
-  /**
-   * Genera un PDF de ejemplo (plantilla simple) y devuelve el Buffer.
-   * Puedes usar este método para probar la integración rápidamente.
-   */
-  async generateSamplePdf(): Promise<Buffer> {
-    const sampleHtml = `
-      <!doctype html>
-      <html>
-      <head>
-        <meta charset="utf-8" />
-        <title>Reporte de ejemplo</title>
-        <style>
-          body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222 }
-          header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px }
-          .logo { width: 72px; height: 72px; background: #004a9f; color: #fff; display:flex; align-items:center; justify-content:center; font-weight:700 }
-          h1 { font-size: 16px; margin: 0 }
-          .meta { font-size: 11px; color: #444 }
-          table { width: 100%; border-collapse: collapse; margin-top: 12px }
-          th, td { border: 1px solid #ddd; padding: 6px; text-align: left }
-          th { background: #f3f3f3 }
-          footer { position: fixed; bottom: 8mm; left: 12mm; right: 12mm; font-size: 10px; color: #666 }
-          @media print {
-            footer { position: fixed }
-          }
-        </style>
-      </head>
-      <body>
-        <header>
-          <div class="logo">MIN</div>
-          <div>
-            <h1>NÓMINAS POR FECHA Y PROFESIONAL (Ejemplo)</h1>
-            <div class="meta">Periodo: 01/09/2025 - 23/10/2025 &nbsp; | &nbsp; Hospital Dr. Carlos Cisterna Calama</div>
-          </div>
-        </header>
-
-        <section>
-          <table>
-            <thead>
-              <tr>
-                <th>Hora</th>
-                <th>Paciente</th>
-                <th>Rut</th>
-                <th>Ficha</th>
-                <th>Diagnóstico</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>11:20</td>
-                <td>GUADARSAMIENTO MARIA</td>
-                <td>08171262-K</td>
-                <td>279.321</td>
-                <td>POLI DIABETES</td>
-              </tr>
-              <tr>
-                <td>11:40</td>
-                <td>MANQUEZ FUENTES FREDY RICA</td>
-                <td>16566341-1</td>
-                <td>100.632</td>
-                <td>POLI DIABETES</td>
-              </tr>
-              <tr>
-                <td>12:00</td>
-                <td>LAGOS HERNANDEZ ESTER</td>
-                <td>13313761-0</td>
-                <td>86.630</td>
-                <td>POLI DIABETES</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <footer>Generado por Reportería - Ejemplo (no oficial)</footer>
-      </body>
-      </html>
-    `;
-
-    return this.generatePdfFromHtml(sampleHtml);
+export class ErrorServicioPdf extends Error {
+  constructor(mensaje: string, public causa?: unknown) {
+    super(mensaje);
+    this.name = 'ErrorServicioPdf';
   }
 }
 
-export const pdfService = new PdfService();
+export interface OpcionesConstruccionPdf {
+  html?: string;
+  url?: string;
+  opcionesPdf?: PDFOptions;
+  emularMedio?: 'print' | 'screen';
+  esperarHasta?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
+  tiempoEsperaMs?: number;
+  baseURL?: string; // Debe terminar con '/'
+  cabecerasHttpExtra?: Record<string, string>;
+  abortarMedios?: boolean;
+  logsDetallados?: boolean;
+}
 
+// Pool global (ajusta según recursos)
+const pool = new PoolPaginas({ maxPaginas: 6, reciclarCada: 80 });
+
+/** Inserta <base href="..."> en el HTML si no existe. */
+function inyectarBaseEnHtml(html: string, baseHref: string): string {
+  if (!baseHref) return html;
+  if (/<base\s+href=/i.test(html)) return html;
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head[^>]*>/i, (m) => `${m}\n<base href="${baseHref}">`);
+  }
+  if (/<!doctype/i.test(html)) {
+    return html.replace(/<html[^>]*>/i, (m) => `${m}\n<head><base href="${baseHref}"></head>`);
+  }
+  return `<head><base href="${baseHref}"></head>${html}`;
+}
+
+/** Devuelve un data URL (base64) de un archivo local. */
+function archivoADataUrl(ruta: string): string | null {
+  try {
+    const bin = fs.readFileSync(ruta);
+    const ext = path.extname(ruta).toLowerCase();
+    const mime =
+      ext === '.png' ? 'image/png' :
+      ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' :
+      ext === '.gif' ? 'image/gif' :
+      'application/octet-stream';
+    return `data:${mime};base64,${bin.toString('base64')}`;
+  } catch {
+    return null;
+  }
+}
+
+/** Reemplaza las rutas de imágenes conocidas por data URLs dentro del HTML. */
+function incrustarImagenes(html: string, publicDir: string, logs = false): string {
+  // Rutas "lógicas" que usa tu HTML
+  const minsalRel = 'images/Logo_del_MINSAL_Chile.png';
+  const hccRel    = 'images/hcc.jpg';
+
+  const minsalAbs = path.join(publicDir, minsalRel);
+  const hccAbs    = path.join(publicDir, hccRel);
+
+  const minsalData = archivoADataUrl(minsalAbs);
+  const hccData    = archivoADataUrl(hccAbs);
+
+  if (logs) {
+    console.log('[PDF] Embed MINSAL from:', minsalAbs, Boolean(minsalData));
+    console.log('[PDF] Embed HCC    from:', hccAbs, Boolean(hccData));
+  }
+
+  let out = html;
+
+  if (minsalData) {
+    // Reemplaza cualquier variante de comillas
+    out = out.replace(/src=["']images\/Logo_del_MINSAL_Chile\.png["']/gi, `src="${minsalData}"`);
+  }
+  if (hccData) {
+    out = out.replace(/src=["']images\/hcc\.jpg["']/gi, `src="${hccData}"`);
+  }
+
+  return out;
+}
+
+export class ServicioPdf {
+  /** Core: Genera un PDF desde HTML o URL reusando páginas del pool */
+  async generar(opciones: OpcionesConstruccionPdf): Promise<Buffer> {
+    if (!opciones.html && !opciones.url) {
+      throw new ErrorServicioPdf('Debes proveer "html" o "url".');
+    }
+
+    const pagina = await pool.prestarPagina();
+    try {
+      if (opciones.cabecerasHttpExtra) {
+        await pagina.setExtraHTTPHeaders(opciones.cabecerasHttpExtra);
+      }
+
+      if (opciones.abortarMedios) {
+        await pagina.setRequestInterception(true);
+        pagina.on('request', (req) => {
+          const tipo = req.resourceType();
+          if (tipo === 'image' || tipo === 'media' || tipo === 'font') return req.abort();
+          req.continue();
+        });
+      }
+
+      const esperarHasta = opciones.esperarHasta ?? 'networkidle0';
+      const tiempoEsperaMs = opciones.tiempoEsperaMs ?? 30_000;
+
+      if (opciones.html) {
+        // Inyecta <base> ANTES de setContent
+        const htmlConBase = opciones.baseURL
+          ? inyectarBaseEnHtml(opciones.html, opciones.baseURL)
+          : opciones.html;
+
+        await pagina.setContent(htmlConBase, { waitUntil: esperarHasta, timeout: tiempoEsperaMs });
+
+        // Esperar que todas las imágenes estén completas
+        try {
+          await pagina.waitForFunction(
+            () => Array.from(document.images).every((img) => img.complete),
+            { timeout: 8000 }
+          );
+        } catch { /* noop */ }
+
+        if (opciones.logsDetallados) {
+          const rutas = await pagina.evaluate(() =>
+            Array.from(document.images).map((img) => ({ src: img.src, complete: img.complete }))
+          );
+          console.log('[PDF imágenes]', rutas);
+        }
+      } else if (opciones.url) {
+        await pagina.goto(opciones.url, { waitUntil: esperarHasta, timeout: tiempoEsperaMs });
+        try {
+          await pagina.waitForFunction(
+            () => Array.from(document.images).every((img) => img.complete),
+            { timeout: 8000 }
+          );
+        } catch { /* noop */ }
+      }
+
+      await pagina.emulateMediaType(opciones.emularMedio ?? 'print');
+
+      const opcionesPdf: PDFOptions = {
+        format: 'A4',
+        landscape: true,           // horizontal por defecto
+        printBackground: true,
+        preferCSSPageSize: true,   // respeta @page del CSS
+        margin: { top: '12mm', bottom: '10mm', left: '10mm', right: '10mm' },
+        ...(opciones.opcionesPdf ?? {}),
+      };
+
+      const bytes = await pagina.pdf(opcionesPdf);
+      const buffer: Buffer = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
+      return buffer;
+    } catch (err) {
+      throw new ErrorServicioPdf('Error generando el PDF', err);
+    } finally {
+      if (pagina.listenerCount('request') > 0) {
+        pagina.removeAllListeners('request');
+        try { await pagina.setRequestInterception(false); } catch {}
+      }
+      await pool.devolverPagina(pagina);
+    }
+  }
+
+  /** Atajo: HTML directo */
+  async generarDesdeHtml(html: string, opciones?: Omit<OpcionesConstruccionPdf, 'html' | 'url'>): Promise<Buffer> {
+    return this.generar({ html, ...(opciones ?? {}) });
+  }
+
+  /** Atajo: URL */
+  async generarDesdeUrl(url: string, opciones?: Omit<OpcionesConstruccionPdf, 'html' | 'url'>): Promise<Buffer> {
+    return this.generar({ url, ...(opciones ?? {}) });
+  }
+
+  /** Genera PDF de NÓMINAS usando el HTML a medida (nominas-html.ts) */
+  async generarNominasDesdeResultados(
+    resultados: any[],
+    meta: {
+      periodo: { desde: string; hasta: string };
+      hospital: string;
+      fechaImpresion?: string;
+      horaImpresion?: string;
+    },
+    opcionesPdf?: PDFOptions
+  ): Promise<Buffer> {
+    const filas: FilaNomina[] = (resultados ?? []).map(mapDesdeNombres);
+    const grupos = agruparNominas(filas, meta);
+    let html = generarHTMLNominas(grupos);
+
+    // ✅ Base URL DEBE apuntar a /public
+    const publicDir = path.resolve(process.cwd(), 'public');
+    const baseURL = pathToFileURL(publicDir + path.sep).href;
+    console.log('Base URL for PDF generation:', baseURL);
+
+    // ✅ Embebe las imágenes como data URL (a prueba de file://)
+    html = incrustarImagenes(html, publicDir, /*logs*/ false);
+
+    return this.generarDesdeHtml(html, {
+      emularMedio: 'print',
+      baseURL,                 // lo mantenemos por si hay otros recursos relativos
+      logsDetallados: false,   // pon true si quieres ver el listado de <img>
+      opcionesPdf: {
+        format: 'Legal',
+        landscape: true,
+        printBackground: true,
+        preferCSSPageSize: true,
+        scale: 0.92,
+        margin: { top: '8mm', bottom: '8mm', left: '8mm', right: '8mm' },
+        ...(opcionesPdf ?? {}),
+      },
+    });
+  }
+}
+
+export const servicioPdf = new ServicioPdf();
