@@ -145,3 +145,20 @@ export function procesarResumenPorServicio(resumen: any[]) {
   }));
 }
 
+export function procesarDiagnosticosRealizados(diagnosticos: any[]) {
+  return diagnosticos.map((h: any) => ({
+    Medico_Rut: h.Medico_Rut ?? '',
+    Medico_Nombre: h.Medico_Nombre ?? '',
+    Policlínico: h.Policlinico ?? '',
+    Fecha_Citacion: h.Fecha_Citacion ?? '',
+    Paciente_Rut: h.Paciente_Rut ?? '',
+    Paciente_Nombre: h.Paciente_Nombre ?? '',
+    Edad: h.Edad ?? '',
+    Sexo: h.Sexo ?? '',
+    Nacionalidad: h.Nacionalidad ?? '',
+    Comuna: h.Comuna ?? '',
+    Direccion: h.Direccion ?? '',
+    Diagnostico: h.Diagnostico ?? '',
+    Atencion_Presencial: h.Atencion_Presencial ?? '',
+  }));
+}

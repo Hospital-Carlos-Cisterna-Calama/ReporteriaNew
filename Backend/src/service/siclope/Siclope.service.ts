@@ -1,7 +1,7 @@
 import { generarArchivoExcel, convertirFecha, aFechaSqlServer } from '../../utils';
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '../../config/initDatabase';
-import { generarExcelContrareferenciaConFormato, procesarContrareferencia, procesarResumenPorServicio } from '../../utils';
+import { generarExcelContrareferenciaConFormato, procesarContrareferencia, procesarResumenPorServicio, generarExcelDiagnosticosRealizados, procesarDiagnosticosRealizados} from '../../utils';
 import { sequelizeHCE } from '../../config/initDatabase';
 import { response, Response } from 'express';
 import { servicioPdf } from '../pdf/pdf.service';
@@ -62,5 +62,26 @@ export class SiclopeService {
     }
   }
 
-  async ObtenerDiagnosticosRealizados(fechaIni: string, fechaTermino: string, especialidad: string, res: Response) {}
+  async ObtenerDiagnosticosRealizados(fechaIni: string, fechaTermino: string, especialidad: string, res: Response) {
+    try {
+      const fechaInicioSql = aFechaSqlServer(fechaIni, false).replace(' ', 'T');
+      const fechaFinSql = aFechaSqlServer(fechaTermino, true).replace(' ', 'T');
+      const padreServicio = especialidad && especialidad !== '' ? especialidad : '%';
+      const sql = `
+      exec BD_HCE..getDataForReporteDiagnostico 
+      @fechaInicio='${fechaInicioSql}', 
+      @fechaTermino='${fechaFinSql}', 
+      @padreServicio=N'${padreServicio}'
+    `;
+      const result = await sequelize.query(sql, { type: QueryTypes.SELECT });
+      if (!result || (Array.isArray(result) && result.length === 0)) {
+        return res.status(204).end();
+      }
+      const datos = procesarDiagnosticosRealizados(result);
+      return await generarExcelDiagnosticosRealizados(datos, fechaIni, fechaTermino, res);
+    } catch (error: any) {
+      console.error('[ObtenerDiagnosticosRealizados] Error:', error?.parent ?? error);
+      return res.status(500).json({ mensaje: 'No se pudo obtener el reporte', detalle: error.message });
+    }
+  }
 }
