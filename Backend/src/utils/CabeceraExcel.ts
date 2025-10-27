@@ -154,18 +154,17 @@ export function procesarResumenPorServicio(resumen: any[]) {
 
 export function procesarDiagnosticosRealizados(diagnosticos: any[]) {
   return diagnosticos.map((h: any) => ({
-    Medico_Rut: h.Medico_Rut ?? '',
-    Medico_Nombre: h.Medico_Nombre ?? '',
-    Policlínico: h.Policlinico ?? '',
-    Fecha_Citacion: h.Fecha_Citacion ?? '',
-    Paciente_Rut: h.Paciente_Rut ?? '',
-    Paciente_Nombre: h.Paciente_Nombre ?? '',
-    Edad: h.Edad ?? '',
-    Sexo: h.Sexo ?? '',
-    Nacionalidad: h.Nacionalidad ?? '',
-    Comuna: h.Comuna ?? '',
-    Direccion: h.Direccion ?? '',
-    Diagnostico: h.Diagnostico ?? '',
-    Atencion_Presencial: h.Atencion_Presencial ?? '',
+    Rut_Medico: h['Rut Médico'] ?? h.Rut_Medico ?? h.Medico_Rut ?? '',
+    Nombre_Medico: h['Nombre Médico'] ?? h.Nombre_Medico ?? h.Medico_Nombre ?? '',
+    Policlínico: h.Policlinico ?? h['Policlinico'] ?? '',
+    Fecha_Citacion: h['Fecha Citación'] ?? h.Fecha_Citacion ?? '',
+    Rut_Paciente: h['Rut Paciente'] ?? h.Paciente_Rut ?? '',
+    Nombre_Paciente: h['Nombre Paciente'] ?? h.Paciente_Nombre ?? '',
+    Edad_Paciente: h['Edad Paciente'] ?? h.Edad ?? '',
+    Sexo_Paciente: h['Sexo Paciente'] ?? h.Sexo ?? '',
+    Nacionalidad_Paciente: h['Nacionalidad Paciente'] ?? h.Nacionalidad ?? '',
+    Comuna_Paciente: h['Comuna Paciente'] ?? h.Comuna ?? '',
+    Diagnostico: h['Diagnostico'] ?? h.Diagnostico ?? '',
+    Atencion_Presencial: h['Atención Presencial'] ?? h.Atencion_Presencial ?? '',
   }));
 }

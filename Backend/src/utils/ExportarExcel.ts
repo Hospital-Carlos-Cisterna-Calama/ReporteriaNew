@@ -76,18 +76,7 @@ export async function generarExcelContrareferenciaConFormato(
   hojaDatos.getCell('B4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
   hojaDatos.getCell('B4').font = { bold: true, color: { argb: 'FFFFFFFF' } };
   hojaDatos.addRow(['Especialidad', 'Nombre', 'Rut', 'Procedencia', 'Medico', 'Fecha Citacion', 'Fecha Alta', 'Diagnostico', 'Tipo de Contrareferencia']);
-  // Aumentar ancho de columnas
-  hojaDatos.columns = [
-    { width: 30 }, // Especialidad
-    { width: 25 }, // Nombre
-    { width: 18 }, // Rut
-    { width: 25 }, // Procedencia
-    { width: 25 }, // Medico
-    { width: 18 }, // Fecha Citacion
-    { width: 18 }, // Fecha Alta
-    { width: 30 }, // Diagnostico
-    { width: 22 }, // Tipo de Contrareferencia
-  ];
+  hojaDatos.columns = [{ width: 30 }, { width: 25 }, { width: 18 }, { width: 25 }, { width: 25 }, { width: 18 }, { width: 18 }, { width: 30 }, { width: 22 }];
   hojaDatos.getRow(5).eachCell(cell => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -196,52 +185,70 @@ export async function generarExcelDiagnosticosRealizados(datos: any[], fechaIni:
   const hoja = workbook.addWorksheet('Diagnósticos Realizados');
 
   hoja.addRow([]);
-  hoja.mergeCells('A2:M2');
+  hoja.mergeCells('A2:L2');
   hoja.getCell('A2').value = `Diagnósticos Realizados entre ${fechaIni} a ${fechaFin}`;
-  hoja.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
-  hoja.getCell('A2').font = { bold: true };
+  hoja.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
+  hoja.getCell('A2').font = { bold: true, color: { argb: 'FFFFFFFF' } };
 
   hoja.addRow([
-    'Médico Rut',
-    'Nombre',
+    'Rut Médico',
+    'Nombre Médico',
     'Policlínico',
     'Fecha Citación',
-    'Paciente Rut',
-    'Paciente Nombre',
-    'Edad',
-    'Sexo',
-    'Nacionalidad',
-    'Comuna',
-    'Dirección',
+    'Rut Paciente',
+    'Nombre Paciente',
+    'Edad Paciente',
+    'Sexo Paciente',
+    'Nacionalidad Paciente',
+    'Comuna Paciente',
     'Diagnóstico',
     'Atención Presencial',
   ]);
+  hoja.columns = [
+    { width: 18 }, // Rut Médico
+    { width: 25 }, // Nombre Médico
+    { width: 22 }, // Policlínico
+    { width: 18 }, // Fecha Citación
+    { width: 18 }, // Rut Paciente
+    { width: 25 }, // Nombre Paciente
+    { width: 10 }, // Edad Paciente
+    { width: 10 }, // Sexo Paciente
+    { width: 18 }, // Nacionalidad Paciente
+    { width: 18 }, // Comuna Paciente
+    { width: 30 }, // Diagnóstico
+    { width: 18 }, // Atención Presencial
+  ];
   hoja.getRow(3).eachCell(cell => {
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
-    cell.font = { bold: true };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF59ACA5' } };
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
   });
 
+  // Agregar filas con bordes
+  let rowDatosIdx = 4;
   datos.forEach(d => {
     hoja.addRow([
-      d.Medico_Rut,
-      d.Medico_Nombre,
-      d.Policlínico,
-      d.Fecha_Citacion,
-      d.Paciente_Rut,
-      d.Paciente_Nombre,
-      d.Edad,
-      d.Sexo,
-      d.Nacionalidad,
-      d.Comuna,
-      d.Direccion,
-      d.Diagnostico,
-      d.Atencion_Presencial,
+      d.Rut_Medico || '',
+      d.Nombre_Medico || '',
+      d.Policlínico || '',
+      d.Fecha_Citacion || '',
+      d.Rut_Paciente || '',
+      d.Nombre_Paciente || '',
+      d.Edad_Paciente || '',
+      d.Sexo_Paciente || '',
+      d.Nacionalidad_Paciente || '',
+      d.Comuna_Paciente || '',
+      d.Diagnostico || '',
+      d.Atencion_Presencial || '',
     ]);
+    hoja.getRow(rowDatosIdx).eachCell(cell => {
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    });
+    rowDatosIdx++;
   });
   hoja.autoFilter = {
     from: 'A3',
-    to: 'M3',
+    to: 'L3',
   };
   const buffer = await workbook.xlsx.writeBuffer();
   res.setHeader('Content-Disposition', `attachment; filename="DiagnosticosRealizados.xlsx"`);

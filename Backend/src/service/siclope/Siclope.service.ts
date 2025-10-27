@@ -71,8 +71,8 @@ export class SiclopeService {
 
   async ObtenerDiagnosticosRealizados(fechaIni: string, fechaTermino: string, especialidad: string, res: Response) {
     try {
-      const fechaInicioSql = aFechaSqlServer(fechaIni, false).replace(' ', 'T');
-      const fechaFinSql = aFechaSqlServer(fechaTermino, true).replace(' ', 'T');
+      const fechaInicioSql = fechaIni;
+      const fechaFinSql = fechaTermino;
       const padreServicio = especialidad && especialidad !== '' ? especialidad : '%';
       const sql = `
       exec BD_HCE..getDataForReporteDiagnostico 
