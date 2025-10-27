@@ -3,7 +3,7 @@ export interface FiltrosSiclopeReporte {
   fechaFin?: Date | null;
   mes?: number;
   anio?: number;
-  especialidadCode?: string | null;
+  especialidadCode?: string;
   rut?: string | null
 }
 

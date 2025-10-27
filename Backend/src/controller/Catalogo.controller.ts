@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
-import { CatalogoService  } from '../service/ppv/Catalogo.service';
+import { CatalogoService  } from '../service/Catalogo.service';
 import type { 
   EspecialidadResponse, 
   PpvServicioResponse, 
@@ -97,5 +97,21 @@ export const obtenerPpvServicios = asyncHandler(async (req: Request, res: Respon
   } catch (error) {
     console.error('Error al obtener servicios:', error);
     throw new AppError('Error interno del servidor al obtener servicios', 500);
+  }
+});
+
+
+export const obtenerEspecialidadAmbulatoria = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const especialidades = await catalogoService.obtenerEspecialidadAmbulatoria();
+    res.status(200).json({
+      success: true,
+      message: 'Especialidades ambulatorias obtenidas exitosamente',
+      count: especialidades.length,
+      data: especialidades,
+    });
+  } catch (error) {
+    console.error('Error al obtener especialidades ambulatorias:', error);
+    throw new AppError('Error interno del servidor al obtener especialidades ambulatorias', 500);
   }
 });

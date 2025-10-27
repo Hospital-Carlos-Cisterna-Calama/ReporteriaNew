@@ -7,6 +7,11 @@ export interface Especialidad {
   codigo: string;
 }
 
+export interface EspecialidadAmbulatoria {
+  SER_ESP_Codigo: string;
+  SER_ESP_Descripcio: string;
+}
+
 /**
  * Interface para Sub Especialidad (Equipamiento Médico)
  */

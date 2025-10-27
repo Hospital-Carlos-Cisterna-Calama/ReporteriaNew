@@ -8,14 +8,14 @@ import {
 } from '@shared/components/ui';
 import type { RangoFechas, SeleccionMes } from '@shared/components/ui';
 
-export interface EspecialidadOption { id: number | string; nombre: string; }
+export interface EspecialidadOption { codigo: string | string; nombre: string; }
 
 export interface FiltrosSiclopeReporte {
   fechaInicio?: Date;
   fechaFin?: Date;
   mes?: number;
   anio?: number;
-  idEspecialidad?: number | string;
+  especialidadCode?: string ;
 }
 
 @Component({
@@ -44,11 +44,11 @@ export class FiltrosSiclopeReporteComponent {
   mes: number | null = null;
   anio: number | null = null;
 
-  idEspecialidadSeleccionada: number | string | null = null;
+  idEspecialidadSeleccionada:  string | null = null;
 
   // Mapea a las opciones que espera el SelectorBuscador
   readonly especialidadesOpciones = computed<OpcionSelector[]>(() =>
-    (this.especialidades() ?? []).map(esp => ({ id: esp.id, nombre: esp.nombre }))
+    (this.especialidades() ?? []).map(esp => ({ id: String(esp.codigo), nombre: esp.nombre }))
   );
 
   alCambiarFecha(rango: RangoFechas): void {
@@ -63,7 +63,7 @@ export class FiltrosSiclopeReporteComponent {
 
   // Evento del SelectorBuscador
   alCambiarEspecialidad(valor: string | number | null): void {
-    this.idEspecialidadSeleccionada = (valor ?? null);
+    this.idEspecialidadSeleccionada = valor != null ? String(valor) : null;
   }
 
   alDescargar(): void {
@@ -78,7 +78,7 @@ export class FiltrosSiclopeReporteComponent {
     }
 
     if (this.mostrarSelectorEspecialidad() && this.idEspecialidadSeleccionada != null) {
-      filtros.idEspecialidad = this.idEspecialidadSeleccionada;
+      filtros.especialidadCode = this.idEspecialidadSeleccionada;
     }
 
     this.descargar.emit(filtros);

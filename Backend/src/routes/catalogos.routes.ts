@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { 
+  obtenerEspecialidadAmbulatoria,
   obtenerEspecialidades, 
   obtenerPpvServicios, 
   obtenerSubEspecialidades
-} from '../../controller/Catalogo.controller';
-import { validateParamSchema } from '../../middlewares/validation';
-import { subEspecialidadesSchema } from '../../schemas/Reportes/validation-schemas';
+} from '../controller/Catalogo.controller';
+import { validateParamSchema } from '../middlewares/validation';
+import { subEspecialidadesSchema } from '../schemas/Reportes/validation-schemas';
 
 const catalogosRouter = Router();
 
@@ -25,5 +26,7 @@ catalogosRouter.get('/especialidades/:especialidadId/sub-especialidades', valida
 
 
 catalogosRouter.get('/servicios', obtenerPpvServicios);
+
+catalogosRouter.get('/especialidades-ambulatorias', obtenerEspecialidadAmbulatoria);
 
 export default catalogosRouter;

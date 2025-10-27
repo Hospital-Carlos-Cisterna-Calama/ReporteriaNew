@@ -1,11 +1,13 @@
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../../config/initDatabase';
+import { sequelize } from '../config/initDatabase';
+import { obtenerEspecialidadAmbulatoria } from '../controller/Catalogo.controller';
 import type { 
   Especialidad, 
   SubEspecialidad, 
   EstadisticasEspecialidades, 
-  PpvServicio
-} from '../../interfaces/Catalogos.interface';
+  PpvServicio,
+  EspecialidadAmbulatoria
+} from '../interfaces/Catalogos.interface';
 
 /**
  * Servicio para el manejo de especialidades y sub-especialidades
@@ -189,5 +191,21 @@ export class CatalogoService {
       totalSubEspecialidades: subEspecialidades.length,
       especialidadesConSubEspecialidades: especialidadesConSub,
     };
+  }
+
+
+  async obtenerEspecialidadAmbulatoria(): Promise<EspecialidadAmbulatoria[]> {
+    // Usar el procedimiento almacenado para obtener los servicios ambulatorios
+    const query = `exec BD_ENTI_CORPORATIVA..CITA_ListaServiciosAmbulatorios`;
+
+    const result = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
+    }) as any[];
+
+    // El procedimiento retorna exactamente SER_ESP_Codigo y SER_ESP_Descripcio
+    return result.map(row => ({
+      SER_ESP_Codigo: row.SER_ESP_Codigo,
+      SER_ESP_Descripcio: row.SER_ESP_Descripcio
+    }));
   }
 }

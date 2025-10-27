@@ -10,7 +10,7 @@ import { FiltrosSiclopeReporteComponent } from '../../components';
 import type { FiltrosSiclopeReporte } from '../../interfaces/filtro.interface';
 
 // 👇 usa el mismo servicio que en PPV (ajusta el path si es otro)
-import { CatalogosService } from '@app/ppv/services/catalogos.service';
+import { CatalogosService } from '@app/shared/services/catalogos.service';
 import { SiclopeService } from '@app/siclope/services/siclope.service';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -106,7 +106,7 @@ export class SiclopePageComponent implements OnInit {
 
   private cargarEspecialidades(): void {
     this.cargandoEspecialidades.set(true);
-    this.catalogosService.listarEspecialidades().subscribe({
+    this.catalogosService.obtenerEspecialidadAmbulatoria().subscribe({
       next: (especialidades) => {
         // adapta al tipo local si tu servicio trae otro shape
         this.especialidades.set(
@@ -150,7 +150,8 @@ export class SiclopePageComponent implements OnInit {
 
     const generadores: Record<string, () => void> = {
       'Nomina': () => this.generarReporteNomina(filtros),
-      'Contra Referencia': () => this.generarReporteContraReferencia(filtros)
+      'Contra Referencia': () => this.generarReporteContraReferencia(filtros),
+      'Diagnóstico': () => this.generarReporteDiagnostico(filtros)
     }
 
     const generador = generadores[reporte];
@@ -202,6 +203,26 @@ export class SiclopePageComponent implements OnInit {
       'Reporte de Contra Referencia generada con exito'
     )
 
+  }
+
+  generarReporteDiagnostico(filtros: FiltrosSiclopeReporte): void {
+    if(!this.validarFechas(filtros)) return;
+    console.log(filtros)
+    if(!filtros.especialidadCode) {
+      this.mostrarError('Debe seleccionar una especialidad para generar el reporte de Diagnóstico.');
+      return;
+    }
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+      especialidadCode: filtros.especialidadCode || ''
+    }
+
+    this.ejecutarDescarga(
+      this.siclopeService.generarReporteDiagnosticoSiclope(query),
+      `Diagnosticos_${query.especialidadCode}-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de Diagnóstico generada con exito'
+    )
   }
 
 

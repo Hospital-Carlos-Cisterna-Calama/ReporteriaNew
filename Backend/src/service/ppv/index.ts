@@ -1,1 +1,1 @@
-export { CatalogoService } from './Catalogo.service';
+export { CatalogoService } from '../Catalogo.service';

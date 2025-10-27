@@ -1,3 +1,4 @@
+
 /**
  * Interface para Especialidad
  */
@@ -52,4 +53,21 @@ export interface EspecialidadesCompletasResponse {
       subEspecialidades: number;
     };
   };
+}
+
+export interface EspecialidadAmbulatoriaResponse {
+  success: boolean;
+  message: string;
+  count: number;
+  data: [
+    {
+      SER_ESP_Codigo: string;
+      SER_ESP_Descripcio: string;
+    }
+  ];
+}
+
+export interface EspecialidadAmbulatoria {
+  codigo: string;
+  nombre: string;
 }

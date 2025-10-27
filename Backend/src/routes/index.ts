@@ -2,9 +2,9 @@ import { Router } from 'express';
 
 import reporteriaRouter from './reporteria/Reporteria.routes';
 import ppvRouter from './ppv/PPV.routes';
-import especialidadRouter from './ppv/catalogos.routes';
 import { validateToken } from '../middlewares/verifyToken';
-import siclopeRouter from './siclope/Siclope.routes';
+import catalogosRouter from './catalogos.routes';
+import siclopeRouter from './Siclope/siclope.routes';
 
 const router = Router();
 
@@ -13,7 +13,7 @@ const router = Router();
 // ▸ /api/reporteria/*
 router.use('/urgencia', reporteriaRouter);
 router.use('/ppv', ppvRouter);
-router.use('/catalogos', especialidadRouter);
+router.use('/catalogos', catalogosRouter);
 router.use('/siclope', siclopeRouter);
 
 export default router;
