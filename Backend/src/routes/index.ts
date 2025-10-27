@@ -4,7 +4,7 @@ import reporteriaRouter from './Reporteria/Reporteria.routes';
 import ppvRouter from './ppv/PPV.routes';
 import { validateToken } from '../middlewares/verifyToken';
 import catalogosRouter from './catalogos.routes';
-import siclopeRouter from './Siclope/Siclope.routes';
+import siclopeRouter from './Siclope/siclope.routes';
 
 const router = Router();
 
