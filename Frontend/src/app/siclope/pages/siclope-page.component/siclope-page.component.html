@@ -52,3 +52,11 @@
     </div>
   </main>
 </div>
+
+
+<!-- Modal de Resultado -->
+<app-modal-resultado
+  [visible]="mostrarModal()"
+  [config]="configuracionModal()"
+  (cerrar)="mostrarModal.set(false)"
+/>

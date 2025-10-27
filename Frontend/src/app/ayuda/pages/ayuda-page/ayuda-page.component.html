@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-teal-50">
+<div class="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-teal-50">
 
 
   <!-- Contenido Principal -->
@@ -15,7 +15,7 @@
         @for (paso of pasosGuia; track paso.numero) {
           <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div class="flex items-center justify-between mb-4">
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+              <div class="w-12 h-12 rounded-xl bg-linear-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
                 {{ paso.numero }}
               </div>
               <div class="text-4xl">{{ paso.icono }}</div>
@@ -37,7 +37,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         @for (modulo of modulos; track modulo.nombre) {
           <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
-            <div class="h-32 bg-gradient-to-br {{ modulo.color }} flex items-center justify-center">
+            <div class="h-32 bg-linear-to-br {{ modulo.color }} flex items-center justify-center">
               <div class="text-7xl">{{ modulo.icono }}</div>
             </div>
             <div class="p-6">

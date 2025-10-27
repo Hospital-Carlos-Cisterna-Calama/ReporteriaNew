@@ -19,9 +19,9 @@ const PORT = Number(process.env.PORT) || 3001;
       console.log(`⚡ Modo: ${process.env.NODE_ENV || 'Desarrollo'}`);
     });
 
-    server.timeout = 300000; 
-    server.keepAliveTimeout = 310000; 
-    server.headersTimeout = 320000; 
+    server.timeout = 600000; 
+    server.keepAliveTimeout = 610000; 
+    server.headersTimeout = 620000; 
 
     console.log(`⏱️  Timeout del servidor: ${server.timeout}ms (${server.timeout / 1000}s)`);
   } catch (error) {
