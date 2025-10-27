@@ -150,7 +150,8 @@ export class SiclopePageComponent implements OnInit {
 
     const generadores: Record<string, () => void> = {
       'Nomina': () => this.generarReporteNomina(filtros),
-      'Contra Referencia': () => this.generarReporteContraReferencia(filtros)
+      'Contra Referencia': () => this.generarReporteContraReferencia(filtros),
+      'Diagnóstico': () => this.generarReporteDiagnostico(filtros)
     }
 
     const generador = generadores[reporte];
@@ -202,6 +203,26 @@ export class SiclopePageComponent implements OnInit {
       'Reporte de Contra Referencia generada con exito'
     )
 
+  }
+
+  generarReporteDiagnostico(filtros: FiltrosSiclopeReporte): void {
+    if(!this.validarFechas(filtros)) return;
+    console.log(filtros)
+    if(!filtros.especialidadCode) {
+      this.mostrarError('Debe seleccionar una especialidad para generar el reporte de Diagnóstico.');
+      return;
+    }
+    const query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+      especialidadCode: filtros.especialidadCode || ''
+    }
+
+    this.ejecutarDescarga(
+      this.siclopeService.generarReporteDiagnosticoSiclope(query),
+      `Diagnosticos_${query.especialidadCode}-${query.fechaInicio}-${query.fechaFin}.xlsx`,
+      'Reporte de Diagnóstico generada con exito'
+    )
   }
 
 

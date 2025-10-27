@@ -60,9 +60,14 @@ export class SiclopeService {
     )
   }
 
-  // generarReporteDiagnosticoSiclope(query: ReporteDiagnosticoSiclopeQuery): Observable<Blob> {
-
-  // }
+   generarReporteDiagnosticoSiclope(query: ReporteDiagnosticoSiclopeQuery): Observable<Blob> {
+    const params = this.construirHttpParams(query);
+    return this.http.get(`${this.API_SICLOPE}/exportar-diagnosticos-realizados`, { params, responseType: 'blob' })
+    .pipe(
+      tap(() => this.log('Reporte Siclope Diagnóstico (archivo) generado', query, '📄')),
+      catchError((err) => this.handleError(err, 'No se pudo generar el reporte de Siclope diagnóstico'))
+    );
+  }
 
 
   descargarPDF(query: ReporteNominaSiclopeQuery): Observable<void> {
