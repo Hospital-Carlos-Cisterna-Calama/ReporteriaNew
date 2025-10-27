@@ -1,7 +1,13 @@
 import { generarArchivoExcel, convertirFecha, aFechaSqlServer } from '../../utils';
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '../../config/initDatabase';
-import { generarExcelContrareferenciaConFormato, procesarContrareferencia, procesarResumenPorServicio, generarExcelDiagnosticosRealizados, procesarDiagnosticosRealizados} from '../../utils';
+import {
+  generarExcelContrareferenciaConFormato,
+  procesarContrareferencia,
+  procesarResumenPorServicio,
+  generarExcelDiagnosticosRealizados,
+  procesarDiagnosticosRealizados,
+} from '../../utils';
 import { sequelizeHCE } from '../../config/initDatabase';
 import { response, Response } from 'express';
 import { servicioPdf } from '../pdf/pdf.service';
@@ -50,14 +56,15 @@ export class SiclopeService {
       const fechaInicioSql = aFechaSqlServer(fechaIni, false);
       const fechaFinSql = aFechaSqlServer(fechaTermino, true);
       const sql = `exec BD_HCE..PRO_HCE_ContraReferenciasSolicitadasV2 @FechaInicio=N'${fechaInicioSql}',@FechaTermino=N'${fechaFinSql}'`;
-      const result = await sequelize.query(sql);
-      const resultadosDetalle = Array.isArray(result[0][0]) ? result[0][0] : result[0];
-      const resultadosResumen = Array.isArray(result[0][1]) ? result[0][1] : [];
-      const datos = procesarContrareferencia(resultadosDetalle);
-      const resumen = procesarResumenPorServicio(resultadosResumen);
-      return await generarExcelContrareferenciaConFormato(datos, resumen, fechaInicioSql, fechaFinSql, res);
+      const result = await sequelize.query(sql, { type: QueryTypes.SELECT });
+      let resultadosDetalle = Array.isArray(result[0]) ? result[0] : result;
+      if (!Array.isArray(resultadosDetalle)) resultadosDetalle = [];
+      const datos = resultadosDetalle.length ? procesarContrareferencia(resultadosDetalle) : [];
+      const resumenData = procesarResumenPorServicio(datos);
+
+      return await generarExcelContrareferenciaConFormato(datos, resumenData, fechaIni, fechaTermino, res);
     } catch (error: any) {
-      console.error('[ObtenerListadoContrareferencia] Error:', error?.parent ?? error);
+      console.error('[ObtenerListadoContrareferenciaPlano] Error:', error?.parent ?? error);
       return res.status(500).json({ mensaje: 'No se pudo generar el Excel', detalle: error.message });
     }
   }

@@ -1,4 +1,11 @@
-import { InformeUrgenciaFila, UrgenciaCategorizacion, UrgenciaDoceHoraFila, UrgenciaHospPabllFila, UrgenciaIrasFila } from '../interfaces';
+import {
+  InformeUrgenciaFila,
+  UrgenciaCategorizacion,
+  UrgenciaDoceHoraFila,
+  UrgenciaHospPabllFila,
+  UrgenciaIrasFila,
+  contrareferenciaFilas,
+} from '../interfaces';
 
 export function anchoCabecera(informe: string) {
   switch (informe) {
@@ -122,18 +129,18 @@ export function procesarIras(dau: UrgenciaIrasFila[]) {
   }));
 }
 
-export function procesarContrareferencia(contrareferencia: any[]) {
+export function procesarContrareferencia(contrareferencia: contrareferenciaFilas[]) {
   return contrareferencia.map((h: any) => ({
-    Especialidad: h.Especialidad ?? '',
-    Nombre: h.Nombre ?? '',
-    Rut: h.Rut ?? '',
-    Procedencia: h.Procedencia ?? '',
-    Medico: h.Medico ?? '',
-    FechaCitacion: h.FechaCitacion ?? '',
-    FechaAlta: h.FechaAlta ?? '',
-    Diagnostico: h.Diagnostico ?? '',
-    TipoContrareferencia: h.TipoContrareferencia ?? '',
-    Fecha: h.Fecha ?? '',
+    Especialidad: h.Especialidad ?? h.especialidad ?? h.ESPECIALIDAD ?? h.SER_SER_Descripcio ?? 'SIN ESPECIALIDAD',
+    Nombre: h.Nombre ?? h.nombre ?? h.NOMBRE ?? '',
+    Rut: h.Rut ?? h.rut ?? h.RUT ?? h.PAC_PAC_Rut ?? 'SIN RUT',
+    Procedencia: h.Procedencia ?? h.procedencia ?? h.PROCEDENCIA ?? '',
+    Medico: h.Médico ?? h.Medico ?? h.medico ?? h.MEDICO ?? '',
+    Fecha_Citacion: h.Fecha_Citacion ?? h.fecha_citacion ?? h.FechaCitacion ?? h.FECHA_CITACION ?? '',
+    Fecha_Alta: h.Fecha_Alta ?? h.fecha_alta ?? h.FechaAlta ?? h.FECHA_ALTA ?? '',
+    Diagnostico: h.Diagnostico ?? h.diagnostico ?? h.DIAGNOSTICO ?? '',
+    Tipo_de_Contrareferencia:
+      h.Tipo_de_Contrareferencia ?? h.ContraReferencia ?? h.tipo_de_contrareferencia ?? h.TipoContrareferencia ?? h.TIPO_DE_CONTRAREFERENCIA ?? 'SIN TIPO',
   }));
 }
 
