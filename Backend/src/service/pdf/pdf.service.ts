@@ -215,6 +215,7 @@ export class ServicioPdf {
       emularMedio: 'print',
       baseURL,                 // lo mantenemos por si hay otros recursos relativos
       logsDetallados: false,   // pon true si quieres ver el listado de <img>
+      tiempoEsperaMs: 600000, // 10 minutos
       opcionesPdf: {
         format: 'Legal',
         landscape: true,

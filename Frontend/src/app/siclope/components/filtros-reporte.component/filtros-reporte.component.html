@@ -1,5 +1,5 @@
 <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200/50 p-3 sm:p-4 lg:p-6 backdrop-blur-sm">
-  <!-- Header de la Sección -->
+  <!-- Header -->
   <div class="mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-gray-100">
     <div class="flex flex-col sm:flex-row items-start justify-between gap-4">
       <div class="flex-1">
@@ -7,28 +7,42 @@
           <ng-content select="[titulo]"></ng-content>
         </h2>
         <p class="text-xs sm:text-sm text-gray-600 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <span>Configura los parámetros para generar tu reporte personalizado</span>
         </p>
       </div>
-      <div class="px-3 sm:px-4 py-1.5 sm:py-2 bg-teal-50 text-teal-700 rounded-lg text-xs sm:text-sm font-semibold border border-teal-200 flex-shrink-0">
+      <div class="px-3 sm:px-4 py-1.5 sm:py-2 bg-teal-50 text-teal-700 rounded-lg text-xs sm:text-sm font-semibold border border-teal-200 shrink-0">
         {{ categoria() }}
       </div>
     </div>
   </div>
 
-  <!-- Formulario de Filtros -->
+  <!-- Filtros -->
   <div class="mb-4 sm:mb-5">
     <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
-      <svg class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
       </svg>
       <span>Filtros de Búsqueda</span>
     </h3>
 
-    <!-- Selector de Rango de Fechas o Mes -->
+        <!-- Especialidad con SelectorBuscador (igual que PPV) -->
+    @if (mostrarSelectorEspecialidad()) {
+      <div class="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
+        <app-selector-buscador
+          [opciones]="especialidadesOpciones()"
+          [valorSeleccionado]="idEspecialidadSeleccionada"
+          [label]="'Especialidad'"
+          [placeholder]="'Todas las Especialidades'"
+          [deshabilitado]="cargando() || especialidades().length === 0"
+          (cambioSeleccion)="alCambiarEspecialidad($event)"
+        />
+      </div>
+    }
+
+    <!-- Fechas o Mes -->
     <div class="mb-3 sm:mb-4">
       @if (usarSelectorMes()) {
         <app-selector-mes (cambioMes)="alCambiarMes($event)" />
@@ -36,6 +50,8 @@
         <app-selector-rango-fechas (cambioFecha)="alCambiarFecha($event)" />
       }
     </div>
+
+
   </div>
 
   <!-- Acciones -->
@@ -43,7 +59,7 @@
     <button
       (click)="alDescargar()"
       [disabled]="cargando()"
-      class="flex-1 px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg sm:rounded-xl font-semibold hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
+      class="flex-1 px-6 sm:px-8 py-3 sm:py-3.5 bg-linear-to-r from-teal-600 to-cyan-600 text-white rounded-lg sm:rounded-xl font-semibold hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
     >
       @if (cargando()) {
         <svg class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,7 +77,7 @@
     <button
       (click)="alLimpiar()"
       [disabled]="cargando()"
-      class="flex-shrink-0 px-6 sm:px-8 py-3 sm:py-3.5 bg-gray-100 text-gray-700 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+      class="shrink-0 px-6 sm:px-8 py-3 sm:py-3.5 bg-gray-100 text-gray-700 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
     >
       <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>

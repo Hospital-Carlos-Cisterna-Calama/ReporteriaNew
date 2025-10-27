@@ -12,7 +12,7 @@
   />
 
   <!-- Contenido Principal -->
-  <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100">
+  <main class="flex-1 overflow-y-auto bg-linear-to-br from-gray-50 to-gray-100">
     <div class="p-4 sm:p-6 lg:p-8">
       <!-- Banner de Instrucciones -->
       <app-banner-instrucciones
@@ -27,11 +27,13 @@
       @if (reporteSeleccionado()) {
         <!-- Área de Contenido -->
         <div class="animate-fade-in">
-          <!-- Filtros con componente reutilizable -->
+          <!-- Filtros -->
           <app-filtros-siclope-reporte
             [categoria]="'SICLOPE'"
             [usarSelectorMes]="false"
             [cargando]="cargandoReporte()"
+            [mostrarSelectorEspecialidad]="mostrarSelectorEspecialidad"
+            [especialidades]="especialidadesParaFiltros()"
             (descargar)="descargarReporte($event)"
             (limpiar)="limpiarFiltros()"
           >
@@ -45,9 +47,16 @@
           [titulo]="'Bienvenido a Reportes de SICLOPE'"
           [descripcion]="'Elige un módulo del menú lateral para comenzar a generar tus informes'"
           [estadisticas]="estadisticas()"
-        >
-        </app-estado-vacio>
+        />
       }
     </div>
   </main>
 </div>
+
+
+<!-- Modal de Resultado -->
+<app-modal-resultado
+  [visible]="mostrarModal()"
+  [config]="configuracionModal()"
+  (cerrar)="mostrarModal.set(false)"
+/>

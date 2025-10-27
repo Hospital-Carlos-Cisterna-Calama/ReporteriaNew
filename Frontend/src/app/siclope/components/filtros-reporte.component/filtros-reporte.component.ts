@@ -1,19 +1,37 @@
-import { Component, input, output, viewChild } from '@angular/core';
+import { Component, input, output, viewChild, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SelectorRangoFechasComponent, SelectorMesComponent } from '@shared/components/ui';
+import {
+  SelectorRangoFechasComponent,
+  SelectorMesComponent,
+  SelectorBuscadorComponent,
+  type OpcionSelector,
+} from '@shared/components/ui';
 import type { RangoFechas, SeleccionMes } from '@shared/components/ui';
-import type { FiltrosSiclopeReporte } from '../../interfaces/filtro.interface';
+
+export interface EspecialidadOption { id: number | string; nombre: string; }
+
+export interface FiltrosSiclopeReporte {
+  fechaInicio?: Date;
+  fechaFin?: Date;
+  mes?: number;
+  anio?: number;
+  idEspecialidad?: number | string;
+}
 
 @Component({
   selector: 'app-filtros-siclope-reporte',
   standalone: true,
-  imports: [FormsModule, SelectorRangoFechasComponent, SelectorMesComponent],
+  imports: [FormsModule, SelectorRangoFechasComponent, SelectorMesComponent, SelectorBuscadorComponent],
   templateUrl: './filtros-reporte.component.html',
 })
 export class FiltrosSiclopeReporteComponent {
   readonly categoria = input('SICLOPE');
   readonly usarSelectorMes = input(false);
   readonly cargando = input(false);
+
+  // Especialidad (solo Diagnóstico)
+  readonly mostrarSelectorEspecialidad = input(false);
+  readonly especialidades = input<EspecialidadOption[]>([]);
 
   readonly descargar = output<FiltrosSiclopeReporte>();
   readonly limpiar = output<void>();
@@ -26,6 +44,13 @@ export class FiltrosSiclopeReporteComponent {
   mes: number | null = null;
   anio: number | null = null;
 
+  idEspecialidadSeleccionada: number | string | null = null;
+
+  // Mapea a las opciones que espera el SelectorBuscador
+  readonly especialidadesOpciones = computed<OpcionSelector[]>(() =>
+    (this.especialidades() ?? []).map(esp => ({ id: esp.id, nombre: esp.nombre }))
+  );
+
   alCambiarFecha(rango: RangoFechas): void {
     this.fechaInicio = rango.fechaInicio;
     this.fechaFin = rango.fechaFin;
@@ -34,6 +59,11 @@ export class FiltrosSiclopeReporteComponent {
   alCambiarMes(seleccion: SeleccionMes): void {
     this.mes = seleccion.mes;
     this.anio = seleccion.anio;
+  }
+
+  // Evento del SelectorBuscador
+  alCambiarEspecialidad(valor: string | number | null): void {
+    this.idEspecialidadSeleccionada = (valor ?? null);
   }
 
   alDescargar(): void {
@@ -47,6 +77,10 @@ export class FiltrosSiclopeReporteComponent {
       filtros.fechaFin = this.fechaFin ?? undefined;
     }
 
+    if (this.mostrarSelectorEspecialidad() && this.idEspecialidadSeleccionada != null) {
+      filtros.idEspecialidad = this.idEspecialidadSeleccionada;
+    }
+
     this.descargar.emit(filtros);
   }
 
@@ -55,6 +89,7 @@ export class FiltrosSiclopeReporteComponent {
     this.fechaFin = null;
     this.mes = null;
     this.anio = null;
+    this.idEspecialidadSeleccionada = null;
 
     this.selectorFechas()?.limpiar();
     this.selectorMes()?.limpiar();

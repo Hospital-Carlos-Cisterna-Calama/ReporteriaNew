@@ -1,6 +1,7 @@
 export interface AccessData {
   has_access: boolean;
   username: string;
+  rut?: string;
   rol: string;
   profesion: string;
   servicio: string;

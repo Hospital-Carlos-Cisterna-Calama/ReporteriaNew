@@ -8,7 +8,7 @@
 
 <!-- Sidebar -->
 <aside
-  class="fixed top-0 left-0 z-50 h-screen bg-gradient-to-b from-teal-600 via-teal-700 to-teal-800 text-white shadow-2xl transition-all duration-300 ease-out flex flex-col
+  class="fixed top-0 left-0 z-50 h-screen bg-linear-to-b from-teal-600 via-teal-700 to-teal-800 text-white shadow-2xl transition-all duration-300 ease-out flex flex-col
          w-80 max-w-[85vw] lg:relative lg:z-auto lg:shadow-xl"
   [class.-translate-x-full]="!isOpen()"
   [class.lg:translate-x-0]="true"
@@ -16,7 +16,7 @@
   [class.lg:w-20]="!isOpen()"
 >
   <!-- Header con degradado -->
-  <div class="relative p-4 lg:p-3 border-b border-white/10 bg-gradient-to-r from-white/5 to-transparent backdrop-blur-sm flex-shrink-0">
+  <div class="relative p-4 lg:p-3 border-b border-white/10 bg-linear-to-r from-white/5 to-transparent backdrop-blur-sm shrink-0">
     <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
 
     <div class="flex items-center justify-between relative z-10">
@@ -36,7 +36,7 @@
 
       <button
         (click)="onToggle()"
-        class="hidden lg:flex items-center justify-center p-2 hover:bg-white/15 active:bg-white/20 rounded-lg transition-all duration-200 flex-shrink-0 group"
+        class="hidden lg:flex items-center justify-center p-2 hover:bg-white/15 active:bg-white/20 rounded-lg transition-all duration-200 shrink-0 group"
         [class.lg:ml-3]="isOpen()"
         [class.lg:mx-auto]="!isOpen()"
         [attr.aria-label]="isOpen() ? 'Comprimir menú' : 'Expandir menú'"
@@ -73,12 +73,12 @@
             ></div>
 
             <!-- Brillo hover -->
-            <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-full group-hover:translate-x-full" style="transition: transform 0.6s ease-out, opacity 0.3s;"></div>
+            <div class="absolute inset-0 bg-linear-to-r from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-full group-hover:translate-x-full" style="transition: transform 0.6s ease-out, opacity 0.3s;"></div>
 
             <div class="flex items-center gap-3 relative z-10 transition-all duration-300" [class.lg:justify-center]="!isOpen()" [class.lg:gap-0]="!isOpen()">
               <!-- Icono con animación -->
               <div
-                class="flex-shrink-0 p-2 rounded-lg transition-all duration-300 transform group-hover:scale-110"
+                class="shrink-0 p-2 rounded-lg transition-all duration-300 transform group-hover:scale-110"
                 [class.bg-white/30]="selectedItemId() === item.title"
                 [class.shadow-md]="selectedItemId() === item.title"
                 [class.bg-white/10]="selectedItemId() !== item.title"
@@ -111,7 +111,7 @@
 
               <!-- Badge de selección -->
               @if (selectedItemId() === item.title && isOpen()) {
-                <div class="flex-shrink-0 w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                <div class="shrink-0 w-2 h-2 rounded-full bg-white animate-pulse"></div>
               }
             </div>
           </button>
@@ -121,7 +121,7 @@
   </nav>
 
   <!-- Footer con estadísticas (opcional) -->
-  <div class="border-t border-white/10 p-3 bg-gradient-to-r from-white/5 to-transparent transition-all duration-300" [class.lg:p-2]="!isOpen()">
+  <div class="border-t border-white/10 p-3 bg-linear-to-r from-white/5 to-transparent transition-all duration-300" [class.lg:p-2]="!isOpen()">
     <div class="flex items-center justify-center gap-2" [class.lg:flex-col]="!isOpen()">
       <div class="text-xs text-teal-100/80 transition-all duration-300" [class.lg:hidden]="!isOpen()">
         {{ itemCount() }} reportes disponibles

@@ -194,11 +194,11 @@ export class PpvPageComponent implements OnInit {
 
     const generadores: Record<string, () => void> = {
       'Intervenciones Pabellón': () => this.generarReportePabellon(filtros),
-      Procedimientos: () => this.generarReporteProcedimientos(filtros),
+      'Procedimientos': () => this.generarReporteProcedimientos(filtros),
       'IR-GRD': () => this.generarReporteIrGrd(filtros),
       'Lista de Espera': () => this.generarReporteListaEspera(filtros),
       'Base Consultas': () => this.generarReporteBaseConsultas(filtros),
-      RPHs: () => this.generarReporteRphs(filtros),
+      'RPHs': () => this.generarReporteRphs(filtros),
       'Camas Críticas': () => this.generarReporteCamasCriticas(filtros),
     };
 
@@ -407,12 +407,6 @@ export class PpvPageComponent implements OnInit {
     const accessData = this.authService.accessData();
     const unidadUsuario = accessData?.servicio || '';
 
-    console.log('👤 Datos del usuario logueado:', {
-      username: accessData?.username,
-      rol: accessData?.rol,
-      servicio: accessData?.servicio,
-      nombre: accessData?.nombre_completo,
-    });
 
     if (!unidadUsuario) {
       console.error('❌ Error: El usuario no tiene una unidad/servicio asignado');
