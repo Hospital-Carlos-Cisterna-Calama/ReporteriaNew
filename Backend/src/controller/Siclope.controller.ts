@@ -19,4 +19,9 @@ export class SiclopeController {
       return res.status(500).json({ mensaje: 'No se pudo generar el reporte', detalle: (error as Error).message });
     }
   }
+  static async exportarDiagnosticosRealizados(req: Request, res: Response) {
+    const { fechaIni, fechaTermino, especialidad } = req.query;
+    const service = new SiclopeService();
+    return await service.ObtenerDiagnosticosRealizados(String(fechaIni), String(fechaTermino), String(especialidad), res);
+  }
 }

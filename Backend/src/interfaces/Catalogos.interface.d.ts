@@ -54,6 +54,14 @@ export interface EstadisticasEspecialidades {
   especialidadesConSubEspecialidades: number;
 }
 
+/**
+ * Interface para servicios ambulatorios
+ */
+export interface ServiciosAmbulatorios{
+  Ser_Esp_Codigo: string;
+  Ser_Esp_Descripcion: string;
+}
+
 
 /** Marca de vigencia. Ajusta según tu dato real ('S'/'N' o '1'/'0'). */
 export type VigenteFlag = 'S' | 'N' | '1' | '0';
@@ -82,4 +90,6 @@ export interface PpvServicioResponse {
   count: number;
   data: PpvServicio[];
 }
+
+
 

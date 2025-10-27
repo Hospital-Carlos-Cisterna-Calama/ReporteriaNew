@@ -138,3 +138,62 @@ export function aFechaSqlServer(fecha: string, finDelDia = false): string {
   }
   return fecha;
 }
+
+export async function generarExcelDiagnosticosRealizados(datos: any[], fechaIni: string, fechaFin: string, res: Response) {
+  const workbook = new ExcelJS.Workbook();
+  const hoja = workbook.addWorksheet('Diagnósticos Realizados');
+
+  hoja.addRow([]);
+  hoja.mergeCells('A2:M2');
+  hoja.getCell('A2').value = `Diagnósticos Realizados entre ${fechaIni} a ${fechaFin}`;
+  hoja.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
+  hoja.getCell('A2').font = { bold: true };
+
+  hoja.addRow([
+    'Médico Rut',
+    'Nombre',
+    'Policlínico',
+    'Fecha Citación',
+    'Paciente Rut',
+    'Paciente Nombre',
+    'Edad',
+    'Sexo',
+    'Nacionalidad',
+    'Comuna',
+    'Dirección',
+    'Diagnóstico',
+    'Atención Presencial',
+  ]);
+  hoja.getRow(3).eachCell(cell => {
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
+    cell.font = { bold: true };
+    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+  });
+
+  datos.forEach(d => {
+    hoja.addRow([
+      d.Medico_Rut,
+      d.Medico_Nombre,
+      d.Policlínico,
+      d.Fecha_Citacion,
+      d.Paciente_Rut,
+      d.Paciente_Nombre,
+      d.Edad,
+      d.Sexo,
+      d.Nacionalidad,
+      d.Comuna,
+      d.Direccion,
+      d.Diagnostico,
+      d.Atencion_Presencial,
+    ]);
+  });
+  hoja.autoFilter = {
+    from: 'A3',
+    to: 'M3',
+  };
+  const buffer = await workbook.xlsx.writeBuffer();
+  res.setHeader('Content-Disposition', `attachment; filename="DiagnosticosRealizados.xlsx"`);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Length', buffer.byteLength);
+  return res.send(buffer);
+}
