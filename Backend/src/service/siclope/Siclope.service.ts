@@ -69,11 +69,11 @@ export class SiclopeService {
     }
   }
 
-  async ObtenerDiagnosticosRealizados(fechaIni: string, fechaTermino: string, especialidad: string, res: Response) {
+  async ObtenerDiagnosticosRealizados(fechaIni: string, fechaTermino: string, especialidadCode: string, res: Response) {
     try {
-      const fechaInicioSql = fechaIni;
-      const fechaFinSql = fechaTermino;
-      const padreServicio = especialidad && especialidad !== '' ? especialidad : '%';
+      const fechaInicioSql = convertirFecha(fechaIni, false);
+      const fechaFinSql = convertirFecha(fechaTermino, true);
+      const padreServicio = especialidadCode && especialidadCode !== '' ? especialidadCode : '%';
       const sql = `
       exec BD_HCE..getDataForReporteDiagnostico 
       @fechaInicio='${fechaInicioSql}', 
@@ -81,10 +81,7 @@ export class SiclopeService {
       @padreServicio=N'${padreServicio}'
     `;
       const result = await sequelize.query(sql, { type: QueryTypes.SELECT });
-      if (!result || (Array.isArray(result) && result.length === 0)) {
-        return res.status(204).end();
-      }
-      const datos = procesarDiagnosticosRealizados(result);
+      const datos = result && Array.isArray(result) && result.length > 0 ? procesarDiagnosticosRealizados(result) : [];
       return await generarExcelDiagnosticosRealizados(datos, fechaIni, fechaTermino, res);
     } catch (error: any) {
       console.error('[ObtenerDiagnosticosRealizados] Error:', error?.parent ?? error);
