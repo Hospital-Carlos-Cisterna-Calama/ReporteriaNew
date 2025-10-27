@@ -62,8 +62,8 @@ export class FiltrosSiclopeReporteComponent {
   }
 
   // Evento del SelectorBuscador
-  alCambiarEspecialidad(valor: string | null): void {
-    this.idEspecialidadSeleccionada = (valor ?? null);
+  alCambiarEspecialidad(valor: string | number | null): void {
+    this.idEspecialidadSeleccionada = valor != null ? String(valor) : null;
   }
 
   alDescargar(): void {
