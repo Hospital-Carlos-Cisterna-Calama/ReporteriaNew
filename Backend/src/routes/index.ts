@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import reporteriaRouter from './Reporteria/Reporteria.routes';
+import reporteriaRouter from './reporteria/Reporteria.routes';
 import ppvRouter from './ppv/PPV.routes';
 import { validateToken } from '../middlewares/verifyToken';
 import catalogosRouter from './catalogos.routes';
