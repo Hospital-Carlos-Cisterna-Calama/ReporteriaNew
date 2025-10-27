@@ -7,10 +7,13 @@ import {
   Especialidad,
   SubEspecialidad,
   EspecialidadesResponse,
-  SubEspecialidadesResponse
+  SubEspecialidadesResponse,
+  EspecialidadAmbulatoria,
+  EspecialidadAmbulatoriaResponse
 } from '../interfaces';
 import { EspecialidadesMapper, ServiciosMapper } from '../mappers';
 import { PpvServicio, PpvServicioResponse } from '../interfaces/servicio.interface';
+import { EspecialidadesAmbuMapper } from '../mappers/especialidadAmbu.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogosService {
@@ -22,6 +25,7 @@ export class CatalogosService {
   // Cache para especialidades y servicios
   private especialidadesCache$?: Observable<Especialidad[]>;
   private serviciosCache$?: Observable<PpvServicio[]>;
+  private especialidadAmbCache$?: Observable<EspecialidadAmbulatoria[]>;
 
   // ============================================================================
   // MÉTODOS PÚBLICOS DEL SERVICIO
@@ -63,10 +67,23 @@ export class CatalogosService {
     return this.serviciosCache$;
   }
 
+  obtenerEspecialidadAmbulatoria(): Observable<EspecialidadAmbulatoria[]> {
+    if(!this.especialidadAmbCache$) {
+      this.especialidadAmbCache$ = this.http.get<EspecialidadAmbulatoriaResponse>(`${this.API_CATALOGOS}/especialidades-ambulatorias`).pipe(
+        map(resp => EspecialidadesAmbuMapper.mapRestEspecialidadesAmbulatorias(resp)),
+        tap(especialidades => this.log('Especialidades ambulatorias recibidas:', especialidades)),
+        shareReplay(1),
+        catchError(err => this.handleError(err, 'No se encontraron especialidades ambulatorias'))
+      );
+    }
+    return this.especialidadAmbCache$;
+    }
+
   /** Limpia el caché de especialidades y servicios */
   limpiarCache(): void {
     this.especialidadesCache$ = undefined;
     this.serviciosCache$ = undefined;
+    this.especialidadAmbCache$ = undefined;
     this.log('Caché de especialidades y servicios limpiado', undefined, '🧹');
   }
 

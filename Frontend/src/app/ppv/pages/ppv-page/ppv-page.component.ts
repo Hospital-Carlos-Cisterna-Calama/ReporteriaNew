@@ -30,11 +30,11 @@ import {
 } from '@shared/components/ui';
 import type { SidebarItem } from '@shared/components/sidebar/sidebar.component';
 import type { EstadisticaReporte } from '@shared/components/ui/estado-vacio/estado-vacio.component';
-import type { Especialidad, SubEspecialidad } from '../../interfaces';
-import type { PpvServicio } from '../../interfaces/servicio.interface';
+import type { Especialidad, SubEspecialidad } from '../../../shared/interfaces';
+import type { PpvServicio } from '../../../shared/interfaces/servicio.interface';
 import type { FiltrosPpvReporte } from '@app/ppv/interfaces/filtro.interface';
 import { FiltrosPpvReporteComponent } from '../../components/filtros-reporte/filtros-reporte.component';
-import { CatalogosService } from '../../services/catalogos.service';
+import { CatalogosService } from '../../../shared/services/catalogos.service';
 import { PpvService } from '../../services/ppv.service';
 import { AuthService } from '@auth/services/auth.service';
 
