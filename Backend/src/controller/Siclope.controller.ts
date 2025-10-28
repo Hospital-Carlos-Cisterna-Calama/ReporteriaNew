@@ -20,8 +20,12 @@ export class SiclopeController {
     }
   }
   static async exportarDiagnosticosRealizados(req: Request, res: Response) {
-    const { fechaIni, fechaTermino, especialidad } = req.query;
+    // Soportar alias de parámetros: fechaInicio/fechaFin y especialidadCode/especialidad
+    const { fechaIni, fechaTermino, fechaInicio, fechaFin, especialidad, especialidadCode } = req.query as any;
+    const desde = (fechaIni ?? fechaInicio) as string;
+    const hasta = (fechaTermino ?? fechaFin) as string;
+    const esp = (especialidadCode ?? especialidad ?? '') as string;
     const service = new SiclopeService();
-    return await service.ObtenerDiagnosticosRealizados(String(fechaIni), String(fechaTermino), String(especialidad), res);
+    return await service.ObtenerDiagnosticosRealizados(String(desde), String(hasta), String(esp), res);
   }
 }
