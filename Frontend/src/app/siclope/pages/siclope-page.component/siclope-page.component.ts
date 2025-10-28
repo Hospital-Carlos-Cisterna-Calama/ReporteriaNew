@@ -207,16 +207,19 @@ export class SiclopePageComponent implements OnInit {
 
   generarReporteDiagnostico(filtros: FiltrosSiclopeReporte): void {
     if(!this.validarFechas(filtros)) return;
-    console.log(filtros)
-    if(!filtros.especialidadCode) {
-      this.mostrarError('Debe seleccionar una especialidad para generar el reporte de Diagnóstico.');
-      return;
-    }
-    const query = {
+    let  query = {
       fechaInicio: this.formatearFecha(filtros.fechaInicio!),
       fechaFin: this.formatearFecha(filtros.fechaFin!),
       especialidadCode: filtros.especialidadCode || ''
+    };
+    if(!filtros.especialidadCode) {
+     query = {
+      fechaInicio: this.formatearFecha(filtros.fechaInicio!),
+      fechaFin: this.formatearFecha(filtros.fechaFin!),
+      especialidadCode: '%'
+     }
     }
+    console.log('query reporte diagnostico', query);
 
     this.ejecutarDescarga(
       this.siclopeService.generarReporteDiagnosticoSiclope(query),
